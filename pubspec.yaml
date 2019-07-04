@@ -1,0 +1,14 @@
+name: immortal
+description: Trve immutable wrapper classes for Dart collections.
+version: 1.0.0
+author: Stephanie Freitag <strange_aeon@gmx.net>
+homepage: https://github.com/strangeAeon/immortal
+
+environment:
+  sdk: ">=2.2.0 <3.0.0"
+
+dependencies:
+  optional: ^3.0.2+1
+
+dev_dependencies:
+  test: ^1.0.0
