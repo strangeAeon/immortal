@@ -301,6 +301,12 @@ void main() {
     expect(multiSet.singleWhere((value) => value > 4), Optional.empty());
   });
 
+  test('should toggle element', () {
+    expectSet(emptySet.toggle(1), singleSet);
+    expectSet(singleSet.toggle(1), emptySet);
+    expectSet(multiSet.toggle(1), ImmortalSet({2, 3}));
+  });
+
   test('should return immortal list', () {
     expectList(emptySet.toList(), ImmortalList([]));
     expectList(singleSet.toList(), ImmortalList([1]));

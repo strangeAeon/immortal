@@ -345,6 +345,13 @@ class ImmortalSet<T> {
   Optional<T> singleWhere(bool Function(T element) predicate) =>
       Optional.ofNullable(_set.singleWhere(predicate, orElse: () => null));
 
+  /// Returns a copy of this set by toggling the presence of [element].
+  ///
+  /// If [element] is already contained, it will be removed from the resulting
+  /// copy, otherwise it is added.
+  ImmortalSet<T> toggle(T element) =>
+      contains(element) ? remove(element) : add(element);
+
   /// Returns an [ImmortalList] containing the elements of this set.
   ImmortalList<T> toList() => ImmortalList(_set.toList());
 
