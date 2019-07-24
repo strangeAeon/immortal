@@ -349,6 +349,13 @@ void main() {
     );
   });
 
+  test('should apply function to each element of the list and its index', () {
+    expectList(
+      multiList.mapIndexed((index, value) => '$index-$value'),
+      ImmortalList(['0-1', '1-2', '2-3']),
+    );
+  });
+
   test('should remove element', () {
     expectList(singleList.remove(1), emptyList);
     expectList(multiList.remove(2), ImmortalList([1, 3]));

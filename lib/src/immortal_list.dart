@@ -479,6 +479,11 @@ class ImmortalList<T> {
   /// element of this list in iteration order.
   ImmortalList<R> map<R>(R Function(T e) f) => ImmortalList(_list.map(f));
 
+  /// Returns a new list with elements that are created by calling [f] on each
+  /// element of this list and its respective index.
+  ImmortalList<R> mapIndexed<R>(R Function(int i, T e) f) =>
+      ImmortalList(_list.asMap().map((i, e) => MapEntry(i, f(i, e))).values);
+
   /// Returns a copy of this list replacing the value at the given [index] with
   /// [value].
   ///
