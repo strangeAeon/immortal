@@ -121,7 +121,7 @@ class ImmortalSet<T> {
     if (other.isEmpty) {
       return this;
     }
-    return ImmortalSet(_set.difference(other));
+    return ImmortalSet._internal(_set.difference(other));
   }
 
   /// Checks whether every element of this set satisfies the given [predicate].
@@ -219,7 +219,7 @@ class ImmortalSet<T> {
   /// It iterates over [other], which must therefore not change during the
   /// iteration.
   ImmortalSet<T> intersectionWithSet(Set<Object> other) =>
-      ImmortalSet(_set.intersection(other));
+      ImmortalSet._internal(_set.intersection(other));
 
   /// Returns `true` if there are no elements in this collection.
   bool get isEmpty => _set.isEmpty;
@@ -387,7 +387,7 @@ class ImmortalSet<T> {
     if (other.isEmpty) {
       return this;
     }
-    return ImmortalSet(_set.union(other));
+    return ImmortalSet._internal(_set.union(other));
   }
 
   /// Returns a new set with all elements of this set that satisfy the given

@@ -828,7 +828,7 @@ class ImmortalList<T> {
     if (validStart == 0 && validEnd == length) {
       return this;
     }
-    return ImmortalList(_list.sublist(validStart, validEnd));
+    return ImmortalList._internal(_list.sublist(validStart, validEnd));
   }
 
   /// Returns a copy of this list containing the [count] first elements.

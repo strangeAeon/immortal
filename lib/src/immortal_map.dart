@@ -151,7 +151,7 @@ class ImmortalMap<K, V> {
   ImmortalMap<K2, V2> map<K2, V2>(
     MapEntry<K2, V2> Function(K key, V value) f,
   ) =>
-      ImmortalMap(_map.map(f));
+      ImmortalMap._internal(_map.map(f));
 
   /// Returns an [ImmortalList] with elements that are created by calling [f]
   /// on each entry in the map.
