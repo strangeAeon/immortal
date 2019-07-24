@@ -200,6 +200,13 @@ void main() {
     );
   });
 
+  test('should create list by applying function to each entry', () {
+    expectList(
+      multiMap.mapEntries((key, value) => '$value$key'),
+      ImmortalList(['1a', '2b', '3c']),
+    );
+  });
+
   test('should apply function to each key', () {
     expectMap(
       multiMap.mapKeys((key, value) => value),

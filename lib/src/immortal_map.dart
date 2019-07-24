@@ -153,6 +153,11 @@ class ImmortalMap<K, V> {
   ) =>
       ImmortalMap(_map.map(f));
 
+  /// Returns an [ImmortalList] with elements that are created by calling [f]
+  /// on each entry in the map.
+  ImmortalList<R> mapEntries<R>(R Function(K key, V value) f) =>
+      ImmortalList(_map.entries.map((entry) => f(entry.key, entry.value)));
+
   /// Returns a new map where all keys of this map are transformed by
   /// the given [f] function in respect to their values.
   ImmortalMap<K2, V> mapKeys<K2>(K2 Function(K key, V value) f) =>
