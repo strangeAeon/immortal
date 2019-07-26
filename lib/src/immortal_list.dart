@@ -32,6 +32,12 @@ class ImmortalList<T> {
   /// See [followedBy].
   ImmortalList<T> operator +(ImmortalList<T> other) => followedBy(other);
 
+  /// Returns a copy of this list where all values in [other] are removed from
+  /// if present.
+  ///
+  /// See [removeAll].
+  ImmortalList<T> operator -(ImmortalList<T> other) => removeAll(other);
+
   /// Returns the [index]th element wrapped by an [Optional] if this element
   /// exists, otherwise returns [Optional.empty].
   ///
@@ -495,6 +501,13 @@ class ImmortalList<T> {
   ImmortalList<T> remove(Object value) =>
       ImmortalList._internal(toMutableList()..remove(value));
 
+  /// Returns a copy of this list where all values in [other] are removed from
+  /// if present.
+  ///
+  /// Unlike [remove] all occurrences of a value are removed.
+  ImmortalList<T> removeAll(ImmortalList<T> other) => ImmortalList._internal(
+      toMutableList()..removeWhere((value) => other.contains(value)));
+
   /// Returns a copy of this list removing the object at position [index] if
   /// present.
   ///
@@ -507,6 +520,16 @@ class ImmortalList<T> {
     final validIndex = max(0, min(index, length - 1));
     return ImmortalList._internal(toMutableList()..removeAt(validIndex));
   }
+
+  /// Returns a copy of this list where all values in the iterable [other] are
+  /// removed from if present.
+  ///
+  /// See [removeAll].
+  ///
+  /// It iterates over [other], which must therefore not change during the
+  /// iteration.
+  ImmortalList<T> removeIterable(Iterable<T> other) => ImmortalList._internal(
+      toMutableList()..removeWhere((value) => other.contains(value)));
 
   /// Returns a copy of this list removing the last object if there is one,
   /// otherwise the list is returned unchanged.

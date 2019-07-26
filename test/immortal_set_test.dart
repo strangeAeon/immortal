@@ -90,6 +90,9 @@ void main() {
     expectSet(emptySet.difference(singleSet), emptySet);
     expect(singleSet.difference(emptySet), singleSet);
     expectSet(multiSet.difference(ImmortalSet({1, 3, 4})), ImmortalSet({2}));
+    expectSet(emptySet - singleSet, emptySet);
+    expect(singleSet - emptySet, singleSet);
+    expectSet(multiSet - ImmortalSet({1, 3, 4}), ImmortalSet({2}));
   });
 
   test('should calculate difference with the given mortal set', () {
@@ -188,6 +191,11 @@ void main() {
     expectSet(emptySet.intersection(singleSet), emptySet);
     expectSet(
       multiSet.intersection(ImmortalSet({1, 3, 4})),
+      ImmortalSet({1, 3}),
+    );
+    expectSet(emptySet & singleSet, emptySet);
+    expectSet(
+      multiSet & ImmortalSet({1, 3, 4}),
       ImmortalSet({1, 3}),
     );
   });
@@ -338,6 +346,18 @@ void main() {
       ImmortalSet({1, 2, 3, 4}),
     );
     expect(multiSet.union(emptySet), multiSet);
+    expectSet(emptySet + singleSet, singleSet);
+    expectSet(
+      multiSet + ImmortalSet({1, 3, 4}),
+      ImmortalSet({1, 2, 3, 4}),
+    );
+    expect(multiSet + emptySet, multiSet);
+    expectSet(emptySet | singleSet, singleSet);
+    expectSet(
+      multiSet | ImmortalSet({1, 3, 4}),
+      ImmortalSet({1, 2, 3, 4}),
+    );
+    expect(multiSet | emptySet, multiSet);
   });
 
   test('should calculate union with the given mortal set', () {

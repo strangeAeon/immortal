@@ -26,6 +26,26 @@ class ImmortalSet<T> {
 
   final Set<T> _set;
 
+  /// Returns a new set which contains all the elements of this set and [other].
+  ///
+  /// See [union].
+  ImmortalSet<T> operator +(ImmortalSet<T> other) => union(other);
+
+  /// Returns a new set which contains all the elements of this set and [other].
+  ///
+  /// See [union].
+  ImmortalSet<T> operator |(ImmortalSet<T> other) => union(other);
+
+  /// Returns a new set with the elements of this set that are not in [other].
+  ///
+  /// See [difference].
+  ImmortalSet<T> operator -(ImmortalSet<Object> other) => difference(other);
+
+  /// Returns a new set which is the intersection between this set and [other].
+  ///
+  /// See [intersection].
+  ImmortalSet<T> operator &(ImmortalSet<Object> other) => intersection(other);
+
   /// Returns a copy of this set where [value] is added to.
   ///
   /// If [value] (or an equal value) was already present in the set, the set is

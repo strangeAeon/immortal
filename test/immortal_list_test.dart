@@ -362,11 +362,35 @@ void main() {
     expectList(multiList.remove(4), multiList);
   });
 
+  test('should remove all elements', () {
+    expectList(singleList.removeAll(singleList), emptyList);
+    expectList(multiList.removeAll(singleList), ImmortalList([2, 3]));
+    expectList(
+      ImmortalList([1, 2, 1, 2, 1]).removeAll(singleList),
+      ImmortalList([2, 2]),
+    );
+    expectList(singleList - singleList, emptyList);
+    expectList(multiList - singleList, ImmortalList([2, 3]));
+    expectList(
+      ImmortalList([1, 2, 1, 2, 1]) - singleList,
+      ImmortalList([2, 2]),
+    );
+  });
+
   test('should remove element at index', () {
     expectList(multiList.removeAt(-1), ImmortalList([2, 3]));
     expectList(multiList.removeAt(5), ImmortalList([1, 2]));
     expectList(singleList.removeAt(0), emptyList);
     expectList(multiList.removeAt(1), ImmortalList([1, 3]));
+  });
+
+  test('should remove all elements from iterable', () {
+    expectList(singleList.removeIterable([1]), emptyList);
+    expectList(multiList.removeIterable([1]), ImmortalList([2, 3]));
+    expectList(
+      ImmortalList([1, 2, 1, 2, 1]).removeIterable([1]),
+      ImmortalList([2, 2]),
+    );
   });
 
   test('should remove last element', () {

@@ -28,6 +28,11 @@ class ImmortalMap<K, V> {
 
   final Map<K, V> _map;
 
+  /// Returns a copy of this map where all key/value pairs of [other] are added.
+  ///
+  /// See [addAll].
+  ImmortalMap<K, V> operator +(ImmortalMap<K, V> other) => addAll(other);
+
   /// Returns an [Optional] containing the value for the given [key] or
   /// [Optional.empty] if [key] is not in the map.
   ///
@@ -190,10 +195,35 @@ class ImmortalMap<K, V> {
   ImmortalMap<K, V> remove(Object key) =>
       ImmortalMap._internal(toMutableMap()..remove(key));
 
+  /// Returns a copy of this map where all keys and their associated values
+  /// contained in [keysToRemove] are removed from.
+  ImmortalMap<K, V> removeAll(ImmortalList<K> keysToRemove) =>
+      removeWhere((key, _) => keysToRemove.contains(key));
+
+  /// Returns a copy of this map where all entries with a value contained in
+  /// [valuesToRemove] are removed from.
+  ImmortalMap<K, V> removeAllValues(ImmortalList<V> valuesToRemove) =>
+      removeWhere((_, value) => valuesToRemove.contains(value));
+
+  /// Returns a copy of this map where all keys and their associated values
+  /// contained in the iterable [keysToRemove] are removed from.
+  ///
+  /// See [removeAll].
+  ///
+  /// It iterates over [keysToRemove], which must therefore not change during
+  /// the iteration.
+  ImmortalMap<K, V> removeIterable(Iterable<K> keysToRemove) =>
+      removeWhere((key, _) => keysToRemove.contains(key));
+
   /// Returns a copy of this map where all entries are removed that contain a
   /// value equal to [valueToRemove] according to the `==` operator.
   ImmortalMap<K, V> removeValue(Object valueToRemove) =>
       removeWhere((_, value) => value == valueToRemove);
+
+  /// Returns a copy of this map where all entries with a value contained in
+  /// the iterable [valuesToRemove] are removed from.
+  ImmortalMap<K, V> removeValuesIterable(Iterable<V> valuesToRemove) =>
+      removeWhere((_, value) => valuesToRemove.contains(value));
 
   /// Returns a copy of this map where all entries that satisfy the given
   /// [predicate] are removed.
