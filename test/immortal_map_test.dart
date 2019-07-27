@@ -42,6 +42,130 @@ void main() {
     expectMap(immortalMap, multiMap);
   });
 
+  test('should create empty map', () {
+    expectMap(ImmortalMap<String, int>.empty(), emptyMap);
+  });
+
+  test('should create map from existing', () {
+    expectMap(ImmortalMap.from(emptyMap), emptyMap);
+    expectMap(ImmortalMap.from(singleMap), singleMap);
+    expectMap(ImmortalMap.from(multiMap), multiMap);
+    expectMap(ImmortalMap.of(emptyMap), emptyMap);
+    expectMap(ImmortalMap.of(singleMap), singleMap);
+    expectMap(ImmortalMap.of(multiMap), multiMap);
+  });
+
+  test('should create map from mutable', () {
+    expectMap(ImmortalMap.fromMutable({}), emptyMap);
+    expectMap(ImmortalMap.fromMutable({'a': 1}), singleMap);
+    expectMap(ImmortalMap.fromMutable({'a': 1, 'b': 2, 'c': 3}), multiMap);
+    expectMap(ImmortalMap.ofMutable({}), emptyMap);
+    expectMap(ImmortalMap.ofMutable({'a': 1}), singleMap);
+    expectMap(ImmortalMap.ofMutable({'a': 1, 'b': 2, 'c': 3}), multiMap);
+  });
+
+  test('should create map from entries', () {
+    expectMap(ImmortalMap.fromEntries(emptyMap.entries), emptyMap);
+    expectMap(ImmortalMap.fromEntries(singleMap.entries), singleMap);
+    expectMap(ImmortalMap.fromEntries(multiMap.entries), multiMap);
+  });
+
+  test('should create map from entries iterable', () {
+    expectMap(
+      ImmortalMap.fromEntriesIterable(emptyMap.entries.toMutableList()),
+      emptyMap,
+    );
+    expectMap(
+      ImmortalMap.fromEntriesIterable(singleMap.entries.toMutableList()),
+      singleMap,
+    );
+    expectMap(
+      ImmortalMap.fromEntriesIterable(multiMap.entries.toMutableList()),
+      multiMap,
+    );
+  });
+
+  test('should create map from pairs', () {
+    expectMap(ImmortalMap.fromPairs(emptyMap.pairs()), emptyMap);
+    expectMap(ImmortalMap.fromPairs(singleMap.pairs()), singleMap);
+    expectMap(ImmortalMap.fromPairs(multiMap.pairs()), multiMap);
+  });
+
+  test('should create map from pairs iterable', () {
+    expectMap(
+      ImmortalMap.fromPairsIterable(emptyMap.pairs().toMutableList()),
+      emptyMap,
+    );
+    expectMap(
+      ImmortalMap.fromPairsIterable(singleMap.pairs().toMutableList()),
+      singleMap,
+    );
+    expectMap(
+      ImmortalMap.fromPairsIterable(multiMap.pairs().toMutableList()),
+      multiMap,
+    );
+  });
+
+  test('should create map from lists of keys and values', () {
+    expectMap(
+      ImmortalMap.fromLists(
+        ImmortalList(['a', 'b', 'c']),
+        ImmortalList([1, 2, 3]),
+      ),
+      multiMap,
+    );
+    expectMap(
+      ImmortalMap.fromLists(
+        ImmortalList(['a']),
+        ImmortalList([1, 2, 3]),
+      ),
+      singleMap,
+    );
+    expectMap(
+      ImmortalMap.fromLists(
+        ImmortalList(['a', 'b', 'c']),
+        ImmortalList([1]),
+      ),
+      singleMap,
+    );
+  });
+
+  test('should create map from iterables of keys and values', () {
+    expectMap(ImmortalMap.fromIterables(['a', 'b', 'c'], [1, 2, 3]), multiMap);
+    expectMap(ImmortalMap.fromIterables(['a'], [1, 2, 3]), singleMap);
+    expectMap(ImmortalMap.fromIterables(['a', 'b', 'c'], [1]), singleMap);
+  });
+
+  test('should create map from list', () {
+    expectMap(
+      ImmortalMap.fromList(
+        ImmortalList([1, 2, 3]),
+        key: (key) => key * 2,
+        value: (value) => value * value,
+      ),
+      ImmortalMap({2: 1, 4: 4, 6: 9}),
+    );
+    expectMap(
+      ImmortalMap.fromList(ImmortalList([1, 2, 3])),
+      ImmortalMap({1: 1, 2: 2, 3: 3}),
+    );
+  });
+
+  test('should create map from iterable', () {
+    expectMap(
+      ImmortalMap.fromIterable(
+        [1, 2, 3],
+        key: (key) => key * 2,
+        value: (value) => value * value,
+      ),
+      ImmortalMap({2: 1, 4: 4, 6: 9}),
+    );
+    expectMap(
+      ImmortalMap.fromIterable([1, 2, 3]),
+      ImmortalMap({1: 1, 2: 2, 3: 3}),
+    );
+  });
+
   test('should return elements by key', () {
     expect(multiMap['a'], Optional.of(1));
     expect(multiMap['b'], Optional.of(2));
@@ -135,6 +259,22 @@ void main() {
   test('should cast the map', () {
     expectMap(
       ImmortalMap<Object, Object>({'a': 1, 'b': 2, 'c': 3}).cast<String, int>(),
+      multiMap,
+    );
+  });
+
+  test('should create map by casting existing', () {
+    expectMap(
+      ImmortalMap.castFrom(
+        ImmortalMap<Object, Object>({'a': 1, 'b': 2, 'c': 3}),
+      ),
+      multiMap,
+    );
+  });
+
+  test('should create map by casting mutable', () {
+    expectMap(
+      ImmortalMap.castFromMutable(<Object, Object>{'a': 1, 'b': 2, 'c': 3}),
       multiMap,
     );
   });

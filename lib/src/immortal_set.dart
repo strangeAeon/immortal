@@ -16,6 +16,8 @@ class ImmortalSet<T> {
   ///
   /// All the elements of [iterable] should be instances of [T].
   /// The [iterable] itself can have any type.
+  /// It iterates over [iterable], which must therefore not change during the
+  /// iteration.
   ///
   /// The set considers elements that are equal (using the `==` operator) to be
   /// indistinguishable and requires them to have a compatible `hashCode`
@@ -24,6 +26,54 @@ class ImmortalSet<T> {
   ImmortalSet([Iterable<T> iterable]) : _set = Set<T>.from(iterable ?? []);
 
   ImmortalSet._internal(this._set);
+
+  /// Creates an empty [ImmortalSet].
+  factory ImmortalSet.empty() => ImmortalSet<T>();
+
+  /// Creates an [ImmortalSet] as copy of [other].
+  ///
+  /// See [ImmortalSet.of].
+  factory ImmortalSet.from(ImmortalSet<T> other) => ImmortalSet.of(other);
+
+  /// Creates an [ImmortalSet] that contains all elements of [other].
+  ///
+  /// See [ImmortalSet.ofIterable].
+  factory ImmortalSet.fromIterable(Iterable<T> other) => ImmortalSet(other);
+
+  /// Creates an [ImmortalSet] as copy of [other].
+  ///
+  /// See [copy].
+  factory ImmortalSet.of(ImmortalSet<T> other) => other.copy();
+
+  /// Creates an [ImmortalSet] that contains all elements of [other].
+  ///
+  /// All the elements of [other] should be instances of [T].
+  /// The [other] itself can have any type.
+  /// It iterates over [other], which must therefore not change during the
+  /// iteration.
+  ///
+  /// The set considers elements that are equal (using the `==` operator) to be
+  /// indistinguishable and requires them to have a compatible `hashCode`
+  /// implementation.
+  /// It is allowed although not advised to use `null` as value.
+  factory ImmortalSet.ofIterable(Iterable<T> other) => ImmortalSet(other);
+
+  /// Returns a copy of [source] casting all elements to instances of [R].
+  ///
+  /// See [cast].
+  static ImmortalSet<R> castFrom<T, R>(ImmortalSet<T> source) =>
+      source.cast<R>();
+
+  /// Creates an [ImmortalSet] by casting all elements of [source] to instances
+  /// of [R].
+  ///
+  /// If [source] contains only instances of [R], the set will be created
+  /// correctly, otherwise an exception will be thrown.
+  ///
+  /// It iterates over [source], which must therefore not change during the
+  /// iteration.
+  static ImmortalSet<R> castFromIterable<T, R>(Iterable<T> source) =>
+      ImmortalSet(source.cast<R>());
 
   final Set<T> _set;
 

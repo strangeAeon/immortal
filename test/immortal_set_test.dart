@@ -41,6 +41,28 @@ void main() {
     expectSet(immortalSet, multiSet);
   });
 
+  test('should create empty set', () {
+    expectSet(ImmortalSet<int>.empty(), emptySet);
+  });
+
+  test('should create set from existing', () {
+    expectSet(ImmortalSet.from(emptySet), emptySet);
+    expectSet(ImmortalSet.from(singleSet), singleSet);
+    expectSet(ImmortalSet.from(multiSet), multiSet);
+    expectSet(ImmortalSet.of(emptySet), emptySet);
+    expectSet(ImmortalSet.of(singleSet), singleSet);
+    expectSet(ImmortalSet.of(multiSet), multiSet);
+  });
+
+  test('should create set from iterable', () {
+    expectSet(ImmortalSet.fromIterable([]), emptySet);
+    expectSet(ImmortalSet.fromIterable([1]), singleSet);
+    expectSet(ImmortalSet.fromIterable([1, 2, 3]), multiSet);
+    expectSet(ImmortalSet.ofIterable([]), emptySet);
+    expectSet(ImmortalSet.ofIterable([1]), singleSet);
+    expectSet(ImmortalSet.ofIterable([1, 2, 3]), multiSet);
+  });
+
   test('should add single value', () {
     expectSet(emptySet.add(1), singleSet);
     expect(singleSet.add(1), singleSet);
@@ -72,6 +94,14 @@ void main() {
 
   test('should cast the set', () {
     expectSet(ImmortalSet<Object>({1, 2, 3}).cast<int>(), multiSet);
+  });
+
+  test('should create set by casting existing', () {
+    expectSet(ImmortalSet.castFrom(ImmortalSet<Object>({1, 2, 3})), multiSet);
+  });
+
+  test('should create set by casting iterable', () {
+    expectSet(ImmortalSet.castFromIterable(<Object>[1, 2, 3]), multiSet);
   });
 
   test('should check if an element is contained', () {

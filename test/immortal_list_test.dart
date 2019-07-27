@@ -46,6 +46,40 @@ void main() {
     expectList(immortalList, multiList);
   });
 
+  test('should create empty list', () {
+    expectList(ImmortalList<int>.empty(), emptyList);
+  });
+
+  test('should create list with fill value', () {
+    expectList(ImmortalList.filled(-1, 1), emptyList);
+    expectList(ImmortalList.filled(1, 1), singleList);
+    expectList(ImmortalList.filled(3, 1), ImmortalList([1, 1, 1]));
+  });
+
+  test('should create list from existing', () {
+    expectList(ImmortalList.from(emptyList), emptyList);
+    expectList(ImmortalList.from(singleList), singleList);
+    expectList(ImmortalList.from(multiList), multiList);
+    expectList(ImmortalList.of(emptyList), emptyList);
+    expectList(ImmortalList.of(singleList), singleList);
+    expectList(ImmortalList.of(multiList), multiList);
+  });
+
+  test('should create list from iterable', () {
+    expectList(ImmortalList.fromIterable([]), emptyList);
+    expectList(ImmortalList.fromIterable([1]), singleList);
+    expectList(ImmortalList.fromIterable([1, 2, 3]), multiList);
+    expectList(ImmortalList.ofIterable([]), emptyList);
+    expectList(ImmortalList.ofIterable([1]), singleList);
+    expectList(ImmortalList.ofIterable([1, 2, 3]), multiList);
+  });
+
+  test('should generate list', () {
+    expectList(ImmortalList.generate(-1, (index) => index), emptyList);
+    expectList(ImmortalList.generate(1, (index) => index + 1), singleList);
+    expectList(ImmortalList.generate(3, (index) => index + 1), multiList);
+  });
+
   test('should return elements by index', () {
     expect(multiList[-1], Optional.empty());
     expect(multiList.elementAt(-1), Optional.empty());
@@ -92,6 +126,17 @@ void main() {
 
   test('should cast the list', () {
     expectList(ImmortalList<Object>([1, 2, 3]).cast<int>(), multiList);
+  });
+
+  test('should create list by casting existing', () {
+    expectList(
+      ImmortalList.castFrom(ImmortalList<Object>([1, 2, 3])),
+      multiList,
+    );
+  });
+
+  test('should create list by casting iterable', () {
+    expectList(ImmortalList.castFromIterable(<Object>[1, 2, 3]), multiList);
   });
 
   test('should concatenate', () {

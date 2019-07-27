@@ -27,6 +27,155 @@ class ImmortalMap<K, V> {
 
   ImmortalMap._internal(this._map);
 
+  /// Creates an empty [ImmortalMap].
+  factory ImmortalMap.empty() => ImmortalMap<K, V>();
+
+  /// Creates an [ImmortalMap] as copy of [other].
+  ///
+  /// See [ImmortalMap.of].
+  factory ImmortalMap.from(ImmortalMap<K, V> other) => ImmortalMap.of(other);
+
+  /// Creates an [ImmortalMap] instance that contains all [entries].
+  ///
+  /// The keys must all be instances of [K] and the values of [V].
+  ///
+  /// All keys are required to implement compatible `operator==` and `hashCode`.
+  /// It is allowed although not advised to use `null` as a key and/or value.
+  ///
+  /// If multiple [entries] have the same key, later occurrences overwrite the
+  /// earlier ones.
+  factory ImmortalMap.fromEntries(ImmortalList<MapEntry<K, V>> entries) =>
+      ImmortalMap.fromEntriesIterable(entries.toMutableList());
+
+  /// Creates an [ImmortalMap] instance that contains all [entries].
+  ///
+  /// See [ImmortalMap.fromEntries].
+  /// It iterates over [entries], which must therefore not change during the
+  /// iteration.
+  factory ImmortalMap.fromEntriesIterable(Iterable<MapEntry<K, V>> entries) =>
+      ImmortalMap._internal(Map.fromEntries(entries));
+
+  /// Creates an [ImmortalMap] by associating the given [keys] to [values].
+  ///
+  /// This constructor iterates over [keys] and [values] and maps each element
+  /// of [keys] to the corresponding element of [values].
+  ///
+  /// If the two lists have different lengths, the iteration will stop at the
+  /// length of the shorter one, so that there are always complete key/value
+  /// pairs.
+  ///
+  /// If [keys] contains the same object multiple times, later occurrences
+  /// overwrite the previous ones.
+  ///
+  /// All [keys] are required to implement compatible `operator==` and
+  /// `hashCode`.
+  /// It is allowed although not advised to use `null` as a key and/or value.
+  factory ImmortalMap.fromLists(ImmortalList<K> keys, ImmortalList<V> values) =>
+      ImmortalMap.fromIterables(keys.toMutableList(), values.toMutableList());
+
+  /// Creates an [ImmortalMap] by associating the given [keys] to [values].
+  ///
+  /// See [ImmortalMap.fromLists].
+  /// It iterates over [keys] and [values], which must therefore not change
+  /// during the iteration.
+  factory ImmortalMap.fromIterables(Iterable<K> keys, Iterable<V> values) =>
+      ImmortalMap._internal(Map.fromIterables(
+        keys.take(values.length),
+        values.take(keys.length),
+      ));
+
+  /// Creates an [ImmortalMap] instance that contains all [pairs] as entries.
+  ///
+  /// The keys must all be instances of [K] and the values of [V].
+  ///
+  /// All keys are required to implement compatible `operator==` and `hashCode`.
+  /// It is allowed although not advised to use `null` as a key and/or value.
+  ///
+  /// If multiple [pairs] have the same key, later occurrences overwrite the
+  /// earlier ones.
+  factory ImmortalMap.fromPairs(ImmortalList<Tuple2<K, V>> pairs) =>
+      ImmortalMap.fromPairsIterable(pairs.toMutableList());
+
+  /// Creates an [ImmortalMap] instance that contains all [pairs] as entries.
+  ///
+  /// See [ImmortalMap.fromPairs].
+  /// It iterates over [pairs], which must therefore not change during the
+  /// iteration.
+  factory ImmortalMap.fromPairsIterable(Iterable<Tuple2<K, V>> pairs) =>
+      ImmortalMap<K, V>().addPairsIterable(pairs);
+
+  /// Creates an [ImmortalMap] containing all entries of [other].
+  ///
+  /// See [ImmortalMap.ofMutable].
+  factory ImmortalMap.fromMutable(Map<K, V> other) => ImmortalMap(other);
+
+  /// Creates an [ImmortalMap] as copy of [other].
+  ///
+  /// See [copy].
+  factory ImmortalMap.of(ImmortalMap<K, V> other) => other.copy();
+
+  /// Creates an [ImmortalMap] instance that contains all key/value pairs of
+  /// [other].
+  ///
+  /// The keys must all be instances of [K] and the values of [V].
+  /// The [other] itself can have any type.
+  ///
+  /// It iterates over the entries of [other], which must therefore not change
+  /// during the iteration.
+  ///
+  /// All keys are required to implement compatible `operator==` and `hashCode`.
+  /// It is allowed although not advised to use `null` as a key and/or value.
+  factory ImmortalMap.ofMutable(Map<K, V> other) => ImmortalMap(other);
+
+  /// Returns a copy of [source] casting all keys to instances of [K2] and all
+  /// values to instances of [V2].
+  ///
+  /// See [cast].
+  static ImmortalMap<K2, V2> castFrom<K, V, K2, V2>(ImmortalMap<K, V> source) =>
+      source.cast<K2, V2>();
+
+  /// Creates an [ImmortalMap] from [source] by casting all keys to instances
+  /// of [K2] and all values to instances of [V2].
+  ///
+  /// If [source] contains only keys of type [K2] and values of type [V2], the
+  /// map will be created correctly, otherwise an exception will be thrown.
+  ///
+  /// It iterates over the entries of [source], which must therefore not change
+  /// during the iteration.
+  static ImmortalMap<K2, V2> castFromMutable<K, V, K2, V2>(Map<K, V> source) =>
+      ImmortalMap(source.cast<K2, V2>());
+
+  /// Creates an [ImmortalMap] by computing the keys and values from [list].
+  ///
+  /// For each element of [list] this constructor computes a key/value pair
+  /// by applying [key] and [value] respectively.
+  /// If no values are specified for [key] and [value] the default is the
+  /// identity function.
+  ///
+  /// The keys computed by the source [list] do not need to be unique. The last
+  /// occurrence of a key will simply overwrite any previous value.
+  ///
+  /// All keys are required to implement compatible `operator==` and `hashCode`.
+  /// It is allowed although not advised to use `null` as a key and/or value.
+  static ImmortalMap<K, V> fromList<T, K, V>(
+    ImmortalList<T> list, {
+    K Function(T element) key,
+    V Function(T element) value,
+  }) =>
+      ImmortalMap.fromIterable(list.toMutableList(), key: key, value: value);
+
+  /// Creates an [ImmortalMap] by computing the keys and values from [iterable].
+  ///
+  /// See [ImmortalMap.fromList].
+  /// It iterates over [iterable], which must therefore not change during the
+  /// iteration.
+  static ImmortalMap<K, V> fromIterable<T, K, V>(
+    Iterable<T> iterable, {
+    K Function(T element) key,
+    V Function(T element) value,
+  }) =>
+      ImmortalMap._internal(Map.fromIterable(iterable, key: key, value: value));
+
   final Map<K, V> _map;
 
   /// Returns a copy of this map where all key/value pairs of [other] are added.
@@ -183,6 +332,9 @@ class ImmortalMap<K, V> {
 
   /// Returns a new map where all entries of this map are transformed by
   /// the given [f] function.
+  ///
+  /// If multiple entries have the same key after transformation, later
+  /// occurences overwrite the earlier ones.
   ImmortalMap<K2, V2> map<K2, V2>(
     MapEntry<K2, V2> Function(K key, V value) f,
   ) =>
@@ -190,11 +342,17 @@ class ImmortalMap<K, V> {
 
   /// Returns an [ImmortalList] with elements that are created by calling [f]
   /// on each entry in the map.
+  ///
+  /// If multiple entries have the same key after transformation, later
+  /// occurences overwrite the earlier ones.
   ImmortalList<R> mapEntries<R>(R Function(K key, V value) f) =>
       ImmortalList(_map.entries.map((entry) => f(entry.key, entry.value)));
 
   /// Returns a new map where all keys of this map are transformed by
   /// the given [f] function in respect to their values.
+  ///
+  /// If multiple entries have the same key after transformation, later
+  /// occurences overwrite the earlier ones.
   ImmortalMap<K2, V> mapKeys<K2>(K2 Function(K key, V value) f) =>
       map((key, value) => MapEntry(f(key, value), value));
 
@@ -205,6 +363,9 @@ class ImmortalMap<K, V> {
 
   /// Returns an [ImmortalList] containing the entries of this map as tuples
   /// of key and value.
+  ///
+  /// If multiple pairs have the same key, later occurences overwrite the
+  /// earlier ones.
   ImmortalList<Tuple2<K, V>> pairs() =>
       mapEntries((key, value) => Tuple2(key, value));
 

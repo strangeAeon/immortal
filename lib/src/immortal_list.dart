@@ -20,11 +20,86 @@ class ImmortalList<T> {
   ///
   /// All the elements in [iterable] should be instances of [T].
   /// The [iterable] itself may have any type.
+  /// It iterates over [iterable], which must therefore not change during the
+  /// iteration.
   /// It is allowed although not advised to use `null` as value.
   ImmortalList([Iterable<T> iterable])
       : _list = List<T>.from(iterable ?? [], growable: false);
 
   ImmortalList._internal(this._list);
+
+  /// Creates an empty [ImmortalList].
+  factory ImmortalList.empty() => ImmortalList<T>();
+
+  /// Creates an [ImmortalList] of the given [length] with [fill] at each
+  /// position.
+  ///
+  /// Will return an empty list, if [length] is negative.
+  ///
+  /// It is allowed although not advised to use `null` as value.
+  ///
+  /// You can use [ImmortalList.generate] to create a list with a new object at
+  /// each position.
+  factory ImmortalList.filled(int length, T fill) => ImmortalList._internal(
+        List.filled(max(length, 0), fill, growable: false),
+      );
+
+  /// Creates an [ImmortalList] as copy of [other].
+  ///
+  /// See [ImmortalList.of].
+  factory ImmortalList.from(ImmortalList<T> other) => ImmortalList.of(other);
+
+  /// Creates an [ImmortalList] that contains all elements of [other].
+  ///
+  /// See [ImmortalList.ofIterable].
+  factory ImmortalList.fromIterable(Iterable<T> other) => ImmortalList(other);
+
+  /// Generates an [ImmortalList] of values.
+  ///
+  /// Creates a list with [length] positions and fills it with values created by
+  /// calling [generator] for each index in the range `0` .. `length - 1` in
+  /// increasing order.
+  ///
+  /// Will return an empty list, if [length] is negative.
+  ///
+  /// It is allowed although not advised to use `null` as value.
+  factory ImmortalList.generate(int length, T Function(int index) generator) =>
+      ImmortalList._internal(
+        List.generate(max(length, 0), generator, growable: false),
+      );
+
+  /// Creates an [ImmortalList] as copy of [other].
+  ///
+  /// See [copy].
+  factory ImmortalList.of(ImmortalList<T> other) => other.copy();
+
+  /// Creates an [ImmortalList] that contains all elements of [other].
+  ///
+  /// The [Iterator] of [other] provides the order of the elements.
+  ///
+  /// All the elements in [other] should be instances of [T].
+  /// The [other] itself may have any type.
+  /// It iterates over [other], which must therefore not change during the
+  /// iteration.
+  /// It is allowed although not advised to use `null` as value.
+  factory ImmortalList.ofIterable(Iterable<T> other) => ImmortalList(other);
+
+  /// Returns a copy of [source] casting all elements to instances of [R].
+  ///
+  /// See [cast].
+  static ImmortalList<R> castFrom<T, R>(ImmortalList<T> source) =>
+      source.cast<R>();
+
+  /// Creates an [ImmortalList] by casting all elements of [source] to instances
+  /// of [R].
+  ///
+  /// If [source] contains only instances of [R], the list will be created
+  /// correctly, otherwise an exception will be thrown.
+  ///
+  /// It iterates over [source], which must therefore not change during the
+  /// iteration.
+  static ImmortalList<R> castFromIterable<T, R>(Iterable<T> source) =>
+      ImmortalList(source.cast<R>());
 
   final List<T> _list;
 
@@ -926,9 +1001,9 @@ class ImmortalList<T> {
   ///
   /// The element at index `i` of the resulting list will consist of the
   /// elements at index `i` from this list and [other].
-  /// If this list and [other] have different lengths, the resulting list will
-  /// be of the same length as the shorter one, so that there are always two
-  /// values for building the tuples.
+  /// If this list and [other] have different lengths, the iteration will stop
+  /// at the length of the shorter one, so that there are always two values for
+  /// building the tuples.
   ImmortalList<Tuple2<T, R>> zip<R>(ImmortalList<R> other) =>
       take(other.length).mapIndexed((index, value) => Tuple2<T, R>(
             elementAt(index).value,
