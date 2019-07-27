@@ -4,6 +4,7 @@ import 'package:optional/optional.dart';
 import 'package:test/test.dart';
 
 import 'package:immortal/immortal.dart';
+import 'package:tuple/tuple.dart';
 
 void main() {
   final emptyList = ImmortalList<int>();
@@ -21,6 +22,14 @@ void main() {
 
   void expectMap<K, V>(ImmortalMap<K, V> actual, ImmortalMap<K, V> expected) {
     expect(actual.toMutableMap(), expected.toMutableMap());
+  }
+
+  void expectListTuple<T1, T2>(
+    Tuple2<ImmortalList<T1>, ImmortalList<T2>> actual,
+    Tuple2<ImmortalList<T1>, ImmortalList<T2>> expected,
+  ) {
+    expectList(actual.item1, expected.item1);
+    expectList(actual.item2, expected.item2);
   }
 
   tearDown(() {
@@ -356,6 +365,17 @@ void main() {
     );
   });
 
+  test('should partition list', () {
+    expectListTuple(
+      singleList.partition((value) => value > 0),
+      Tuple2(singleList, emptyList),
+    );
+    expectListTuple(
+      multiList.partition((value) => value > 1),
+      Tuple2(ImmortalList([2, 3]), singleList),
+    );
+  });
+
   test('should remove element', () {
     expectList(singleList.remove(1), emptyList);
     expectList(multiList.remove(2), ImmortalList([1, 3]));
@@ -587,5 +607,26 @@ void main() {
     expect(emptyList.toString(), 'Immortal[]');
     expect(singleList.toString(), 'Immortal[1]');
     expect(multiList.toString(), 'Immortal[1, 2, 3]');
+  });
+
+  test('should zip lists', () {
+    expectList(singleList.zip(emptyList), emptyList);
+    expectList(
+      singleList.zip(multiList.reversed),
+      ImmortalList([Tuple2(1, 3)]),
+    );
+    expectList(
+      multiList.zip(multiList.reversed),
+      ImmortalList([Tuple2(1, 3), Tuple2(2, 2), Tuple2(3, 1)]),
+    );
+  });
+
+  test('should zip list iterable', () {
+    expectList(singleList.zipIterable([]), emptyList);
+    expectList(singleList.zipIterable([3, 2, 1]), ImmortalList([Tuple2(1, 3)]));
+    expectList(
+      multiList.zipIterable([3, 2, 1]),
+      ImmortalList([Tuple2(1, 3), Tuple2(2, 2), Tuple2(3, 1)]),
+    );
   });
 }

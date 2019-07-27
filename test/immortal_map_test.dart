@@ -2,6 +2,7 @@ import 'package:optional/optional_internal.dart';
 import 'package:test/test.dart';
 
 import 'package:immortal/immortal.dart';
+import 'package:tuple/tuple.dart';
 
 void main() {
   final emptyMap = ImmortalMap<String, int>();
@@ -55,18 +56,22 @@ void main() {
   test('should add entry', () {
     expectMap(emptyMap.add('a', 1), singleMap);
     expectMap(emptyMap.addEntry(MapEntry('a', 1)), singleMap);
+    expectMap(emptyMap.addPair(Tuple2('a', 1)), singleMap);
     final twoEntryMap = ImmortalMap({'a': 1, 'c': 3});
     expectMap(twoEntryMap.add('b', 2), multiMap);
     expectMap(twoEntryMap.addEntry(MapEntry('b', 2)), multiMap);
+    expectMap(twoEntryMap.addPair(Tuple2('b', 2)), multiMap);
   });
 
   test('should replace entry', () {
     final otherSingleMap = ImmortalMap({'a': 2});
     expectMap(otherSingleMap.add('a', 1), singleMap);
     expectMap(otherSingleMap.addEntry(MapEntry('a', 1)), singleMap);
+    expectMap(otherSingleMap.addPair(Tuple2('a', 1)), singleMap);
     final otherMultiMap = ImmortalMap({'a': 1, 'b': 4, 'c': 3});
     expectMap(otherMultiMap.add('b', 2), multiMap);
     expectMap(otherMultiMap.addEntry(MapEntry('b', 2)), multiMap);
+    expectMap(otherMultiMap.addPair(Tuple2('b', 2)), multiMap);
   });
 
   test('should combine two immortal maps', () {
@@ -107,6 +112,24 @@ void main() {
     expectMap(emptyMap.addMap(multiMap.toMutableMap()), multiMap);
     expectMap(singleMap.addMap(multiMap.toMutableMap()), multiMap);
     expect(multiMap.addMap({}), multiMap);
+  });
+
+  test('should add pairs', () {
+    expectMap(emptyMap.addPairs(multiMap.pairs()), multiMap);
+    expectMap(singleMap.addPairs(multiMap.pairs()), multiMap);
+    expect(multiMap.addPairs(ImmortalList()), multiMap);
+  });
+
+  test('should add iterable of pairs', () {
+    expectMap(
+      emptyMap.addPairsIterable(multiMap.pairs().toMutableList()),
+      multiMap,
+    );
+    expectMap(
+      singleMap.addPairsIterable(multiMap.pairs().toMutableList()),
+      multiMap,
+    );
+    expect(multiMap.addPairsIterable([]), multiMap);
   });
 
   test('should cast the map', () {
@@ -222,6 +245,25 @@ void main() {
     expectMap(
       multiMap.mapValues((key, value) => value * 2),
       ImmortalMap({'a': 2, 'b': 4, 'c': 6}),
+    );
+  });
+
+  test('should return immortal list of pairs', () {
+    expectList(
+      emptyMap.pairs(),
+      ImmortalList<Tuple2<String, int>>(),
+    );
+    expectList(
+      singleMap.pairs(),
+      ImmortalList([Tuple2('a', 1)]),
+    );
+    expectList(
+      multiMap.pairs(),
+      ImmortalList([
+        Tuple2('a', 1),
+        Tuple2('b', 2),
+        Tuple2('c', 3),
+      ]),
     );
   });
 

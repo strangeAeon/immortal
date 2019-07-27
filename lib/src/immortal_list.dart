@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:optional/optional.dart';
+import 'package:tuple/tuple.dart';
 
 import '../immortal.dart';
 
@@ -490,6 +491,17 @@ class ImmortalList<T> {
   ImmortalList<R> mapIndexed<R>(R Function(int i, T e) f) =>
       ImmortalList(_list.asMap().map((i, e) => MapEntry(i, f(i, e))).values);
 
+  /// Returns a tuple of two new lists by splitting the list into two depending
+  /// on the result of the given [predicate].
+  ///
+  /// The first list will contain all elements that satisfy [predicate] and the
+  /// remaining elements will produce the second list. The iteration order is
+  /// preserved in both lists.
+  Tuple2<ImmortalList<T>, ImmortalList<T>> partition(
+    bool Function(T element) predicate,
+  ) =>
+      Tuple2(where(predicate), removeWhere(predicate));
+
   /// Returns a copy of this list replacing the value at the given [index] with
   /// [value].
   ///
@@ -528,8 +540,8 @@ class ImmortalList<T> {
   ///
   /// It iterates over [other], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> removeIterable(Iterable<T> other) => ImmortalList._internal(
-      toMutableList()..removeWhere((value) => other.contains(value)));
+  ImmortalList<T> removeIterable(Iterable<T> other) =>
+      removeAll(ImmortalList._internal(other));
 
   /// Returns a copy of this list removing the last object if there is one,
   /// otherwise the list is returned unchanged.
@@ -908,4 +920,25 @@ class ImmortalList<T> {
   /// The matching elements have the same order in the returned list
   /// as they have in [iterator].
   ImmortalList<R> whereType<R>() => ImmortalList(_list.whereType<R>());
+
+  /// Returns a new list consisting of tuples with elements from this list and
+  /// [other].
+  ///
+  /// The element at index `i` of the resulting list will consist of the
+  /// elements at index `i` from this list and [other].
+  /// If this list and [other] have different lengths, the resulting list will
+  /// be of the same length as the shorter one, so that there are always two
+  /// values for building the tuples.
+  ImmortalList<Tuple2<T, R>> zip<R>(ImmortalList<R> other) =>
+      take(other.length).mapIndexed((index, value) => Tuple2<T, R>(
+            elementAt(index).value,
+            other.elementAt(index).value,
+          ));
+
+  /// Returns a new list consisting of tuples with elements from this list and
+  /// the iterable [other].
+  ///
+  /// See [zip].
+  ImmortalList<Tuple2<T, R>> zipIterable<R>(Iterable<R> other) =>
+      zip(ImmortalList._internal(other));
 }

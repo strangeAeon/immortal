@@ -1,4 +1,5 @@
 import 'package:optional/optional.dart';
+import 'package:tuple/tuple.dart';
 
 import '../immortal.dart';
 
@@ -102,6 +103,35 @@ class ImmortalMap<K, V> {
     return ImmortalMap._internal(toMutableMap()..addAll(other));
   }
 
+  /// Returns a copy of this map where the elements of [pair] are added as a
+  /// new map entry.
+  ///
+  /// The first element will be used as key and the second one as value.
+  /// If the key is already present in the copy, the corresponding value is
+  /// overwritten.
+  ImmortalMap<K, V> addPair(Tuple2<K, V> pair) =>
+      addEntry(MapEntry(pair.item1, pair.item2));
+
+  /// Returns a copy of this map where all elements of [pairs] are added as new
+  /// map entries.
+  ///
+  /// THe first element of each pair is used as key and the second one as value.
+  /// If a key is already present in the copy, the corresponding value is
+  /// overwritten.
+  ///
+  /// If [pairs] is empty, the map is returned unchanged.
+  ImmortalMap<K, V> addPairs(ImmortalList<Tuple2<K, V>> pairs) =>
+      addPairsIterable(pairs.toMutableList());
+
+  /// Returns a copy of this map where all elements of [pairs] are added as new
+  /// map entries.
+  ///
+  /// See [addPairs].
+  /// It iterates over [pairs], which must therefore not change during the
+  /// iteration.
+  ImmortalMap<K, V> addPairsIterable(Iterable<Tuple2<K, V>> pairs) =>
+      addEntriesIterable(pairs.map((pair) => MapEntry(pair.item1, pair.item2)));
+
   /// Returns a copy of this map casting all keys to instances of [K2] and all
   /// values to instances of [V2].
   ///
@@ -172,6 +202,11 @@ class ImmortalMap<K, V> {
   /// the given [f] function in respect of their keys.
   ImmortalMap<K, V2> mapValues<V2>(V2 Function(K key, V value) f) =>
       map((key, value) => MapEntry(key, f(key, value)));
+
+  /// Returns an [ImmortalList] containing the entries of this map as tuples
+  /// of key and value.
+  ImmortalList<Tuple2<K, V>> pairs() =>
+      mapEntries((key, value) => Tuple2(key, value));
 
   /// Returns a copy of this map setting the value of [key] if it isn't there.
   ///

@@ -1,4 +1,5 @@
 import 'package:optional/optional.dart';
+import 'package:tuple/tuple.dart';
 
 import '../immortal.dart';
 
@@ -276,6 +277,16 @@ class ImmortalSet<T> {
   /// Returns a new set with elements that are created by calling [f] on each
   /// element of this set.
   ImmortalSet<R> map<R>(R Function(T e) f) => ImmortalSet(_set.map(f));
+
+  /// Returns a tuple of two new sets by splitting the set into two depending
+  /// on the result of the given [predicate].
+  ///
+  /// The first set will contain all elements that satisfy [predicate] and the
+  /// remaining elements will produce the second set.
+  Tuple2<ImmortalSet<T>, ImmortalSet<T>> partition(
+    bool Function(T element) predicate,
+  ) =>
+      Tuple2(where(predicate), removeWhere(predicate));
 
   /// Returns a copy of this set where [value] is removed from if present,
   /// otherwise the set is returned unchanged.

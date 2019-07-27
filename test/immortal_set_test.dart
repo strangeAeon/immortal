@@ -4,6 +4,7 @@ import 'package:optional/optional.dart';
 import 'package:test/test.dart';
 
 import 'package:immortal/immortal.dart';
+import 'package:tuple/tuple.dart';
 
 void main() {
   final emptySet = ImmortalSet<int>();
@@ -16,6 +17,14 @@ void main() {
 
   void expectList<T>(ImmortalList<T> actual, ImmortalList<T> expected) {
     expect(actual.toMutableList(), expected.toMutableList());
+  }
+
+  void expectSetTuple<T1, T2>(
+    Tuple2<ImmortalSet<T1>, ImmortalSet<T2>> actual,
+    Tuple2<ImmortalSet<T1>, ImmortalSet<T2>> expected,
+  ) {
+    expectSet(actual.item1, expected.item1);
+    expectSet(actual.item2, expected.item2);
   }
 
   tearDown(() {
@@ -248,6 +257,17 @@ void main() {
     expectSet(
       multiSet.map((value) => value.toString()),
       ImmortalSet({'1', '2', '3'}),
+    );
+  });
+
+  test('should partition set', () {
+    expectSetTuple(
+      singleSet.partition((value) => value > 0),
+      Tuple2(singleSet, emptySet),
+    );
+    expectSetTuple(
+      multiSet.partition((value) => value > 1),
+      Tuple2(ImmortalSet({2, 3}), singleSet),
     );
   });
 
