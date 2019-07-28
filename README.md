@@ -24,6 +24,7 @@ The key objectives for this library are the following:
 - Provide more common names in addition to the Dart method names, like `flatMap` for `expand` (this is something that might be extended in future updates as well)
 - Addition of useful methods missing in `dart:core`, e.g. `mapKeys` and `mapValues` on `ImmortalMap` (this is again something that might be extended in future library updates).
 - Encourage further usage of immutable collections by prefering `Immortal` parameters.
+- Encourage comparison by identity only by not overriding the `==` operator. To compare collections by their content `equals` methods are provided.
 - Designed to write elegant code - not neccessarily the most performant. But immutability usually comes with a price anyways 🤷 (this might still be improved in future versions of this library)
 
 ## Motivation
