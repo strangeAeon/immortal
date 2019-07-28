@@ -12,11 +12,11 @@ void main() {
   final multiSet = ImmortalSet({1, 2, 3});
 
   void expectSet<T>(ImmortalSet<T> actual, ImmortalSet<T> expected) {
-    expect(actual.toMutableSet(), expected.toMutableSet());
+    expect(actual.equals(expected), true);
   }
 
   void expectList<T>(ImmortalList<T> actual, ImmortalList<T> expected) {
-    expect(actual.toMutableList(), expected.toMutableList());
+    expect(actual.equals(expected), true);
   }
 
   void expectSetTuple<T1, T2>(
@@ -138,6 +138,12 @@ void main() {
     expectSet(emptySet.differenceWithSet(singleSet.toMutableSet()), emptySet);
     expect(singleSet.differenceWithSet({}), singleSet);
     expectSet(multiSet.differenceWithSet({1, 3, 4}), ImmortalSet({2}));
+  });
+
+  test('should compare sets', () {
+    expect(emptySet.equals(ImmortalSet<int>()), true);
+    expect(singleSet.equals(multiSet), false);
+    expect(multiSet.equals(ImmortalSet([1, 2, 3])), true);
   });
 
   test('should check if every element satisfies a test', () {
@@ -366,7 +372,7 @@ void main() {
   });
 
   test('should return immortal list', () {
-    expectList(emptySet.toList(), ImmortalList([]));
+    expectList(emptySet.toList(), ImmortalList<int>());
     expectList(singleSet.toList(), ImmortalList([1]));
     expectList(multiSet.toList(), ImmortalList([1, 2, 3]));
   });

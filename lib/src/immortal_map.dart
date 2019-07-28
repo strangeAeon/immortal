@@ -306,6 +306,24 @@ class ImmortalMap<K, V> {
   /// Returns an [ImmortalList] containing the entries of this map.
   ImmortalList<MapEntry<K, V>> get entries => ImmortalList(_map.entries);
 
+  /// Checks whether this map is equal to [other].
+  ///
+  /// First an identity check is performed, using [ImmortalMap.==]. If this
+  /// fails, it is checked if [other] is an [ImmortalMap] and all contained
+  /// entries of the two maps are compared using the `==` operators for keys
+  /// and values.
+  ///
+  /// To solely test if two maps are identical, the operator `==` can be used.
+  bool equals(dynamic other) =>
+      this == other ||
+      other is ImmortalMap<K, V> &&
+          length == other.length &&
+          mapEntries(
+            (key, value) => other[key]
+                .map((otherValue) => otherValue == value)
+                .orElse(false),
+          ).every((value) => value);
+
   /// Applies [f] to each key/value pair of the map.
   void forEach(void Function(K key, V value) f) => _map.forEach(f);
 

@@ -10,22 +10,21 @@ void main() {
   final multiMap = ImmortalMap({'a': 1, 'b': 2, 'c': 3});
 
   void expectMap<K, V>(ImmortalMap<K, V> actual, ImmortalMap<K, V> expected) {
-    expect(actual.toMutableMap(), expected.toMutableMap());
+    expect(actual.equals(expected), true);
   }
 
   void expectMapEntries<K, V>(ImmortalList<MapEntry<K, V>> actual,
       ImmortalList<MapEntry<K, V>> expected) {
     expect(actual.length, expected.length);
-    for (var index = 0; index < actual.length; index++) {
-      final actualEntry = actual.elementAt(index).value;
-      final expectedEntry = expected.elementAt(index).value;
+    actual.forEachIndexed((index, actualEntry) {
+      final expectedEntry = expected[index].value;
       expect(actualEntry.key, expectedEntry.key);
       expect(actualEntry.value, expectedEntry.value);
-    }
+    });
   }
 
   void expectList<T>(ImmortalList<T> actual, ImmortalList<T> expected) {
-    expect(actual.toMutableList(), expected.toMutableList());
+    expect(actual.equals(expected), true);
   }
 
   tearDown(() {
@@ -312,6 +311,12 @@ void main() {
         MapEntry('c', 3),
       ]),
     );
+  });
+
+  test('should compare maps', () {
+    expect(emptyMap.equals(ImmortalMap<String, int>()), true);
+    expect(singleMap.equals(multiMap), false);
+    expect(multiMap.equals(ImmortalMap({'a': 1, 'b': 2, 'c': 3})), true);
   });
 
   test('should execute function for each entry', () {

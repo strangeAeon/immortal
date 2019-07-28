@@ -13,15 +13,15 @@ void main() {
   final equalElementsList = ImmortalList([1, 1, 1]);
 
   void expectList<T>(ImmortalList<T> actual, ImmortalList<T> expected) {
-    expect(actual.toMutableList(), expected.toMutableList());
+    expect(actual.equals(expected), true);
   }
 
   void expectSet<T>(ImmortalSet<T> actual, ImmortalSet<T> expected) {
-    expect(actual.toMutableSet(), expected.toMutableSet());
+    expect(actual.equals(expected), true);
   }
 
   void expectMap<K, V>(ImmortalMap<K, V> actual, ImmortalMap<K, V> expected) {
-    expect(actual.toMutableMap(), expected.toMutableMap());
+    expect(actual.equals(expected), true);
   }
 
   void expectListTuple<T1, T2>(
@@ -177,6 +177,12 @@ void main() {
     expect(copy == singleList, false);
   });
 
+  test('should compare lists', () {
+    expect(emptyList.equals(ImmortalList<int>()), true);
+    expect(singleList.equals(multiList), false);
+    expect(multiList.equals(ImmortalList([1, 2, 3])), true);
+  });
+
   test('should check if all elements satisfy a test', () {
     expect(emptyList.every((value) => value < 4), true);
     expect(multiList.every((value) => value < 4), true);
@@ -278,6 +284,25 @@ void main() {
     callCount = 0;
     sum = 0;
     emptyList.forEach(handleValue);
+    expect(callCount, 0);
+    expect(sum, 0);
+  });
+
+  test('should execute function for each element and its index', () {
+    var callCount = 0;
+    var sum = 0;
+    void handleValue(index, value) {
+      callCount++;
+      sum += (index + 1) * value;
+    }
+
+    multiList.forEachIndexed(handleValue);
+    expect(callCount, 3);
+    expect(sum, 14);
+
+    callCount = 0;
+    sum = 0;
+    emptyList.forEachIndexed(handleValue);
     expect(callCount, 0);
     expect(sum, 0);
   });
@@ -641,7 +666,7 @@ void main() {
   });
 
   test('should return immortal set', () {
-    expectSet(emptyList.toSet(), ImmortalSet());
+    expectSet(emptyList.toSet(), ImmortalSet<int>());
     expectSet(singleList.toSet(), ImmortalSet({1}));
     expectSet(multiList.toSet(), ImmortalSet({1, 2, 3}));
     expectSet(equalElementsList.toSet(), ImmortalSet({1}));
@@ -655,7 +680,7 @@ void main() {
   });
 
   test('should zip lists', () {
-    expectList(singleList.zip(emptyList), emptyList);
+    expectList(singleList.zip(emptyList), ImmortalList<Tuple2<int, int>>());
     expectList(
       singleList.zip(multiList.reversed),
       ImmortalList([Tuple2(1, 3)]),
@@ -667,7 +692,7 @@ void main() {
   });
 
   test('should zip list iterable', () {
-    expectList(singleList.zipIterable([]), emptyList);
+    expectList(singleList.zipIterable([]), ImmortalList<Tuple2<int, int>>());
     expectList(singleList.zipIterable([3, 2, 1]), ImmortalList([Tuple2(1, 3)]));
     expectList(
       multiList.zipIterable([3, 2, 1]),

@@ -195,6 +195,20 @@ class ImmortalSet<T> {
     return ImmortalSet._internal(_set.difference(other));
   }
 
+  /// Checks whether this set is equal to [other].
+  ///
+  /// First an identity check is performed, using [ImmortalSet.==]. If this
+  /// fails, it is checked if [other] is an [ImmortalSet] and all contained
+  /// values of the two sets are compared using their respective `==`
+  /// operators.
+  ///
+  /// To solely test if two sets are identical, the operator `==` can be used.
+  bool equals(dynamic other) =>
+      this == other ||
+      other is ImmortalSet<T> &&
+          length == other.length &&
+          every((value) => other.contains(value));
+
   /// Checks whether every element of this set satisfies the given [predicate].
   ///
   /// Returns `false` if any element makes [predicate] return `false`, otherwise

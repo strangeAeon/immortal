@@ -207,6 +207,22 @@ class ImmortalList<T> {
     return Optional.ofNullable(_list.elementAt(index));
   }
 
+  /// Checks whether this list is equal to [other].
+  ///
+  /// First an identity check is performed, using [ImmortalList.==]. If this
+  /// fails, it is checked if [other] is an [ImmortalList] and all contained
+  /// values of the two lists are compared in iteration order using their
+  /// respective `==` operators.
+  ///
+  /// To solely test if two lists are identical, the operator `==` can be used.
+  bool equals(dynamic other) =>
+      this == other ||
+      other is ImmortalList<T> &&
+          length == other.length &&
+          mapIndexed((index, value) => other[index]
+              .map((otherValue) => otherValue == value)
+              .orElse(false)).every((value) => value);
+
   /// Checks whether every element of this list satisfies the given [predicate].
   ///
   /// Returns `false` if any element makes [predicate] return `false`, otherwise
@@ -377,6 +393,9 @@ class ImmortalList<T> {
 
   /// Applies the function [f] to each element of this list.
   void forEach(void Function(T element) f) => _list.forEach(f);
+
+  /// Applies the function [f] to each element and its index of this list.
+  void forEachIndexed(void Function(int index, T element) f) => mapIndexed(f);
 
   /// Returns a copy of this list that contains all elements in the range
   /// [start] inclusive to [end] exclusive.
