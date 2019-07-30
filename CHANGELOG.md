@@ -1,3 +1,18 @@
 ## 1.0.0
 
 * Initial release
+
+## 1.1.0
+
+* Extend list functionality:
+  * methods: `mapIndexed`, `removeAll`, `removeIterable`, `partition`, `zip`, `zipIterable`, `forEachIndexed`, `equals`
+  * operators: `-`
+  * factories: `empty`, `filled`, `from`, `fromIterable`, `generate`, `of`, `ofIterable`, `castFrom`, `castFromIterable`
+* Extend set functionality:
+  * methods: `toggle`, `partition`, `equals`
+  * operators: `+`, `-`, `|`, `&`
+  * factories: `empty`, `from`, `fromIterable`, `of`, `ofIterable`, `castFrom`, `castFromIterable`
+* Extend map functionality:
+  * methods: `mapEntries`, `removeAll`, `removeIterable`, `removeAllValues`, `removeValuesIterable`, `addPair`, `addPairs`, `addPairsIterable`, `pairs`, `equals`
+  * operators: `+`
+  * factories: `empty`, `from`, `fromEntries`, `fromEntriesIterable`, `fromLists`, `fromIterables`, `fromPairs`, `fromPairsIterable`, `fromMutable`, `of`, `ofMutable`, `castFrom`, `castFromMutable`, `fromList`, `fromIterable`
