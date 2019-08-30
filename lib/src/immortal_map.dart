@@ -465,6 +465,28 @@ class ImmortalMap<K, V> {
   ImmortalMap<K, V> removeWhere(bool Function(K key, V value) predicate) =>
       ImmortalMap._internal(toMutableMap()..removeWhere(predicate));
 
+  /// Returns an [Optional] containing the only entry of this map if it has
+  /// exactly one key/value pair, otherwise returns [Optional.empty].
+  Optional<MapEntry<K, V>> get single => entries.single;
+
+  /// Returns an [Optional] containing the only key in this map if it has
+  /// exactly one key/value pair, otherwise returns [Optional.empty].
+  ///
+  /// This lookup can not distinguish between the map being empty and
+  /// containing the `null` value as only key.
+  /// Methods like [containsKey] or [length] can be used if the distinction
+  /// is important.
+  Optional<K> get singleKey => single.map((entry) => entry.key);
+
+  /// Returns an [Optional] containing the only value in this map if it has
+  /// exactly one key/value pair, otherwise returns [Optional.empty].
+  ///
+  /// This lookup can not distinguish between the map being empty and
+  /// containing `null` as only value.
+  /// Methods like [containsValue] or [length] can be used if the distinction
+  /// is important.
+  Optional<V> get singleValue => single.map((entry) => entry.value);
+
   /// Returns a mutable [LinkedHashMap] containing all key/value pairs of this map.
   Map<K, V> toMutableMap() => Map.from(_map);
 

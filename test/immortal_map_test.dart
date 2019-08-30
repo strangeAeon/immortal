@@ -13,13 +13,16 @@ void main() {
     expect(actual.equals(expected), true);
   }
 
+  void expectMapEntry<K, V>(MapEntry<K, V> actual, MapEntry<K, V> expected) {
+    expect(actual.key, expected.key);
+    expect(actual.value, expected.value);
+  }
+
   void expectMapEntries<K, V>(ImmortalList<MapEntry<K, V>> actual,
       ImmortalList<MapEntry<K, V>> expected) {
     expect(actual.length, expected.length);
     actual.forEachIndexed((index, actualEntry) {
-      final expectedEntry = expected[index].value;
-      expect(actualEntry.key, expectedEntry.key);
-      expect(actualEntry.value, expectedEntry.value);
+      expectMapEntry(actualEntry, expected[index].value);
     });
   }
 
@@ -480,6 +483,24 @@ void main() {
     expectMap(singleMap.removeWhere((key, value) => true), emptyMap);
     expectMap(multiMap.removeWhere((key, value) => value > 1), singleMap);
     expectMap(multiMap.removeWhere((key, value) => false), multiMap);
+  });
+
+  test('should return single entry', () {
+    expect(emptyMap.single, Optional.empty());
+    expectMapEntry(singleMap.single.value, MapEntry('a', 1));
+    expect(multiMap.single, Optional.empty());
+  });
+
+  test('should return single key', () {
+    expect(emptyMap.singleKey, Optional.empty());
+    expect(singleMap.singleKey, Optional.of('a'));
+    expect(multiMap.singleKey, Optional.empty());
+  });
+
+  test('should return single value', () {
+    expect(emptyMap.singleValue, Optional.empty());
+    expect(singleMap.singleValue, Optional.of(1));
+    expect(multiMap.singleValue, Optional.empty());
   });
 
   test('should return map', () {
