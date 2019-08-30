@@ -324,6 +324,27 @@ class ImmortalMap<K, V> {
                 .orElse(false),
           ).every((value) => value);
 
+  /// Returns a copy of this map containing all entries that satisfy the given
+  /// [predicate].
+  ///
+  /// See [where].
+  ImmortalMap<K, V> filter(bool Function(K key, V value) predicate) =>
+      where(predicate);
+
+  /// Returns a copy of this map containing all entries with keys that satisfy
+  /// the given [predicate].
+  ///
+  /// See [whereKey].
+  ImmortalMap<K, V> filterKeys(bool Function(K key) predicate) =>
+      whereKey(predicate);
+
+  /// Returns a copy of this map containing all entries with values that satisfy
+  /// the given [predicate].
+  ///
+  /// See [whereValue].
+  ImmortalMap<K, V> filterValues(bool Function(V value) predicate) =>
+      whereValue(predicate);
+
   /// Applies [f] to each key/value pair of the map.
   void forEach(void Function(K key, V value) f) => _map.forEach(f);
 
@@ -482,4 +503,22 @@ class ImmortalMap<K, V> {
 
   /// Returns an [ImmortalList] containing the values of this map.
   ImmortalList<V> get values => ImmortalList(_map.values);
+
+  /// Returns a copy of this map containing all entries that satisfy the given
+  /// [predicate].
+  ImmortalMap<K, V> where(bool Function(K key, V value) predicate) =>
+      ImmortalMap._internal(
+          toMutableMap()..removeWhere((k, v) => !predicate(k, v)));
+
+  /// Returns a copy of this map containing all entries with keys that satisfy
+  /// the given [predicate].
+  ImmortalMap<K, V> whereKey(bool Function(K key) predicate) =>
+      ImmortalMap._internal(
+          toMutableMap()..removeWhere((k, v) => !predicate(k)));
+
+  /// Returns a copy of this map containing all entries with values that satisfy
+  /// the given [predicate].
+  ImmortalMap<K, V> whereValue(bool Function(V value) predicate) =>
+      ImmortalMap._internal(
+          toMutableMap()..removeWhere((k, v) => !predicate(v)));
 }

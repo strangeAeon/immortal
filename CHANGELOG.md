@@ -2,6 +2,8 @@
 
 * Extend list functionality:
   * methods: `asMapWithKeys`
+* Extend map functionality:
+  * methods: `filter`, `filterKeys`, `filterValues`, `where`, `whereKey`, `whereValue`
 
 ## 1.1.0
 

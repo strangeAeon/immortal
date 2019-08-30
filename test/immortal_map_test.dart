@@ -319,6 +319,33 @@ void main() {
     expect(multiMap.equals(ImmortalMap({'a': 1, 'b': 2, 'c': 3})), true);
   });
 
+  test('should filter for entries fulfilling a test', () {
+    expectMap(singleMap.filter((key, value) => false), emptyMap);
+    expectMap(multiMap.filter((key, value) => value < 2), singleMap);
+    expectMap(multiMap.filter((key, value) => true), multiMap);
+    expectMap(singleMap.where((key, value) => false), emptyMap);
+    expectMap(multiMap.where((key, value) => value < 2), singleMap);
+    expectMap(multiMap.where((key, value) => true), multiMap);
+  });
+
+  test('should filter for entries with keys fulfilling a test', () {
+    expectMap(singleMap.filterKeys((key) => false), emptyMap);
+    expectMap(multiMap.filterKeys((key) => true), multiMap);
+    expectMap(multiMap.filterKeys((key) => key == 'a'), singleMap);
+    expectMap(singleMap.whereKey((key) => false), emptyMap);
+    expectMap(multiMap.whereKey((key) => key == 'a'), singleMap);
+    expectMap(multiMap.whereKey((key) => true), multiMap);
+  });
+
+  test('should filter for entries with values fulfilling a test', () {
+    expectMap(singleMap.filterValues((value) => false), emptyMap);
+    expectMap(multiMap.filterValues((value) => value < 2), singleMap);
+    expectMap(multiMap.filterValues((value) => true), multiMap);
+    expectMap(singleMap.whereValue((value) => false), emptyMap);
+    expectMap(multiMap.whereValue((value) => value < 2), singleMap);
+    expectMap(multiMap.whereValue((value) => true), multiMap);
+  });
+
   test('should execute function for each entry', () {
     var joinedKeys = '';
     var sum = 0;
