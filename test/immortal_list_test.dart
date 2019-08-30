@@ -124,6 +124,18 @@ void main() {
     expectMap(multiList.asMap(), ImmortalMap({0: 1, 1: 2, 2: 3}));
   });
 
+  test('should transform list to immortal map with a key function', () {
+    expectMap(singleList.asMapWithKeys((v) => v), ImmortalMap({1: 1}));
+    expectMap(
+      multiList.asMapWithKeys((v) => v.toString()),
+      ImmortalMap({'1': 1, '2': 2, '3': 3}),
+    );
+    expectMap(
+      multiList.asMapWithKeys((v) => v.isOdd),
+      ImmortalMap({true: 3, false: 2}),
+    );
+  });
+
   test('should cast the list', () {
     expectList(ImmortalList<Object>([1, 2, 3]).cast<int>(), multiList);
   });

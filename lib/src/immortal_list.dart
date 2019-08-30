@@ -161,6 +161,15 @@ class ImmortalList<T> {
   ///     map.keys.toList();           // [0, 1, 2, 3]
   ImmortalMap<int, T> asMap() => ImmortalMap(_list.asMap());
 
+  /// Returns an [ImmortalMap] using the given function [f] as key generator.
+  ///
+  /// Iterates over all elements in iteration order and creates the key for
+  /// each element by applying [f] to its value.
+  /// If a key is already present in the copy, the corresponding value is
+  /// overwritten.
+  ImmortalMap<K, T> asMapWithKeys<K>(K Function(T) f) =>
+      ImmortalMap.fromEntries(map((v) => MapEntry(f(v), v)));
+
   /// Returns a copy of this list casting all elements to instances of [R].
   ///
   /// If this list contains only instances of [R] the new list will be created

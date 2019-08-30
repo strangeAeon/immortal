@@ -1,6 +1,7 @@
-## 1.0.0
+## 1.2.0
 
-* Initial release
+* Extend list functionality:
+  * methods: `asMapWithKeys`
 
 ## 1.1.0
 
@@ -16,3 +17,7 @@
   * methods: `mapEntries`, `removeAll`, `removeIterable`, `removeAllValues`, `removeValuesIterable`, `addPair`, `addPairs`, `addPairsIterable`, `pairs`, `equals`
   * operators: `+`
   * factories: `empty`, `from`, `fromEntries`, `fromEntriesIterable`, `fromLists`, `fromIterables`, `fromPairs`, `fromPairsIterable`, `fromMutable`, `of`, `ofMutable`, `castFrom`, `castFromMutable`, `fromList`, `fromIterable`
+
+## 1.0.0
+
+* Initial release
