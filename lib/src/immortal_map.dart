@@ -408,6 +408,11 @@ class ImmortalMap<K, V> {
   ImmortalList<Tuple2<K, V>> pairs() =>
       mapEntries((key, value) => Tuple2(key, value));
 
+  /// Returns a copy of this map where the value of [key] is set to [value].
+  ///
+  /// See [add].
+  ImmortalMap<K, V> put(K key, V value) => add(key, value);
+
   /// Returns a copy of this map setting the value of [key] if it isn't there.
   ///
   /// If [key] is present in the original map, [ifAbsent] is called to get the
@@ -424,6 +429,14 @@ class ImmortalMap<K, V> {
   ///     scores['Sophena'];  //  7
   ImmortalMap<K, V> putIfAbsent(K key, V Function() ifAbsent) =>
       ImmortalMap._internal(toMutableMap()..putIfAbsent(key, ifAbsent));
+
+  /// Returns a copy of this map replacing the values of all key/value pairs
+  /// fulfilling the given [predicate] with [value].
+  ImmortalMap<K, V> putWhere(
+    bool Function(K key, V value) predicate,
+    V value,
+  ) =>
+      mapValues((k, v) => predicate(k, v) ? value : v);
 
   /// Returns a copy of this map where [key] and its associated value are
   /// removed if present.
@@ -464,6 +477,44 @@ class ImmortalMap<K, V> {
   /// [predicate] are removed.
   ImmortalMap<K, V> removeWhere(bool Function(K key, V value) predicate) =>
       ImmortalMap._internal(toMutableMap()..removeWhere(predicate));
+
+  /// Returns a copy of this map where the value of [key] is set to [value] if
+  /// already present.
+  ///
+  /// Returns the map unchanged if [key] is not present.
+  ImmortalMap<K, V> replace(K key, V value) =>
+      lookup(key).map((v) => add(key, value)).orElse(this);
+
+  /// Returns a copy of this map replacing the values of all key/value pairs
+  /// fulfilling the given [predicate] with [value].
+  ///
+  /// See [putWhere].
+  ImmortalMap<K, V> replaceWhere(
+    bool Function(K key, V value) predicate,
+    V value,
+  ) =>
+      putWhere(predicate, value);
+
+  /// Returns a copy of this map where the value of [key] is set to [value].
+  ///
+  /// See [add].
+  ImmortalMap<K, V> set(K key, V value) => add(key, value);
+
+  /// Returns a copy of this map setting the value of [key] if it isn't there.
+  ///
+  /// See [putIfAbsent].
+  ImmortalMap<K, V> setIfAbsent(K key, V Function() ifAbsent) =>
+      putIfAbsent(key, ifAbsent);
+
+  /// Returns a copy of this map replacing the values of all key/value pairs
+  /// fulfilling the given [predicate] with [value].
+  ///
+  /// See [putWhere].
+  ImmortalMap<K, V> setWhere(
+    bool Function(K key, V value) predicate,
+    V value,
+  ) =>
+      putWhere(predicate, value);
 
   /// Returns an [Optional] containing the only entry of this map if it has
   /// exactly one key/value pair, otherwise returns [Optional.empty].
@@ -522,6 +573,14 @@ class ImmortalMap<K, V> {
   /// result of invoking [update].
   ImmortalMap<K, V> updateAll(V Function(K key, V value) update) =>
       ImmortalMap._internal(toMutableMap()..updateAll(update));
+
+  /// Returns a copy of this map invoking [update] on all key/value pairs
+  /// fulfilling the given [predicate].
+  ImmortalMap<K, V> updateWhere(
+    bool Function(K key, V value) predicate,
+    V Function(K key, V value) update,
+  ) =>
+      mapValues((k, v) => predicate(k, v) ? update(k, v) : v);
 
   /// Returns an [ImmortalList] containing the values of this map.
   ImmortalList<V> get values => ImmortalList(_map.values);

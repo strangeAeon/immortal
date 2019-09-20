@@ -183,10 +183,14 @@ void main() {
     expectMap(emptyMap.add('a', 1), singleMap);
     expectMap(emptyMap.addEntry(MapEntry('a', 1)), singleMap);
     expectMap(emptyMap.addPair(Tuple2('a', 1)), singleMap);
+    expectMap(emptyMap.put('a', 1), singleMap);
+    expectMap(emptyMap.set('a', 1), singleMap);
     final twoEntryMap = ImmortalMap({'a': 1, 'c': 3});
     expectMap(twoEntryMap.add('b', 2), multiMap);
     expectMap(twoEntryMap.addEntry(MapEntry('b', 2)), multiMap);
     expectMap(twoEntryMap.addPair(Tuple2('b', 2)), multiMap);
+    expectMap(twoEntryMap.put('b', 2), multiMap);
+    expectMap(twoEntryMap.set('b', 2), multiMap);
   });
 
   test('should replace entry', () {
@@ -232,6 +236,8 @@ void main() {
     expectMap(multiMap.addIfAbsent('a', () => 4), multiMap);
     expectMap(emptyMap.putIfAbsent('a', () => 1), singleMap);
     expectMap(multiMap.putIfAbsent('a', () => 4), multiMap);
+    expectMap(emptyMap.setIfAbsent('a', () => 1), singleMap);
+    expectMap(multiMap.setIfAbsent('a', () => 4), multiMap);
   });
 
   test('should combine with the given mortal map', () {
@@ -485,6 +491,30 @@ void main() {
     expectMap(multiMap.removeWhere((key, value) => false), multiMap);
   });
 
+  test('should replace value if present', () {
+    expect(emptyMap.replace('a', 1), emptyMap);
+    expect(multiMap.replace('d', 4), multiMap);
+    expectMap(multiMap.replace('a', 4), ImmortalMap({'a': 4, 'b': 2, 'c': 3}));
+  });
+
+  test('should replace values fulfilling a test', () {
+    expectMap(
+      multiMap.replaceWhere((key, value) => value > 1, 4),
+      ImmortalMap({'a': 1, 'b': 4, 'c': 4}),
+    );
+    expectMap(multiMap.replaceWhere((key, value) => false, 4), multiMap);
+    expectMap(
+      multiMap.putWhere((key, value) => value > 1, 4),
+      ImmortalMap({'a': 1, 'b': 4, 'c': 4}),
+    );
+    expectMap(multiMap.putWhere((key, value) => false, 4), multiMap);
+    expectMap(
+      multiMap.setWhere((key, value) => value > 1, 4),
+      ImmortalMap({'a': 1, 'b': 4, 'c': 4}),
+    );
+    expectMap(multiMap.setWhere((key, value) => false, 4), multiMap);
+  });
+
   test('should return single entry', () {
     expect(emptyMap.single, Optional.empty());
     expectMapEntry(singleMap.single.value, MapEntry('a', 1));
@@ -529,6 +559,17 @@ void main() {
     expectMap(
       multiMap.updateAll((key, value) => value + 1),
       ImmortalMap({'a': 2, 'b': 3, 'c': 4}),
+    );
+  });
+
+  test('should update values fulfilling a test', () {
+    expectMap(
+      multiMap.updateWhere((key, value) => value > 1, (key, value) => 4),
+      ImmortalMap({'a': 1, 'b': 4, 'c': 4}),
+    );
+    expectMap(
+      multiMap.updateWhere((key, value) => false, (key, value) => 4),
+      multiMap,
     );
   });
 
