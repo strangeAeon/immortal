@@ -1,7 +1,7 @@
 ## 1.2.0
 
 * Extend list functionality:
-  * methods: `asMapWithKeys`
+  * methods: `asMapWithKeys`, `putWhere`, `putWhereIndexed`, `replaceAt`, `replaceWhere`, `replaceWhereIndexed`, `setWhere`, `setWhereIndexed`, `updateAt`, `updateWhere`, `updateWhereIndexed`
 * Extend map functionality:
   * methods: `filter`, `filterKeys`, `filterValues`, `single`, `singleKey`, `singleValue`, `where`, `whereKey`, `whereValue`
 

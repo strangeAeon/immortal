@@ -611,6 +611,23 @@ class ImmortalList<T> {
   /// See [set].
   ImmortalList<T> put(int index, T value) => set(index, value);
 
+  /// Returns a copy of this list replacing each element that fulfills the
+  /// given [predicate] by [value].
+  ///
+  /// See [setWhere].
+  ImmortalList<T> putWhere(bool Function(T element) predicate, T value) =>
+      setWhere(predicate, value);
+
+  /// Returns a copy of this list replacing each element that fulfills the
+  /// given [predicate] with its respective index by [value].
+  ///
+  /// See [setWhereIndexed].
+  ImmortalList<T> putWhereIndexed(
+    bool Function(int i, T element) predicate,
+    T value,
+  ) =>
+      setWhereIndexed(predicate, value);
+
   /// Returns a copy of this list where the first occurrence of [value] is
   /// removed from if present.
   ImmortalList<T> remove(Object value) =>
@@ -686,6 +703,12 @@ class ImmortalList<T> {
   ImmortalList<T> removeWhere(bool Function(T element) predicate) =>
       ImmortalList._internal(toMutableList()..removeWhere(predicate));
 
+  /// Returns a copy of this list replacing the value at the given [index] with
+  /// [value].
+  ///
+  /// See [set].
+  ImmortalList<T> replaceAt(int index, T value) => set(index, value);
+
   /// Returns a copy of this list where all objects in the range [start]
   /// inclusive to [end] exclusive are removed from and replaced by the contents
   /// of [replacement].
@@ -729,6 +752,23 @@ class ImmortalList<T> {
         replacement,
       ));
   }
+
+  /// Returns a copy of this list replacing each element that fulfills the
+  /// given [predicate] by [value].
+  ///
+  /// See [setWhere].
+  ImmortalList<T> replaceWhere(bool Function(T element) predicate, T value) =>
+      setWhere(predicate, value);
+
+  /// Returns a copy of this list replacing each element that fulfills the
+  /// given [predicate] with its respective index by [value].
+  ///
+  /// See [setWhereIndexed].
+  ImmortalList<T> replaceWhereIndexed(
+    bool Function(int i, T element) predicate,
+    T value,
+  ) =>
+      setWhereIndexed(predicate, value);
 
   /// Returns a copy of this list where all values that fail to satisfy the
   /// given [predicate] are removed from.
@@ -855,6 +895,19 @@ class ImmortalList<T> {
         skipCount,
       ));
   }
+
+  /// Returns a copy of this list replacing each element that fulfills the
+  /// given [predicate] by [value].
+  ImmortalList<T> setWhere(bool Function(T value) predicate, T value) =>
+      map((e) => predicate(e) ? value : e);
+
+  /// Returns a copy of this list replacing each element that fulfills the
+  /// given [predicate] with its respective index by [value].
+  ImmortalList<T> setWhereIndexed(
+    bool Function(int index, T value) predicate,
+    T value,
+  ) =>
+      mapIndexed((i, e) => predicate(i, e) ? value : e);
 
   /// Returns a copy of this list randomly shuffling the elements.
   ImmortalList<T> shuffle([Random random]) =>
@@ -1009,6 +1062,31 @@ class ImmortalList<T> {
 
   @override
   String toString() => 'Immortal${_list.toString()}';
+
+  /// Returns a copy of this list replacing the value at the given [index] by
+  /// applying the function [f] to its value.
+  ///
+  /// If there is no element at the provided [index], the list is returned
+  /// unchanged.
+  /// The resulting list will have the same length as the original list.
+  ImmortalList<T> updateAt(int index, T Function(T e) f) =>
+      elementAt(index).map((e) => set(index, f(e))).orElse(this);
+
+  /// Returns a copy of this list by applying [f] on each element that fulfills
+  /// the given [predicate].
+  ImmortalList<T> updateWhere(
+    bool Function(T element) predicate,
+    T Function(T e) f,
+  ) =>
+      map((e) => predicate(e) ? f(e) : e);
+
+  /// Returns a copy of this list by applying [f] on each element and its
+  /// respective index that fulfill the given [predicate].
+  ImmortalList<T> updateWhereIndexed(
+    bool Function(int i, T element) predicate,
+    T Function(int i, T e) f,
+  ) =>
+      mapIndexed((i, e) => predicate(i, e) ? f(i, e) : e);
 
   /// Returns a new list with all elements of this list that satisfy the given
   /// [predicate].

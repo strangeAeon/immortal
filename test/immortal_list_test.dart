@@ -566,6 +566,10 @@ void main() {
     expectList(multiList.put(5, 4), ImmortalList([1, 2, 4]));
     expectList(singleList.put(0, 2), ImmortalList([2]));
     expectList(multiList.put(1, 4), ImmortalList([1, 4, 3]));
+    expectList(multiList.replaceAt(-1, 4), ImmortalList([4, 2, 3]));
+    expectList(multiList.replaceAt(5, 4), ImmortalList([1, 2, 4]));
+    expectList(singleList.replaceAt(0, 2), ImmortalList([2]));
+    expectList(multiList.replaceAt(1, 4), ImmortalList([1, 4, 3]));
   });
 
   test('should set elements starting at index', () {
@@ -605,6 +609,51 @@ void main() {
       ImmortalList([1, 1, 2]),
     );
     expectList(multiList.setRangeIterable(1, 3, [1]), ImmortalList([1, 1, 3]));
+  });
+
+  test('should replace elements fulfilling a test', () {
+    expectList(
+      multiList.setWhere((value) => value > 1, 4),
+      ImmortalList([1, 4, 4]),
+    );
+    expectList(multiList.setWhere((value) => value < 1, 4), multiList);
+    expectList(
+      multiList.putWhere((value) => value > 1, 4),
+      ImmortalList([1, 4, 4]),
+    );
+    expectList(multiList.putWhere((value) => value < 1, 4), multiList);
+    expectList(
+      multiList.replaceWhere((value) => value > 1, 4),
+      ImmortalList([1, 4, 4]),
+    );
+    expectList(multiList.replaceWhere((value) => value < 1, 4), multiList);
+  });
+
+  test('should replace elements fulfilling a test by index', () {
+    expectList(
+      multiList.setWhereIndexed((value, index) => value + index > 1, 4),
+      ImmortalList([1, 4, 4]),
+    );
+    expectList(
+      multiList.setWhereIndexed((value, index) => value + index < 1, 4),
+      multiList,
+    );
+    expectList(
+      multiList.putWhereIndexed((value, index) => value + index > 1, 4),
+      ImmortalList([1, 4, 4]),
+    );
+    expectList(
+      multiList.putWhereIndexed((value, index) => value + index < 1, 4),
+      multiList,
+    );
+    expectList(
+      multiList.replaceWhereIndexed((value, index) => value + index > 1, 4),
+      ImmortalList([1, 4, 4]),
+    );
+    expectList(
+      multiList.replaceWhereIndexed((value, index) => value + index < 1, 4),
+      multiList,
+    );
   });
 
   test('should shuffle elements', () {
@@ -689,6 +738,34 @@ void main() {
     expect(emptyList.toString(), 'Immortal[]');
     expect(singleList.toString(), 'Immortal[1]');
     expect(multiList.toString(), 'Immortal[1, 2, 3]');
+  });
+
+  test('should update element at index', () {
+    int inc(v) => v + 1;
+    expect(emptyList.updateAt(1, inc), emptyList);
+    expectList(singleList.updateAt(0, inc), ImmortalList([2]));
+    expectList(multiList.updateAt(1, inc), ImmortalList([1, 3, 3]));
+  });
+
+  test('should update elements fulfilling a test', () {
+    int inc(v) => v + 1;
+    expectList(
+      multiList.updateWhere((value) => value > 1, inc),
+      ImmortalList([1, 3, 4]),
+    );
+    expectList(multiList.updateWhere((value) => value < 1, inc), multiList);
+  });
+
+  test('should update elements fulfilling a test by index', () {
+    int add(v, i) => v + i;
+    expectList(
+      multiList.updateWhereIndexed((value, index) => value + index > 1, add),
+      ImmortalList([1, 3, 5]),
+    );
+    expectList(
+      multiList.updateWhereIndexed((value, index) => value + index < 1, add),
+      multiList,
+    );
   });
 
   test('should zip lists', () {
