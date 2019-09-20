@@ -421,4 +421,13 @@ void main() {
     expectSet(multiSet.unionWithSet({1, 3, 4}), ImmortalSet({1, 2, 3, 4}));
     expect(multiSet.unionWithSet({}), multiSet);
   });
+
+  test('should update elements fulfilling a test', () {
+    int inc(v) => v + 1;
+    expectSet(
+      multiSet.updateWhere((value) => value > 1, inc),
+      ImmortalSet({1, 3, 4}),
+    );
+    expectSet(multiSet.updateWhere((value) => value < 1, inc), multiSet);
+  });
 }

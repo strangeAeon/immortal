@@ -485,6 +485,14 @@ class ImmortalSet<T> {
     return ImmortalSet._internal(_set.union(other));
   }
 
+  /// Returns a copy of this set by applying [f] to all elements that fulfill
+  /// the given [predicate].
+  ImmortalSet<T> updateWhere(
+    bool Function(T element) predicate,
+    T Function(T element) f,
+  ) =>
+      map((e) => predicate(e) ? f(e) : e);
+
   /// Returns a new set with all elements of this set that satisfy the given
   /// [predicate].
   ImmortalSet<T> where(bool Function(T element) predicate) =>
