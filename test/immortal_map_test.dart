@@ -514,6 +514,15 @@ void main() {
     );
   });
 
+  test('should replace key if present', () {
+    expect(emptyMap.replaceKey('a', 'd'), emptyMap);
+    expect(multiMap.replaceKey('d', 'e'), multiMap);
+    expectMap(
+      multiMap.replaceKey('a', 'd'),
+      ImmortalMap({'b': 2, 'c': 3, 'd': 1}),
+    );
+  });
+
   test('should replace values fulfilling a test', () {
     expectMap(
       multiMap.replaceWhere((key, value) => value > 1, 4),
@@ -590,6 +599,11 @@ void main() {
       multiMap.updateAll((key, value) => value + 1),
       ImmortalMap({'a': 2, 'b': 3, 'c': 4}),
     );
+  });
+
+  test('should update key', () {
+    expect(emptyMap.updateKey('a', (value) => 'd'), emptyMap);
+    expectMap(singleMap.updateKey('a', (value) => 'd'), ImmortalMap({'d': 1}));
   });
 
   test('should update values fulfilling a test', () {

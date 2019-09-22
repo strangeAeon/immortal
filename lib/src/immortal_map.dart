@@ -509,6 +509,16 @@ class ImmortalMap<K, V> {
   ImmortalMap<K, V> replaceEntry(K key, MapEntry<K, V> entry) =>
       lookup(key).map((_) => remove(key).addEntry(entry)).orElse(this);
 
+  /// Returns a copy of this map where the key of the entry with [key] is
+  /// replaced by [newKey] if already present.
+  ///
+  /// Overwrites a previous value in the copied map if [newKey] was already
+  /// present.
+  ///
+  /// Returns the map unchanged if [key] is not present.
+  ImmortalMap<K, V> replaceKey(K key, K newKey) =>
+      lookup(key).map((v) => remove(key).add(newKey, v)).orElse(this);
+
   /// Returns a copy of this map replacing the values of all key/value pairs
   /// fulfilling the given [predicate] with [value].
   ///
@@ -638,6 +648,16 @@ class ImmortalMap<K, V> {
               : remove(key).addEntry(
                   ifAbsent(),
                 ));
+
+  /// Returns a copy of this map where the key of the entry with [key] is
+  /// replaced by applying [update] to its value if already present.
+  ///
+  /// Overwrites a previous value in the copied map if an entry for the
+  /// resulting key was already present.
+  ///
+  /// Returns the map unchanged if [key] is not present.
+  ImmortalMap<K, V> updateKey(K key, K Function(V value) update) =>
+      lookup(key).map((v) => remove(key).add(update(v), v)).orElse(this);
 
   /// Returns a copy of this map invoking [update] on all key/value pairs
   /// fulfilling the given [predicate].
