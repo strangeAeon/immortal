@@ -19,6 +19,10 @@ void main() {
     expect(actual.equals(expected), true);
   }
 
+  void expectMap<K, V>(ImmortalMap<K, V> actual, ImmortalMap<K, V> expected) {
+    expect(actual.equals(expected), true);
+  }
+
   void expectSetTuple<T1, T2>(
     Tuple2<ImmortalSet<T1>, ImmortalSet<T2>> actual,
     Tuple2<ImmortalSet<T1>, ImmortalSet<T2>> expected,
@@ -90,6 +94,18 @@ void main() {
   test('should check if any element satisfies a test', () {
     expect(multiSet.any((value) => value < 3), true);
     expect(multiSet.any((value) => value > 3), false);
+  });
+
+  test('should transform set to immortal map with a key function', () {
+    expectMap(singleSet.asMapWithKeys((v) => v), ImmortalMap({1: 1}));
+    expectMap(
+      multiSet.asMapWithKeys((v) => v.toString()),
+      ImmortalMap({'1': 1, '2': 2, '3': 3}),
+    );
+    expectMap(
+      multiSet.asMapWithKeys((v) => v.isOdd),
+      ImmortalMap({true: 3, false: 2}),
+    );
   });
 
   test('should cast the set', () {

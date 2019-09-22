@@ -165,7 +165,7 @@ class ImmortalList<T> {
   ///
   /// Iterates over all elements in iteration order and creates the key for
   /// each element by applying [f] to its value.
-  /// If a key is already present in the copy, the corresponding value is
+  /// If a key is already present in the map, the corresponding value is
   /// overwritten.
   ImmortalMap<K, T> asMapWithKeys<K>(K Function(T) f) =>
       ImmortalMap.fromEntries(map((v) => MapEntry(f(v), v)));

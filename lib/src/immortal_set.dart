@@ -149,6 +149,15 @@ class ImmortalSet<T> {
   /// returns false.
   bool any(bool Function(T element) predicate) => _set.any(predicate);
 
+  /// Returns an [ImmortalMap] using the given function [f] as key generator.
+  ///
+  /// Iterates over all elements and creates the key for each element by
+  /// applying [f] to its value.
+  /// If a key is already present in the map, the corresponding value is
+  /// overwritten.
+  ImmortalMap<K, T> asMapWithKeys<K>(K Function(T) f) =>
+      ImmortalMap.fromEntries(toList().map((v) => MapEntry(f(v), v)));
+
   /// Returns a copy of this set casting all elements to instances of [R].
   ///
   /// If this set contains only instances of [R], the new set will be created
