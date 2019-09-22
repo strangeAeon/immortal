@@ -402,6 +402,19 @@ void main() {
     expectList(multiMap.keys, ImmortalList(['a', 'b', 'c']));
   });
 
+  test('should return immortal list of keys with value', () {
+    final multiValueMap = ImmortalMap({'a': 1, 'b': 2, 'c': 1});
+    expectList(emptyMap.keysForValue(1), ImmortalList<String>());
+    expectList(singleMap.keysForValue(1), ImmortalList(['a']));
+    expectList(multiValueMap.keysForValue(1), ImmortalList(['a', 'c']));
+    expectList(emptyMap.lookupKeysForValue(1), ImmortalList<String>());
+    expectList(singleMap.lookupKeysForValue(1), ImmortalList(['a']));
+    expectList(multiValueMap.lookupKeysForValue(1), ImmortalList(['a', 'c']));
+    expectList(emptyMap.getKeysForValue(1), ImmortalList<String>());
+    expectList(singleMap.getKeysForValue(1), ImmortalList(['a']));
+    expectList(multiValueMap.getKeysForValue(1), ImmortalList(['a', 'c']));
+  });
+
   test("should return the map's size", () {
     expect(emptyMap.length, 0);
     expect(singleMap.length, 1);

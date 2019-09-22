@@ -361,6 +361,12 @@ class ImmortalMap<K, V> {
   /// See [lookup].
   Optional<V> get(K key) => lookup(key);
 
+  /// Returns an immortal list of all keys with a value equal to the given
+  /// [value] according to the `==` operator.
+  ///
+  /// See [lookupKeysForValue].
+  ImmortalList<K> getKeysForValue(V value) => lookupKeysForValue(value);
+
   /// Returns `true` if there is no key/value pair in the map.
   bool get isEmpty => _map.isEmpty;
 
@@ -369,6 +375,12 @@ class ImmortalMap<K, V> {
 
   /// Returns an [ImmortalList] containing the keys of this map.
   ImmortalList<K> get keys => ImmortalList(_map.keys);
+
+  /// Returns an immortal list of all keys with a value equal to the given
+  /// [value] according to the `==` operator.
+  ///
+  /// See [lookupKeysForValue].
+  ImmortalList<K> keysForValue(V value) => lookupKeysForValue(value);
 
   /// The number of key/value pairs in the map.
   int get length => _map.length;
@@ -381,6 +393,11 @@ class ImmortalMap<K, V> {
   /// Methods like [containsKey] or [addIfAbsent] can be used if the distinction
   /// is important.
   Optional<V> lookup(K key) => Optional.ofNullable(_map[key]);
+
+  /// Returns an immortal list of all keys with a value equal to the given
+  /// [value] according to the `==` operator.
+  ImmortalList<K> lookupKeysForValue(V value) =>
+      where((_, v) => v == value).keys;
 
   /// Returns a new map where all entries of this map are transformed by
   /// the given [f] function.
