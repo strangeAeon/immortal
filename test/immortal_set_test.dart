@@ -207,6 +207,39 @@ void main() {
     expectSet(multiSet.whereType<String>(), ImmortalSet<String>({}));
   });
 
+  test('should flatten set of sets', () {
+    expectSet(
+      ImmortalSet([
+        ImmortalSet([1, 2]),
+        ImmortalSet([1, 2, 3]),
+        ImmortalSet([4]),
+      ]).flatten(),
+      ImmortalSet([1, 2, 3, 4]),
+    );
+  });
+
+  test('should flatten set of iterables', () {
+    expectSet(
+      ImmortalSet([
+        [1, 2],
+        [1, 2, 3],
+        [4],
+      ]).flattenIterables(),
+      ImmortalSet([1, 2, 3, 4]),
+    );
+  });
+
+  test('should flatten set of lists', () {
+    expectSet(
+      ImmortalSet([
+        ImmortalList([1, 1, 2]),
+        ImmortalList([1, 2, 2, 3]),
+        ImmortalList([4]),
+      ]).flattenLists(),
+      ImmortalSet([1, 2, 3, 4]),
+    );
+  });
+
   test('should fold elements', () {
     expect(emptySet.fold(0, max), 0);
     expect(multiSet.fold(0, (v1, v2) => v1 + v2), 6);

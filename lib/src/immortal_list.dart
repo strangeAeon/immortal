@@ -360,6 +360,21 @@ class ImmortalList<T> {
   ImmortalList<R> flatMapIterable<R>(Iterable<R> Function(T element) f) =>
       expandIterable(f);
 
+  /// Flattens a list of immortal lists by concatenating the values in iteration
+  /// order.
+  ///
+  /// If this list contains only instances of [ImmortalList<R>] the new list
+  /// will be created correctly, otherwise an exception is thrown.
+  ImmortalList<R> flatten<R>() => cast<ImmortalList<R>>().expand<R>((l) => l);
+
+  /// Flattens a list of iterables by concatenating the values in iteration
+  /// order.
+  ///
+  /// If this list contains only instances of [Iterable<R>] the new list
+  /// will be created correctly, otherwise an exception is thrown.
+  ImmortalList<R> flattenIterables<R>() =>
+      cast<Iterable<R>>().expandIterable<R>((l) => l);
+
   /// Reduces the list to a single value by iteratively combining each element
   /// of this list with an existing value.
   ///

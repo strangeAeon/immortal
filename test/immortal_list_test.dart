@@ -275,6 +275,28 @@ void main() {
     expect(multiList.firstWhere((value) => value < 0), Optional.empty());
   });
 
+  test('should flatten list of lists', () {
+    expectList(
+      ImmortalList([
+        ImmortalList([1, 2]),
+        ImmortalList([1, 2, 3]),
+        ImmortalList([4]),
+      ]).flatten(),
+      ImmortalList([1, 2, 1, 2, 3, 4]),
+    );
+  });
+
+  test('should flatten list of iterables', () {
+    expectList(
+      ImmortalList([
+        [1, 2],
+        [1, 2, 3],
+        [4],
+      ]).flattenIterables(),
+      ImmortalList([1, 2, 1, 2, 3, 4]),
+    );
+  });
+
   test('should fold elements', () {
     expect(emptyList.fold(0, max), 0);
     expect(multiList.fold(0, (v1, v2) => v1 + v2), 6);

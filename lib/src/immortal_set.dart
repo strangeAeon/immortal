@@ -268,6 +268,27 @@ class ImmortalSet<T> {
   ImmortalSet<R> flatMapIterable<R>(Iterable<R> Function(T element) f) =>
       expandIterable(f);
 
+  /// Flattens a set of immortal sets by combining their values to a single set.
+  ///
+  /// If this set contains only instances of [ImmortalSet<R>] the new set
+  /// will be created correctly, otherwise an exception is thrown.
+  ImmortalSet<R> flatten<R>() => cast<ImmortalSet<R>>().expand<R>((l) => l);
+
+  /// Flattens a set of iterables by combining their values to a single set.
+  ///
+  /// If this set contains only instances of [Iterable<R>] the new set
+  /// will be created correctly, otherwise an exception is thrown.
+  ImmortalSet<R> flattenIterables<R>() =>
+      cast<Iterable<R>>().expandIterable<R>((l) => l);
+
+  /// Flattens a set of immortal lists by combining their values to a single
+  /// set.
+  ///
+  /// If this set contains only instances of [ImmortalList<R>] the new set
+  /// will be created correctly, otherwise an exception is thrown.
+  ImmortalSet<R> flattenLists<R>() =>
+      cast<ImmortalList<R>>().expand<R>((l) => l.toSet());
+
   /// Reduces the set to a single value by iteratively combining each element of
   /// this set with an existing value.
   ///

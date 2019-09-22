@@ -1,9 +1,9 @@
 ## 1.2.0
 
 * Extend list functionality:
-  * methods: `asMapWithKeys`, `putWhere`, `putWhereIndexed`, `replaceAt`, `replaceWhere`, `replaceWhereIndexed`, `setWhere`, `setWhereIndexed`, `updateAt`, `updateWhere`, `updateWhereIndexed`
+  * methods: `asMapWithKeys`, `flatten`, `flattenIterables`, `putWhere`, `putWhereIndexed`, `replaceAt`, `replaceWhere`, `replaceWhereIndexed`, `setWhere`, `setWhereIndexed`, `updateAt`, `updateWhere`, `updateWhereIndexed`
 * Extend set functionality:
-  * methods: `updateWhere`
+  * methods: `flatten`, `flattenIterables`, `flattenLists`, `updateWhere`
 * Extend map functionality:
   * methods: `addEntryIfAbsent`, `filter`, `filterKeys`, `filterValues`, `get`, `getKeysForValue`, `keysForValue`, `lookupKeysForValue`, `put`, `putEntryIfAbsent`, `putWhere`, `replace`, `replaceEntry`, `replaceKey`, `replaceWhere`, `set`, `setEntry`, `setEntryIfAbsent`, `setIfAbsent`, `setWhere`, `single`, `singleKey`, `singleValue`, `updateEntry`, `updateKey`, `updateWhere`, `where`, `whereKey`, `whereValue`
 
