@@ -234,6 +234,13 @@ class ImmortalMap<K, V> {
   ImmortalMap<K, V> addEntry(MapEntry<K, V> entry) =>
       addEntriesIterable([entry]);
 
+  /// Returns a copy of this map where the key/value pair [entry] is added if no
+  /// entry for [entry.key] is already present.
+  ///
+  /// Otherwise the map is returned unchanged.
+  ImmortalMap<K, V> addEntryIfAbsent(MapEntry<K, V> entry) =>
+      lookup(entry.key).map((_) => this).orElse(addEntry(entry));
+
   /// Returns a copy of this map setting the value of [key] if it isn't there.
   ///
   /// See [putIfAbsent].
@@ -413,6 +420,13 @@ class ImmortalMap<K, V> {
   /// See [add].
   ImmortalMap<K, V> put(K key, V value) => add(key, value);
 
+  /// Returns a copy of this map where the key/value pair [entry] is added if no
+  /// entry for [entry.key] is already present.
+  ///
+  /// See [addEntryIfAbsent].
+  ImmortalMap<K, V> putEntryIfAbsent(MapEntry<K, V> entry) =>
+      addEntryIfAbsent(entry);
+
   /// Returns a copy of this map setting the value of [key] if it isn't there.
   ///
   /// If [key] is present in the original map, [ifAbsent] is called to get the
@@ -485,6 +499,16 @@ class ImmortalMap<K, V> {
   ImmortalMap<K, V> replace(K key, V value) =>
       lookup(key).map((v) => add(key, value)).orElse(this);
 
+  /// Returns a copy of this map where the key/value pair with [key] is replaced
+  /// by [entry] if already present.
+  ///
+  /// Overwrites a previous value in the copied map if [entry.key] was already
+  /// present.
+  ///
+  /// Returns the map unchanged if [key] is not present.
+  ImmortalMap<K, V> replaceEntry(K key, MapEntry<K, V> entry) =>
+      lookup(key).map((_) => remove(key).addEntry(entry)).orElse(this);
+
   /// Returns a copy of this map replacing the values of all key/value pairs
   /// fulfilling the given [predicate] with [value].
   ///
@@ -499,6 +523,18 @@ class ImmortalMap<K, V> {
   ///
   /// See [add].
   ImmortalMap<K, V> set(K key, V value) => add(key, value);
+
+  /// Returns a copy of this map where the key/value pair [entry] is added.
+  ///
+  /// See [addEntry].
+  ImmortalMap<K, V> setEntry(MapEntry<K, V> entry) => addEntry(entry);
+
+  /// Returns a copy of this map where the key/value pair [entry] is added if no
+  /// entry for [entry.key] is already present.
+  ///
+  /// See [addEntryIfAbsent].
+  ImmortalMap<K, V> setEntryIfAbsent(MapEntry<K, V> entry) =>
+      addEntryIfAbsent(entry);
 
   /// Returns a copy of this map setting the value of [key] if it isn't there.
   ///
@@ -552,10 +588,13 @@ class ImmortalMap<K, V> {
   /// If the key is not present and [ifAbsent] is provided, calls [ifAbsent]
   /// and adds the key with the returned value to the copied map.
   ///
-  /// If the key is not present and [ifAbsent] is not provided, the list is
+  /// If the key is not present and [ifAbsent] is not provided, the map is
   /// returned unchanged.
-  ImmortalMap<K, V> update(K key, V Function(V value) update,
-      {V Function() ifAbsent}) {
+  ImmortalMap<K, V> update(
+    K key,
+    V Function(V value) update, {
+    V Function() ifAbsent,
+  }) {
     if (ifAbsent == null && !containsKey(key)) {
       return this;
     }
@@ -573,6 +612,32 @@ class ImmortalMap<K, V> {
   /// result of invoking [update].
   ImmortalMap<K, V> updateAll(V Function(K key, V value) update) =>
       ImmortalMap._internal(toMutableMap()..updateAll(update));
+
+  /// Returns a copy of this map updating the entry for the provided [key].
+  ///
+  /// If the key is present, invokes [update] with the current value and
+  /// replaces the key/value-pair with the result in the copied map.
+  ///
+  /// If the key is not present and [ifAbsent] is provided, calls [ifAbsent]
+  /// and replaces the key/value with the result in the copied map.
+  ///
+  /// If the key is not present and [ifAbsent] is not provided, the map is
+  /// returned unchanged.
+  ///
+  /// Overwrites a previous value in the copied map if a key/value pair with the
+  /// new entry's key is already present.
+  ImmortalMap<K, V> updateEntry(
+    K key,
+    MapEntry<K, V> Function(V value) update, {
+    MapEntry<K, V> Function() ifAbsent,
+  }) =>
+      lookup(key)
+          .map((v) => remove(key).addEntry(update(v)))
+          .orElse(ifAbsent == null
+              ? this
+              : remove(key).addEntry(
+                  ifAbsent(),
+                ));
 
   /// Returns a copy of this map invoking [update] on all key/value pairs
   /// fulfilling the given [predicate].

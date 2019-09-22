@@ -5,7 +5,7 @@
 * Extend set functionality:
   * methods: `updateWhere`
 * Extend map functionality:
-  * methods: `filter`, `filterKeys`, `filterValues`, `put`, `putWhere`, `replace`, `replaceWhere`, `set`, `setIfAbsent`, `setWhere`, `single`, `singleKey`, `singleValue`, `updateWhere`, `where`, `whereKey`, `whereValue`
+  * methods: `addEntryIfAbsent`, `filter`, `filterKeys`, `filterValues`, `put`, `putEntryIfAbsent`, `putWhere`, `replace`, `replaceEntry`, `replaceWhere`, `set`, `setEntry`, `setEntryIfAbsent`, `setIfAbsent`, `setWhere`, `single`, `singleKey`, `singleValue`, `updateEntry`, `updateWhere`, `where`, `whereKey`, `whereValue`
 
 ## 1.1.0
 

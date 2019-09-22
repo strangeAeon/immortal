@@ -185,12 +185,14 @@ void main() {
     expectMap(emptyMap.addPair(Tuple2('a', 1)), singleMap);
     expectMap(emptyMap.put('a', 1), singleMap);
     expectMap(emptyMap.set('a', 1), singleMap);
+    expectMap(emptyMap.setEntry(MapEntry('a', 1)), singleMap);
     final twoEntryMap = ImmortalMap({'a': 1, 'c': 3});
     expectMap(twoEntryMap.add('b', 2), multiMap);
     expectMap(twoEntryMap.addEntry(MapEntry('b', 2)), multiMap);
     expectMap(twoEntryMap.addPair(Tuple2('b', 2)), multiMap);
     expectMap(twoEntryMap.put('b', 2), multiMap);
     expectMap(twoEntryMap.set('b', 2), multiMap);
+    expectMap(twoEntryMap.setEntry(MapEntry('b', 2)), multiMap);
   });
 
   test('should replace entry', () {
@@ -238,6 +240,12 @@ void main() {
     expectMap(multiMap.putIfAbsent('a', () => 4), multiMap);
     expectMap(emptyMap.setIfAbsent('a', () => 1), singleMap);
     expectMap(multiMap.setIfAbsent('a', () => 4), multiMap);
+    expectMap(emptyMap.addEntryIfAbsent(MapEntry('a', 1)), singleMap);
+    expectMap(multiMap.addEntryIfAbsent(MapEntry('a', 4)), multiMap);
+    expectMap(emptyMap.putEntryIfAbsent(MapEntry('a', 1)), singleMap);
+    expectMap(multiMap.putEntryIfAbsent(MapEntry('a', 4)), multiMap);
+    expectMap(emptyMap.setEntryIfAbsent(MapEntry('a', 1)), singleMap);
+    expectMap(multiMap.setEntryIfAbsent(MapEntry('a', 4)), multiMap);
   });
 
   test('should combine with the given mortal map', () {
@@ -497,6 +505,15 @@ void main() {
     expectMap(multiMap.replace('a', 4), ImmortalMap({'a': 4, 'b': 2, 'c': 3}));
   });
 
+  test('should replace entry if present', () {
+    expect(emptyMap.replaceEntry('a', MapEntry('d', 1)), emptyMap);
+    expect(multiMap.replaceEntry('d', MapEntry('e', 4)), multiMap);
+    expectMap(
+      multiMap.replaceEntry('a', MapEntry('d', 4)),
+      ImmortalMap({'b': 2, 'c': 3, 'd': 4}),
+    );
+  });
+
   test('should replace values fulfilling a test', () {
     expectMap(
       multiMap.replaceWhere((key, value) => value > 1, 4),
@@ -551,6 +568,19 @@ void main() {
     expectMap(
       singleMap.update('a', (value) => value + 1),
       ImmortalMap({'a': 2}),
+    );
+    expect(emptyMap.updateEntry('a', (value) => MapEntry('d', 4)), emptyMap);
+    expectMap(
+      emptyMap.updateEntry(
+        'd',
+        (value) => MapEntry('e', 4),
+        ifAbsent: () => MapEntry('a', 1),
+      ),
+      singleMap,
+    );
+    expectMap(
+      singleMap.updateEntry('a', (value) => MapEntry('d', value + 1)),
+      ImmortalMap({'d': 2}),
     );
   });
 
