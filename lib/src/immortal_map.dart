@@ -355,6 +355,12 @@ class ImmortalMap<K, V> {
   /// Applies [f] to each key/value pair of the map.
   void forEach(void Function(K key, V value) f) => _map.forEach(f);
 
+  /// Returns an [Optional] containing the value for the given [key] or
+  /// [Optional.empty] if [key] is not in the map.
+  ///
+  /// See [lookup].
+  Optional<V> get(K key) => lookup(key);
+
   /// Returns `true` if there is no key/value pair in the map.
   bool get isEmpty => _map.isEmpty;
 

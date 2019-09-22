@@ -177,6 +177,10 @@ void main() {
     expect(multiMap.lookup('b'), Optional.of(2));
     expect(multiMap.lookup('c'), Optional.of(3));
     expect(multiMap.lookup('d'), Optional.empty());
+    expect(multiMap.get('a'), Optional.of(1));
+    expect(multiMap.get('b'), Optional.of(2));
+    expect(multiMap.get('c'), Optional.of(3));
+    expect(multiMap.get('d'), Optional.empty());
   });
 
   test('should add entry', () {
