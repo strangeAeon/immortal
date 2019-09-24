@@ -1,7 +1,7 @@
 ## 1.2.0
 
 * Extend list functionality:
-  * methods: `asMapWithKeys`, `flatten`, `flattenIterables`, `putWhere`, `putWhereIndexed`, `replaceAt`, `replaceWhere`, `replaceWhereIndexed`, `setWhere`, `setWhereIndexed`, `updateAt`, `updateWhere`, `updateWhereIndexed`
+  * methods: `anyIndexed`, `asMapWithKeys`, `asMapWithKeysIndexed`, `everyIndexed`, `expandIndexed`, `expandIterableIndexed`, `filterIndexed`, `flatMapIndexed`, `flatMapIterableIndexed`, `flatten`, `flattenIterables`, `indicesOf`, `indicesWhere`, `putWhere`, `putWhereIndexed`, `replaceAt`, `replaceWhere`, `replaceWhereIndexed`, `setWhere`, `setWhereIndexed`, `updateAt`, `updateWhere`, `updateWhereIndexed`, `whereIndexed`
 * Extend set functionality:
   * methods: `asMapWithKeys`, `flatten`, `flattenIterables`, `flattenLists`, `updateWhere`
 * Extend map functionality:

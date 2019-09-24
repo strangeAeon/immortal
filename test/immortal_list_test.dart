@@ -118,6 +118,11 @@ void main() {
     expect(multiList.any((value) => value > 3), false);
   });
 
+  test('should check if any element and index satisfies a test', () {
+    expect(multiList.anyIndexed((index, value) => value + index < 3), true);
+    expect(multiList.anyIndexed((index, value) => value - index > 3), false);
+  });
+
   test('should transform list to immortal map', () {
     expectMap(emptyList.asMap(), ImmortalMap<int, int>());
     expectMap(singleList.asMap(), ImmortalMap({0: 1}));
@@ -133,6 +138,22 @@ void main() {
     expectMap(
       multiList.asMapWithKeys((v) => v.isOdd),
       ImmortalMap({true: 3, false: 2}),
+    );
+  });
+
+  test('should transform list to immortal map with an indexed key function',
+      () {
+    expectMap(
+      singleList.asMapWithKeysIndexed((i, v) => v + i),
+      ImmortalMap({1: 1}),
+    );
+    expectMap(
+      multiList.asMapWithKeysIndexed((i, v) => '$i-$v'),
+      ImmortalMap({'0-1': 1, '1-2': 2, '2-3': 3}),
+    );
+    expectMap(
+      multiList.asMapWithKeysIndexed((i, v) => (v + i).isOdd),
+      ImmortalMap({true: 3}),
     );
   });
 
@@ -201,6 +222,12 @@ void main() {
     expect(multiList.every((value) => value > 2), false);
   });
 
+  test('should check if all elements and their indices satisfy a test', () {
+    expect(emptyList.everyIndexed((index, value) => value + index < 4), true);
+    expect(multiList.everyIndexed((index, value) => value - index < 4), true);
+    expect(multiList.everyIndexed((index, value) => value + index > 2), false);
+  });
+
   test('should expand each element to a list and flatten the result', () {
     expectList(
       singleList.expand((i) => ImmortalList([i, i * 1.0])),
@@ -217,6 +244,27 @@ void main() {
     expectList(
       multiList.flatMap((i) => ImmortalList([i, i * 2])),
       ImmortalList([1, 2, 2, 4, 3, 6]),
+    );
+  });
+
+  test(
+      'should expand each element and its index to a list and flatten the'
+      'result', () {
+    expectList(
+      singleList.expandIndexed((index, i) => ImmortalList([i, i * index])),
+      ImmortalList([1, 0]),
+    );
+    expectList(
+      multiList.expandIndexed((index, i) => ImmortalList([i, i * index])),
+      ImmortalList([1, 0, 2, 2, 3, 6]),
+    );
+    expectList(
+      singleList.flatMapIndexed((index, i) => ImmortalList([i, i * index])),
+      ImmortalList([1, 0]),
+    );
+    expectList(
+      multiList.flatMapIndexed((index, i) => ImmortalList([i, i * index])),
+      ImmortalList([1, 0, 2, 2, 3, 6]),
     );
   });
 
@@ -239,6 +287,27 @@ void main() {
     );
   });
 
+  test(
+      'should expand each element and its index to an iterable and flatten the'
+      'result', () {
+    expectList(
+      singleList.expandIterableIndexed((index, i) => [i, i * index]),
+      ImmortalList([1, 0]),
+    );
+    expectList(
+      multiList.expandIterableIndexed((index, i) => [i, i * index]),
+      ImmortalList([1, 0, 2, 2, 3, 6]),
+    );
+    expectList(
+      singleList.flatMapIterableIndexed((index, i) => [i, i * index]),
+      ImmortalList([1, 0]),
+    );
+    expectList(
+      multiList.flatMapIterableIndexed((index, i) => [i, i * index]),
+      ImmortalList([1, 0, 2, 2, 3, 6]),
+    );
+  });
+
   test('should fill a range with a given value', () {
     expectList(multiList.fillRange(-1, 1, 4), ImmortalList([4, 2, 3]));
     expectList(multiList.fillRange(2, 5, 4), ImmortalList([1, 2, 4]));
@@ -253,6 +322,33 @@ void main() {
     expectList(multiList.where((value) => value > 1), ImmortalList([2, 3]));
     expectList(multiList.where((value) => value > 4), emptyList);
     expectList(multiList.where((value) => value > 0), multiList);
+  });
+
+  test('should return elements that fulfill a test with their index', () {
+    expectList(
+      multiList.filterIndexed((index, value) => value + index > 1),
+      ImmortalList([2, 3]),
+    );
+    expectList(
+      multiList.filterIndexed((index, value) => value + index > 5),
+      emptyList,
+    );
+    expectList(
+      multiList.filterIndexed((index, value) => value + index > 0),
+      multiList,
+    );
+    expectList(
+      multiList.whereIndexed((index, value) => value + index > 1),
+      ImmortalList([2, 3]),
+    );
+    expectList(
+      multiList.whereIndexed((index, value) => value + index > 5),
+      emptyList,
+    );
+    expectList(
+      multiList.whereIndexed((index, value) => value + index > 0),
+      multiList,
+    );
   });
 
   test('should return elements of a type', () {
@@ -360,6 +456,17 @@ void main() {
     expect(multiList.indexWhere((value) => value > 2), 2);
     expect(multiList.indexWhere((value) => value > 4), -1);
     expect(multiList.indexWhere((value) => value > 0, 2), 2);
+  });
+
+  test('should return all indices of element', () {
+    expectList(singleList.indicesOf(2), ImmortalList<int>());
+    expectList(multiList.indicesOf(2), ImmortalList([1]));
+    expectList(equalElementsList.indicesOf(1), ImmortalList([0, 1, 2]));
+  });
+
+  test('should return all indices fulfilling a test', () {
+    expectList(singleList.indicesWhere((e) => e > 1), ImmortalList<int>());
+    expectList(multiList.indicesWhere((e) => e > 1), ImmortalList([1, 2]));
   });
 
   test('should insert element at index', () {
