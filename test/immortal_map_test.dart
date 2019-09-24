@@ -142,8 +142,8 @@ void main() {
     expectMap(
       ImmortalMap.fromList(
         ImmortalList([1, 2, 3]),
-        key: (key) => key * 2,
-        value: (value) => value * value,
+        keyGenerator: (key) => key * 2,
+        valueGenerator: (value) => value * value,
       ),
       ImmortalMap({2: 1, 4: 4, 6: 9}),
     );
@@ -157,8 +157,8 @@ void main() {
     expectMap(
       ImmortalMap.fromIterable(
         [1, 2, 3],
-        key: (key) => key * 2,
-        value: (value) => value * value,
+        keyGenerator: (key) => key * 2,
+        valueGenerator: (value) => value * value,
       ),
       ImmortalMap({2: 1, 4: 4, 6: 9}),
     );

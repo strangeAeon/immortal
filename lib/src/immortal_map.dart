@@ -71,7 +71,10 @@ class ImmortalMap<K, V> {
   /// `hashCode`.
   /// It is allowed although not advised to use `null` as a key and/or value.
   factory ImmortalMap.fromLists(ImmortalList<K> keys, ImmortalList<V> values) =>
-      ImmortalMap.fromIterables(keys.toMutableList(), values.toMutableList());
+      ImmortalMap.fromIterables(
+        keys.toMutableList(),
+        values.toMutableList(),
+      );
 
   /// Creates an [ImmortalMap] by associating the given [keys] to [values].
   ///
@@ -127,30 +130,30 @@ class ImmortalMap<K, V> {
   /// It is allowed although not advised to use `null` as a key and/or value.
   factory ImmortalMap.ofMutable(Map<K, V> other) => ImmortalMap(other);
 
-  /// Returns a copy of [source] casting all keys to instances of [K2] and all
+  /// Returns a copy of [other] casting all keys to instances of [K2] and all
   /// values to instances of [V2].
   ///
   /// See [cast].
-  static ImmortalMap<K2, V2> castFrom<K, V, K2, V2>(ImmortalMap<K, V> source) =>
-      source.cast<K2, V2>();
+  static ImmortalMap<K2, V2> castFrom<K, V, K2, V2>(ImmortalMap<K, V> other) =>
+      other.cast<K2, V2>();
 
-  /// Creates an [ImmortalMap] from [source] by casting all keys to instances
-  /// of [K2] and all values to instances of [V2].
+  /// Creates an [ImmortalMap] from [other] by casting all keys to instances of
+  /// [K2] and all values to instances of [V2].
   ///
-  /// If [source] contains only keys of type [K2] and values of type [V2], the
+  /// If [other] contains only keys of type [K2] and values of type [V2], the
   /// map will be created correctly, otherwise an exception will be thrown.
   ///
-  /// It iterates over the entries of [source], which must therefore not change
+  /// It iterates over the entries of [other], which must therefore not change
   /// during the iteration.
-  static ImmortalMap<K2, V2> castFromMutable<K, V, K2, V2>(Map<K, V> source) =>
-      ImmortalMap(source.cast<K2, V2>());
+  static ImmortalMap<K2, V2> castFromMutable<K, V, K2, V2>(Map<K, V> other) =>
+      ImmortalMap(other.cast<K2, V2>());
 
   /// Creates an [ImmortalMap] by computing the keys and values from [list].
   ///
-  /// For each element of [list] this constructor computes a key/value pair
-  /// by applying [key] and [value] respectively.
-  /// If no values are specified for [key] and [value] the default is the
-  /// identity function.
+  /// For each element of [list] this constructor computes a key/value pair by
+  /// applying [keyGenerator] and [valueGenerator] respectively.
+  /// If no values are specified for [keyGenerator] and [valueGenerator] the
+  /// default is the identity function.
   ///
   /// The keys computed by the source [list] do not need to be unique. The last
   /// occurrence of a key will simply overwrite any previous value.
@@ -159,10 +162,14 @@ class ImmortalMap<K, V> {
   /// It is allowed although not advised to use `null` as a key and/or value.
   static ImmortalMap<K, V> fromList<T, K, V>(
     ImmortalList<T> list, {
-    K Function(T element) key,
-    V Function(T element) value,
+    K Function(T value) keyGenerator,
+    V Function(T value) valueGenerator,
   }) =>
-      ImmortalMap.fromIterable(list.toMutableList(), key: key, value: value);
+      ImmortalMap.fromIterable(
+        list.toMutableList(),
+        keyGenerator: keyGenerator,
+        valueGenerator: valueGenerator,
+      );
 
   /// Creates an [ImmortalMap] by computing the keys and values from [iterable].
   ///
@@ -171,10 +178,14 @@ class ImmortalMap<K, V> {
   /// iteration.
   static ImmortalMap<K, V> fromIterable<T, K, V>(
     Iterable<T> iterable, {
-    K Function(T element) key,
-    V Function(T element) value,
+    K Function(T value) keyGenerator,
+    V Function(T value) valueGenerator,
   }) =>
-      ImmortalMap._internal(Map.fromIterable(iterable, key: key, value: value));
+      ImmortalMap._internal(Map.fromIterable(
+        iterable,
+        key: keyGenerator,
+        value: valueGenerator,
+      ));
 
   final Map<K, V> _map;
 
@@ -204,33 +215,33 @@ class ImmortalMap<K, V> {
   ImmortalMap<K, V> addAll(ImmortalMap<K, V> other) =>
       addMap(other.toMutableMap());
 
-  /// Returns a copy of this map where all key/value pairs of [newEntries] are
+  /// Returns a copy of this map where all key/value pairs of [entries] are
   /// added.
   ///
-  /// If a key of [newEntries] is already present in the copy,
-  /// the corresponding value is overwritten.
+  /// If a key of [entries] is already present in the copy, the corresponding
+  /// value is overwritten.
   ///
-  /// If [newEntries] is empty, the map is returned unchanged.
-  ImmortalMap<K, V> addEntries(ImmortalList<MapEntry<K, V>> newEntries) =>
-      addEntriesIterable(newEntries.toMutableList());
+  /// If [entries] is empty, the map is returned unchanged.
+  ImmortalMap<K, V> addEntries(ImmortalList<MapEntry<K, V>> entries) =>
+      addEntriesIterable(entries.toMutableList());
 
   /// Returns a copy of this map where all key/value pairs of the iterable
-  /// [newEntries] are added.
+  /// [entries] are added.
   ///
   /// See [addEntries].
-  /// It iterates over [newEntries], which must therefore not change during the
+  /// It iterates over [entries], which must therefore not change during the
   /// iteration.
-  ImmortalMap<K, V> addEntriesIterable(Iterable<MapEntry<K, V>> newEntries) {
-    if (newEntries.isEmpty) {
+  ImmortalMap<K, V> addEntriesIterable(Iterable<MapEntry<K, V>> entries) {
+    if (entries.isEmpty) {
       return this;
     }
-    return ImmortalMap._internal(toMutableMap()..addEntries(newEntries));
+    return ImmortalMap._internal(toMutableMap()..addEntries(entries));
   }
 
   /// Returns a copy of this map where the key/value pair [entry] is added.
   ///
-  /// If the key of [entry] is already present in the copy,
-  /// the corresponding value is overwritten.
+  /// If the key of [entry] is already present in the copy, the corresponding
+  /// value is overwritten.
   ImmortalMap<K, V> addEntry(MapEntry<K, V> entry) =>
       addEntriesIterable([entry]);
 
@@ -259,8 +270,8 @@ class ImmortalMap<K, V> {
     return ImmortalMap._internal(toMutableMap()..addAll(other));
   }
 
-  /// Returns a copy of this map where the elements of [pair] are added as a
-  /// new map entry.
+  /// Returns a copy of this map where the elements of [pair] are added as a new
+  /// map entry.
   ///
   /// The first element will be used as key and the second one as value.
   /// If the key is already present in the copy, the corresponding value is
@@ -271,7 +282,7 @@ class ImmortalMap<K, V> {
   /// Returns a copy of this map where all elements of [pairs] are added as new
   /// map entries.
   ///
-  /// THe first element of each pair is used as key and the second one as value.
+  /// The first element of each pair is used as key and the second one as value.
   /// If a key is already present in the copy, the corresponding value is
   /// overwritten.
   ///
@@ -286,19 +297,21 @@ class ImmortalMap<K, V> {
   /// It iterates over [pairs], which must therefore not change during the
   /// iteration.
   ImmortalMap<K, V> addPairsIterable(Iterable<Tuple2<K, V>> pairs) =>
-      addEntriesIterable(pairs.map((pair) => MapEntry(pair.item1, pair.item2)));
+      addEntriesIterable(pairs.map(
+        (pair) => MapEntry(pair.item1, pair.item2),
+      ));
 
   /// Returns a copy of this map casting all keys to instances of [K2] and all
   /// values to instances of [V2].
   ///
-  /// If this map contains only keys of type [K2] and values of type [V2],
-  /// the copy will be created correctly, otherwise an exception will be thrown.
+  /// If this map contains only keys of type [K2] and values of type [V2], the
+  /// copy will be created correctly, otherwise an exception will be thrown.
   ImmortalMap<K2, V2> cast<K2, V2>() => ImmortalMap(_map.cast<K2, V2>());
 
   /// Returns `true` if this map contains the given [key].
   ///
-  /// Returns `true` if any of the keys in the map are equal to [key]
-  /// according to the `==` operator.
+  /// Returns `true` if any of the keys in the map are equal to [key] according
+  /// to the `==` operator.
   bool containsKey(Object key) => _map.containsKey(key);
 
   /// Returns `true` if this map contains the given [value].
@@ -329,7 +342,7 @@ class ImmortalMap<K, V> {
             (key, value) => other[key]
                 .map((otherValue) => otherValue == value)
                 .orElse(false),
-          ).every((value) => value);
+          ).every((result) => result);
 
   /// Returns a copy of this map containing all entries that satisfy the given
   /// [predicate].
@@ -395,12 +408,12 @@ class ImmortalMap<K, V> {
   Optional<V> lookup(K key) => Optional.ofNullable(_map[key]);
 
   /// Returns an immortal list of all keys with a value equal to the given
-  /// [value] according to the `==` operator.
-  ImmortalList<K> lookupKeysForValue(V value) =>
-      where((_, v) => v == value).keys;
+  /// [lookupValue] according to the `==` operator.
+  ImmortalList<K> lookupKeysForValue(V lookupValue) =>
+      where((_, value) => value == lookupValue).keys;
 
-  /// Returns a new map where all entries of this map are transformed by
-  /// the given [f] function.
+  /// Returns a new map where all entries of this map are transformed by the
+  /// given [f] function.
   ///
   /// If multiple entries have the same key after transformation, later
   /// occurences overwrite the earlier ones.
@@ -415,10 +428,12 @@ class ImmortalMap<K, V> {
   /// If multiple entries have the same key after transformation, later
   /// occurences overwrite the earlier ones.
   ImmortalList<R> mapEntries<R>(R Function(K key, V value) f) =>
-      ImmortalList(_map.entries.map((entry) => f(entry.key, entry.value)));
+      ImmortalList(_map.entries.map(
+        (entry) => f(entry.key, entry.value),
+      ));
 
-  /// Returns a new map where all keys of this map are transformed by
-  /// the given [f] function in respect to their values.
+  /// Returns a new map where all keys of this map are transformed by the given
+  /// [f] function in respect to their values.
   ///
   /// If multiple entries have the same key after transformation, later
   /// occurences overwrite the earlier ones.
@@ -430,8 +445,8 @@ class ImmortalMap<K, V> {
   ImmortalMap<K, V2> mapValues<V2>(V2 Function(K key, V value) f) =>
       map((key, value) => MapEntry(key, f(key, value)));
 
-  /// Returns an [ImmortalList] containing the entries of this map as tuples
-  /// of key and value.
+  /// Returns an [ImmortalList] containing the entries of this map as tuples of
+  /// key and value.
   ///
   /// If multiple pairs have the same key, later occurences overwrite the
   /// earlier ones.
@@ -468,12 +483,12 @@ class ImmortalMap<K, V> {
       ImmortalMap._internal(toMutableMap()..putIfAbsent(key, ifAbsent));
 
   /// Returns a copy of this map replacing the values of all key/value pairs
-  /// fulfilling the given [predicate] with [value].
+  /// fulfilling the given [predicate] with [newValue].
   ImmortalMap<K, V> putWhere(
     bool Function(K key, V value) predicate,
-    V value,
+    V newValue,
   ) =>
-      mapValues((k, v) => predicate(k, v) ? value : v);
+      mapValues((key, value) => predicate(key, value) ? newValue : value);
 
   /// Returns a copy of this map where [key] and its associated value are
   /// removed if present.
@@ -494,7 +509,6 @@ class ImmortalMap<K, V> {
   /// contained in the iterable [keysToRemove] are removed from.
   ///
   /// See [removeAll].
-  ///
   /// It iterates over [keysToRemove], which must therefore not change during
   /// the iteration.
   ImmortalMap<K, V> removeIterable(Iterable<K> keysToRemove) =>
@@ -505,8 +519,10 @@ class ImmortalMap<K, V> {
   ImmortalMap<K, V> removeValue(Object valueToRemove) =>
       removeWhere((_, value) => value == valueToRemove);
 
-  /// Returns a copy of this map where all entries with a value contained in
-  /// the iterable [valuesToRemove] are removed from.
+  /// Returns a copy of this map where all entries with a value contained in the
+  /// iterable [valuesToRemove] are removed from.
+  /// It iterates over [valuesToRemove], which must therefore not change during
+  /// the iteration.
   ImmortalMap<K, V> removeValuesIterable(Iterable<V> valuesToRemove) =>
       removeWhere((_, value) => valuesToRemove.contains(value));
 
@@ -515,12 +531,12 @@ class ImmortalMap<K, V> {
   ImmortalMap<K, V> removeWhere(bool Function(K key, V value) predicate) =>
       ImmortalMap._internal(toMutableMap()..removeWhere(predicate));
 
-  /// Returns a copy of this map where the value of [key] is set to [value] if
-  /// already present.
+  /// Returns a copy of this map where the value of [key] is set to [newValue]
+  /// if already present.
   ///
   /// Returns the map unchanged if [key] is not present.
-  ImmortalMap<K, V> replace(K key, V value) =>
-      lookup(key).map((v) => add(key, value)).orElse(this);
+  ImmortalMap<K, V> replace(K key, V newValue) =>
+      lookup(key).map((value) => add(key, newValue)).orElse(this);
 
   /// Returns a copy of this map where the key/value pair with [key] is replaced
   /// by [entry] if already present.
@@ -540,7 +556,7 @@ class ImmortalMap<K, V> {
   ///
   /// Returns the map unchanged if [key] is not present.
   ImmortalMap<K, V> replaceKey(K key, K newKey) =>
-      lookup(key).map((v) => remove(key).add(newKey, v)).orElse(this);
+      lookup(key).map((value) => remove(key).add(newKey, value)).orElse(this);
 
   /// Returns a copy of this map replacing the values of all key/value pairs
   /// fulfilling the given [predicate] with [value].
@@ -607,7 +623,8 @@ class ImmortalMap<K, V> {
   /// is important.
   Optional<V> get singleValue => single.map((entry) => entry.value);
 
-  /// Returns a mutable [LinkedHashMap] containing all key/value pairs of this map.
+  /// Returns a mutable [LinkedHashMap] containing all key/value pairs of this
+  /// map.
   Map<K, V> toMutableMap() => Map.from(_map);
 
   @override
@@ -618,8 +635,8 @@ class ImmortalMap<K, V> {
   /// If the key is present, invokes [update] with the current value and stores
   /// the new value in the copied map.
   ///
-  /// If the key is not present and [ifAbsent] is provided, calls [ifAbsent]
-  /// and adds the key with the returned value to the copied map.
+  /// If the key is not present and [ifAbsent] is provided, calls [ifAbsent] and
+  /// adds the key with the returned value to the copied map.
   ///
   /// If the key is not present and [ifAbsent] is not provided, the map is
   /// returned unchanged.
@@ -631,12 +648,9 @@ class ImmortalMap<K, V> {
     if (ifAbsent == null && !containsKey(key)) {
       return this;
     }
-    return ImmortalMap._internal(toMutableMap()
-      ..update(
-        key,
-        update,
-        ifAbsent: ifAbsent,
-      ));
+    return ImmortalMap._internal(
+      toMutableMap()..update(key, update, ifAbsent: ifAbsent),
+    );
   }
 
   /// Returns a copy of this map updating all values.
@@ -651,8 +665,8 @@ class ImmortalMap<K, V> {
   /// If the key is present, invokes [update] with the current value and
   /// replaces the key/value-pair with the result in the copied map.
   ///
-  /// If the key is not present and [ifAbsent] is provided, calls [ifAbsent]
-  /// and replaces the key/value with the result in the copied map.
+  /// If the key is not present and [ifAbsent] is provided, calls [ifAbsent] and
+  /// replaces the key/value with the result in the copied map.
   ///
   /// If the key is not present and [ifAbsent] is not provided, the map is
   /// returned unchanged.
@@ -665,12 +679,8 @@ class ImmortalMap<K, V> {
     MapEntry<K, V> Function() ifAbsent,
   }) =>
       lookup(key)
-          .map((v) => remove(key).addEntry(update(v)))
-          .orElse(ifAbsent == null
-              ? this
-              : remove(key).addEntry(
-                  ifAbsent(),
-                ));
+          .map((value) => remove(key).addEntry(update(value)))
+          .orElse(ifAbsent == null ? this : remove(key).addEntry(ifAbsent()));
 
   /// Returns a copy of this map where the key of the entry with [key] is
   /// replaced by applying [update] to its value if already present.
@@ -679,8 +689,9 @@ class ImmortalMap<K, V> {
   /// resulting key was already present.
   ///
   /// Returns the map unchanged if [key] is not present.
-  ImmortalMap<K, V> updateKey(K key, K Function(V value) update) =>
-      lookup(key).map((v) => remove(key).add(update(v), v)).orElse(this);
+  ImmortalMap<K, V> updateKey(K key, K Function(V value) update) => lookup(key)
+      .map((value) => remove(key).add(update(value), value))
+      .orElse(this);
 
   /// Returns a copy of this map invoking [update] on all key/value pairs
   /// fulfilling the given [predicate].
@@ -688,7 +699,9 @@ class ImmortalMap<K, V> {
     bool Function(K key, V value) predicate,
     V Function(K key, V value) update,
   ) =>
-      mapValues((k, v) => predicate(k, v) ? update(k, v) : v);
+      mapValues(
+        (key, value) => predicate(key, value) ? update(key, value) : value,
+      );
 
   /// Returns an [ImmortalList] containing the values of this map.
   ImmortalList<V> get values => ImmortalList(_map.values);
@@ -697,17 +710,20 @@ class ImmortalMap<K, V> {
   /// [predicate].
   ImmortalMap<K, V> where(bool Function(K key, V value) predicate) =>
       ImmortalMap._internal(
-          toMutableMap()..removeWhere((k, v) => !predicate(k, v)));
+        toMutableMap()..removeWhere((key, value) => !predicate(key, value)),
+      );
 
   /// Returns a copy of this map containing all entries with keys that satisfy
   /// the given [predicate].
   ImmortalMap<K, V> whereKey(bool Function(K key) predicate) =>
       ImmortalMap._internal(
-          toMutableMap()..removeWhere((k, v) => !predicate(k)));
+        toMutableMap()..removeWhere((key, _) => !predicate(key)),
+      );
 
   /// Returns a copy of this map containing all entries with values that satisfy
   /// the given [predicate].
   ImmortalMap<K, V> whereValue(bool Function(V value) predicate) =>
       ImmortalMap._internal(
-          toMutableMap()..removeWhere((k, v) => !predicate(v)));
+        toMutableMap()..removeWhere((_, value) => !predicate(value)),
+      );
 }

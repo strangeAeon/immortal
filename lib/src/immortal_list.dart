@@ -24,14 +24,17 @@ class ImmortalList<T> {
   /// iteration.
   /// It is allowed although not advised to use `null` as value.
   ImmortalList([Iterable<T> iterable])
-      : _list = List<T>.from(iterable ?? [], growable: false);
+      : _list = List<T>.from(
+          iterable ?? [],
+          growable: false,
+        );
 
   ImmortalList._internal(this._list);
 
   /// Creates an empty [ImmortalList].
   factory ImmortalList.empty() => ImmortalList<T>();
 
-  /// Creates an [ImmortalList] of the given [length] with [fill] at each
+  /// Creates an [ImmortalList] of the given [length] with [fillValue] at each
   /// position.
   ///
   /// Will return an empty list, if [length] is negative.
@@ -40,66 +43,76 @@ class ImmortalList<T> {
   ///
   /// You can use [ImmortalList.generate] to create a list with a new object at
   /// each position.
-  factory ImmortalList.filled(int length, T fill) => ImmortalList._internal(
-        List.filled(max(length, 0), fill, growable: false),
-      );
+  factory ImmortalList.filled(int length, T fillValue) =>
+      ImmortalList._internal(List.filled(
+        max(length, 0),
+        fillValue,
+        growable: false,
+      ));
 
   /// Creates an [ImmortalList] as copy of [other].
   ///
   /// See [ImmortalList.of].
   factory ImmortalList.from(ImmortalList<T> other) => ImmortalList.of(other);
 
-  /// Creates an [ImmortalList] that contains all elements of [other].
+  /// Creates an [ImmortalList] that contains all elements of [iterable].
   ///
   /// See [ImmortalList.ofIterable].
-  factory ImmortalList.fromIterable(Iterable<T> other) => ImmortalList(other);
+  factory ImmortalList.fromIterable(Iterable<T> iterable) =>
+      ImmortalList(iterable);
 
   /// Generates an [ImmortalList] of values.
   ///
   /// Creates a list with [length] positions and fills it with values created by
-  /// calling [generator] for each index in the range `0` .. `length - 1` in
-  /// increasing order.
+  /// calling [valueGenerator] for each index in the range `0` .. `length - 1`
+  /// in increasing order.
   ///
   /// Will return an empty list, if [length] is negative.
   ///
   /// It is allowed although not advised to use `null` as value.
-  factory ImmortalList.generate(int length, T Function(int index) generator) =>
-      ImmortalList._internal(
-        List.generate(max(length, 0), generator, growable: false),
-      );
+  factory ImmortalList.generate(
+    int length,
+    T Function(int index) valueGenerator,
+  ) =>
+      ImmortalList._internal(List.generate(
+        max(length, 0),
+        valueGenerator,
+        growable: false,
+      ));
 
   /// Creates an [ImmortalList] as copy of [other].
   ///
   /// See [copy].
   factory ImmortalList.of(ImmortalList<T> other) => other.copy();
 
-  /// Creates an [ImmortalList] that contains all elements of [other].
+  /// Creates an [ImmortalList] that contains all elements of [iterable].
   ///
-  /// The [Iterator] of [other] provides the order of the elements.
+  /// The [Iterator] of [iterable] provides the order of the elements.
   ///
-  /// All the elements in [other] should be instances of [T].
-  /// The [other] itself may have any type.
-  /// It iterates over [other], which must therefore not change during the
+  /// All the elements in [iterable] should be instances of [T].
+  /// The [iterable] itself may have any type.
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
   /// It is allowed although not advised to use `null` as value.
-  factory ImmortalList.ofIterable(Iterable<T> other) => ImmortalList(other);
+  factory ImmortalList.ofIterable(Iterable<T> iterable) =>
+      ImmortalList(iterable);
 
-  /// Returns a copy of [source] casting all elements to instances of [R].
+  /// Returns a copy of [other] casting all elements to instances of [R].
   ///
   /// See [cast].
-  static ImmortalList<R> castFrom<T, R>(ImmortalList<T> source) =>
-      source.cast<R>();
+  static ImmortalList<R> castFrom<T, R>(ImmortalList<T> other) =>
+      other.cast<R>();
 
-  /// Creates an [ImmortalList] by casting all elements of [source] to instances
-  /// of [R].
+  /// Creates an [ImmortalList] by casting all elements of [iterable] to
+  /// instances of [R].
   ///
-  /// If [source] contains only instances of [R], the list will be created
+  /// If [iterable] contains only instances of [R], the list will be created
   /// correctly, otherwise an exception will be thrown.
   ///
-  /// It iterates over [source], which must therefore not change during the
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  static ImmortalList<R> castFromIterable<T, R>(Iterable<T> source) =>
-      ImmortalList(source.cast<R>());
+  static ImmortalList<R> castFromIterable<T, R>(Iterable<T> iterable) =>
+      ImmortalList(iterable.cast<R>());
 
   final List<T> _list;
 
@@ -131,31 +144,31 @@ class ImmortalList<T> {
   ImmortalList<T> addAll(ImmortalList<T> other) =>
       addIterable(other.toMutableList());
 
-  /// Returns a copy of this list where all elements of the iterable [elements]
-  /// are added to the end.
+  /// Returns a copy of this list where all elements of [iterable] are added to
+  /// the end.
   ///
   /// See [addAll].
-  /// It iterates over [elements], which must therefore not change during the
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> addIterable(Iterable<T> elements) {
-    if (elements.isEmpty) {
+  ImmortalList<T> addIterable(Iterable<T> iterable) {
+    if (iterable.isEmpty) {
       return this;
     }
-    return ImmortalList._internal(toMutableList()..addAll(elements));
+    return ImmortalList._internal(toMutableList()..addAll(iterable));
   }
 
   /// Checks whether any element of this list satisfies the given [predicate].
   ///
-  /// Checks every element in iteration order, and returns `true` if
-  /// any of them make [predicate] return `true`, otherwise returns `false`.
-  bool any(bool Function(T element) predicate) => _list.any(predicate);
+  /// Checks every element in iteration order, and returns `true` if any of them
+  /// make [predicate] return `true`, otherwise returns `false`.
+  bool any(bool Function(T value) predicate) => _list.any(predicate);
 
   /// Checks whether any element and its respective index satisfies the given
   /// [predicate].
   ///
   /// See [any].
-  bool anyIndexed(bool Function(int, T) predicate) =>
-      mapIndexed(predicate).any((v) => v == true);
+  bool anyIndexed(bool Function(int index, T value) predicate) =>
+      mapIndexed(predicate).any((result) => result);
 
   /// Returns an [ImmortalMap] using the indices of this list as keys and the
   /// corresponding objects as values.
@@ -168,23 +181,28 @@ class ImmortalList<T> {
   ///     map.keys.toList();           // [0, 1, 2, 3]
   ImmortalMap<int, T> asMap() => ImmortalMap(_list.asMap());
 
-  /// Returns an [ImmortalMap] using the given function [f] as key generator.
+  /// Returns an [ImmortalMap] using the given [keyGenerator].
   ///
-  /// Iterates over all elements in iteration order and creates the key for
-  /// each element by applying [f] to its value.
+  /// Iterates over all elements in iteration order and creates the key for each
+  /// element by applying [keyGenerator] to its value.
   /// If a key is already present in the map, the corresponding value is
   /// overwritten.
-  ImmortalMap<K, T> asMapWithKeys<K>(K Function(T) f) =>
-      ImmortalMap.fromEntries(map((v) => MapEntry(f(v), v)));
+  ImmortalMap<K, T> asMapWithKeys<K>(K Function(T value) keyGenerator) =>
+      ImmortalMap.fromEntries(
+          map((value) => MapEntry(keyGenerator(value), value)));
 
   /// Returns an [ImmortalMap] generating keys by applying the given function
-  /// [f] to each value and its respective index.
+  /// [keyGenerator] to each value and its respective index.
   ///
   /// Iterates over all elements in iteration order.
   /// If a key is already present in the map, the corresponding value is
   /// overwritten.
-  ImmortalMap<K, T> asMapWithKeysIndexed<K>(K Function(int, T) f) =>
-      ImmortalMap.fromEntries(mapIndexed((i, v) => MapEntry(f(i, v), v)));
+  ImmortalMap<K, T> asMapWithKeysIndexed<K>(
+    K Function(int index, T value) keyGenerator,
+  ) =>
+      ImmortalMap.fromEntries(mapIndexed(
+        (index, value) => MapEntry(keyGenerator(index, value), value),
+      ));
 
   /// Returns a copy of this list casting all elements to instances of [R].
   ///
@@ -197,13 +215,13 @@ class ImmortalList<T> {
   /// See [followedBy].
   ImmortalList<T> concatenate(ImmortalList<T> other) => followedBy(other);
 
-  /// Returns a copy of this list concatenating [other].
+  /// Returns a copy of this list concatenating [iterable].
   ///
   /// See [followedBy].
-  /// It iterates over [other], which must therefore not change during the
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> concatenateIterable(Iterable<T> other) =>
-      followedByIterable(other);
+  ImmortalList<T> concatenateIterable(Iterable<T> iterable) =>
+      followedByIterable(iterable);
 
   /// Returns `true` if the list contains an element equal to [element].
   ///
@@ -223,8 +241,8 @@ class ImmortalList<T> {
   ///
   /// This lookup can not distinguish between handling and invalid [index] and
   /// containing the value `null` at the requested index.
-  /// Methods like [contains] or [length] can be used if the distinction
-  /// is important.
+  /// Methods like [contains] or [length] can be used if the distinction is
+  /// important.
   Optional<T> elementAt(int index) {
     if (index < 0 || index >= length) {
       return Optional.empty();
@@ -246,20 +264,20 @@ class ImmortalList<T> {
           length == other.length &&
           mapIndexed((index, value) => other[index]
               .map((otherValue) => otherValue == value)
-              .orElse(false)).every((value) => value);
+              .orElse(false)).every((result) => result);
 
   /// Checks whether every element of this list satisfies the given [predicate].
   ///
   /// Returns `false` if any element makes [predicate] return `false`, otherwise
   /// returns `true`.
-  bool every(bool Function(T element) predicate) => _list.every(predicate);
+  bool every(bool Function(T value) predicate) => _list.every(predicate);
 
   /// Checks whether all elements and their respective indices satisfy the given
   /// [predicate].
   ///
   /// See [every].
-  bool everyIndexed(bool Function(int, T) predicate) =>
-      mapIndexed(predicate).every((v) => v == true);
+  bool everyIndexed(bool Function(int index, T value) predicate) =>
+      mapIndexed(predicate).every((result) => result);
 
   /// Returns a new list expanding each element of this list into a list of zero
   /// or more elements.
@@ -276,16 +294,18 @@ class ImmortalList<T> {
   ///     final input = ImmortalList([1, 2, 3]);
   ///     final duplicated = input.flatMap((i) => ImmortalList([i, i]));
   ///     print(duplicated); // => Immortal[1, 1, 2, 2, 3, 3]
-  ImmortalList<R> expand<R>(ImmortalList<R> Function(T element) f) =>
-      expandIterable((element) => f(element).toMutableList());
+  ImmortalList<R> expand<R>(ImmortalList<R> Function(T value) f) =>
+      expandIterable((value) => f(value).toMutableList());
 
   /// Returns a new list expanding each element of this list into a list of zero
   /// or more elements by applying [f] to each element and its respective index
   /// and concatenating the resulting lists.
   ///
   /// See [expand].
-  ImmortalList<R> expandIndexed<R>(ImmortalList<R> Function(int, T) f) =>
-      mapIndexed(f).expand((e) => e);
+  ImmortalList<R> expandIndexed<R>(
+    ImmortalList<R> Function(int index, T value) f,
+  ) =>
+      mapIndexed(f).expand((result) => result);
 
   /// Returns a new list expanding each element of this list into an iterable of
   /// zero or more elements.
@@ -293,7 +313,7 @@ class ImmortalList<T> {
   /// See [expand].
   /// The iterables returnd by [f] are iterated over and must therefore not
   /// change during the iteration.
-  ImmortalList<R> expandIterable<R>(Iterable<R> Function(T element) f) =>
+  ImmortalList<R> expandIterable<R>(Iterable<R> Function(T value) f) =>
       ImmortalList(_list.expand(f));
 
   /// Returns a new list expanding each element of this list into an interable
@@ -303,8 +323,10 @@ class ImmortalList<T> {
   /// See [expand].
   /// The iterables returnd by [f] are iterated over and must therefore not
   /// change during the iteration.
-  ImmortalList<R> expandIterableIndexed<R>(Iterable<R> Function(int, T) f) =>
-      mapIndexed(f).expandIterable((e) => e);
+  ImmortalList<R> expandIterableIndexed<R>(
+    Iterable<R> Function(int index, T value) f,
+  ) =>
+      mapIndexed(f).expandIterable((result) => result);
 
   /// Returns a copy of this list setting the objects in the range [start]
   /// inclusive to [end] exclusive to the given [fillValue].
@@ -322,11 +344,7 @@ class ImmortalList<T> {
   ///     final list = ImmortalList([1, 2, 3]);
   ///     final filledList = list.fillRange(0, 2, 4);
   ///     print(filledList); //  Immortal[4, 4, 3]
-  ImmortalList<T> fillRange(
-    int start,
-    int end, [
-    T fillValue,
-  ]) {
+  ImmortalList<T> fillRange(int start, int end, [T fillValue]) {
     final validStart = max(min(start, length), 0);
     final validEnd = max(validStart, min(end, length));
     if (validStart == validEnd) {
@@ -344,14 +362,13 @@ class ImmortalList<T> {
   /// [predicate].
   ///
   /// See [where].
-  ImmortalList<T> filter(bool Function(T element) predicate) =>
-      where(predicate);
+  ImmortalList<T> filter(bool Function(T value) predicate) => where(predicate);
 
   /// Returns a new list containing all elements that satisfy the given
   /// [predicate] with their respective indices.
   ///
   /// See [whereIndexed].
-  ImmortalList<T> filterIndexed(bool Function(int, T) predicate) =>
+  ImmortalList<T> filterIndexed(bool Function(int index, T value) predicate) =>
       whereIndexed(predicate);
 
   /// Returns a new list with all elements of this list that have type [R].
@@ -367,8 +384,8 @@ class ImmortalList<T> {
   ///
   /// This lookup can not distinguish between the list being empty and
   /// containing the `null` value as first element.
-  /// Methods like [contains] or [length] can be used if the distinction
-  /// is important.
+  /// Methods like [contains] or [length] can be used if the distinction is
+  /// important.
   Optional<T> get first {
     if (isEmpty) {
       return Optional.empty();
@@ -389,22 +406,25 @@ class ImmortalList<T> {
   /// containing the `null` value satisfying the predicate.
   /// Methods like [contains] or [indexWhere] can be used if the distinction is
   /// important.
-  Optional<T> firstWhere(bool Function(T element) predicate) =>
-      Optional.ofNullable(_list.firstWhere(predicate, orElse: () => null));
+  Optional<T> firstWhere(bool Function(T value) predicate) =>
+      Optional.ofNullable(
+        _list.firstWhere(predicate, orElse: () => null),
+      );
 
   /// Returns a new list expanding each element of this list into a list of zero
   /// or more elements.
   ///
   /// See [expand].
-  ImmortalList<R> flatMap<R>(ImmortalList<R> Function(T element) f) =>
-      expand(f);
+  ImmortalList<R> flatMap<R>(ImmortalList<R> Function(T value) f) => expand(f);
 
   /// Returns a new list expanding each element of this list into a list of zero
   /// or more elements by applying [f] to each element and its respective index
   /// and concatenating the resulting lists.
   ///
   /// See [expandIndexed].
-  ImmortalList<R> flatMapIndexed<R>(ImmortalList<R> Function(int, T) f) =>
+  ImmortalList<R> flatMapIndexed<R>(
+    ImmortalList<R> Function(int index, T value) f,
+  ) =>
       expandIndexed(f);
 
   /// Returns a new list expanding each element of this list into an iterable of
@@ -413,7 +433,7 @@ class ImmortalList<T> {
   /// See [expand].
   /// The iterables returnd by [f] are iterated over and must therefore not
   /// change during the iteration.
-  ImmortalList<R> flatMapIterable<R>(Iterable<R> Function(T element) f) =>
+  ImmortalList<R> flatMapIterable<R>(Iterable<R> Function(T value) f) =>
       expandIterable(f);
 
   /// Returns a new list expanding each element of this list into an interable
@@ -423,7 +443,9 @@ class ImmortalList<T> {
   /// See [expandIterableIndexed].
   /// The iterables returnd by [f] are iterated over and must therefore not
   /// change during the iteration.
-  ImmortalList<R> flatMapIterableIndexed<R>(Iterable<R> Function(int, T) f) =>
+  ImmortalList<R> flatMapIterableIndexed<R>(
+    Iterable<R> Function(int index, T value) f,
+  ) =>
       expandIterableIndexed(f);
 
   /// Flattens a list of immortal lists by concatenating the values in iteration
@@ -431,25 +453,26 @@ class ImmortalList<T> {
   ///
   /// If this list contains only instances of [ImmortalList<R>] the new list
   /// will be created correctly, otherwise an exception is thrown.
-  ImmortalList<R> flatten<R>() => cast<ImmortalList<R>>().expand<R>((l) => l);
+  ImmortalList<R> flatten<R>() =>
+      cast<ImmortalList<R>>().expand<R>((value) => value);
 
   /// Flattens a list of iterables by concatenating the values in iteration
   /// order.
   ///
-  /// If this list contains only instances of [Iterable<R>] the new list
-  /// will be created correctly, otherwise an exception is thrown.
+  /// If this list contains only instances of [Iterable<R>] the new list will be
+  /// created correctly, otherwise an exception is thrown.
   ///
   /// The iterables are iterated over and must therefore not change during the
   /// iteration.
   ImmortalList<R> flattenIterables<R>() =>
-      cast<Iterable<R>>().expandIterable<R>((l) => l);
+      cast<Iterable<R>>().expandIterable<R>((value) => value);
 
   /// Reduces the list to a single value by iteratively combining each element
   /// of this list with an existing value.
   ///
-  /// Uses [initialValue] as the initial value,
-  /// then iterates through the elements and updates the value with
-  /// each element using the [combine] function, as if by:
+  /// Uses [initialValue] as the initial value, then iterates through the
+  /// elements and updates the value with each element using the [combine]
+  /// function, as if by:
   ///
   ///     var value = initialValue;
   ///     for (E element in this) {
@@ -460,7 +483,7 @@ class ImmortalList<T> {
   /// Example of calculating the sum of a list:
   ///
   ///     list.fold(0, (prev, element) => prev + element);
-  R fold<R>(R initialValue, R Function(R previousValue, T element) combine) =>
+  R fold<R>(R initialValue, R Function(R previousResult, T value) combine) =>
       _list.fold(initialValue, combine);
 
   /// Returns a copy of this list concatenating [other].
@@ -472,23 +495,23 @@ class ImmortalList<T> {
   ImmortalList<T> followedBy(ImmortalList<T> other) =>
       followedByIterable(other.toMutableList());
 
-  /// Returns a copy of this list concatenating [other].
+  /// Returns a copy of this list concatenating [iterable].
   ///
   /// See [followedBy].
-  /// It iterates over [other], which must therefore not change during the
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> followedByIterable(Iterable<T> other) {
-    if (other.isEmpty) {
+  ImmortalList<T> followedByIterable(Iterable<T> iterable) {
+    if (iterable.isEmpty) {
       return this;
     }
-    return ImmortalList(_list.followedBy(other));
+    return ImmortalList(_list.followedBy(iterable));
   }
 
   /// Applies the function [f] to each element of this list.
-  void forEach(void Function(T element) f) => _list.forEach(f);
+  void forEach(void Function(T value) f) => _list.forEach(f);
 
   /// Applies the function [f] to each element and its index of this list.
-  void forEachIndexed(void Function(int index, T element) f) => mapIndexed(f);
+  void forEachIndexed(void Function(int index, T value) f) => mapIndexed(f);
 
   /// Returns a copy of this list that contains all elements in the range
   /// [start] inclusive to [end] exclusive.
@@ -513,20 +536,20 @@ class ImmortalList<T> {
     return ImmortalList(_list.getRange(validStart, validEnd));
   }
 
-  /// Returns the first index of [element] in this list.
+  /// Returns the first index of [value] in this list.
   ///
   /// Searches the list from index [start] to the end of the list.
-  /// The first time an object [:o:] is encountered so that [:o == element:],
-  /// the index of [:o:] is returned.
+  /// The first time an object [:o:] is encountered so that [:o == value:], the
+  /// index of [:o:] is returned.
   ///
   ///     final notes = ImmortalList(['do', 're', 'mi', 're']);
   ///     notes.indexOf('re');    // 1
   ///     notes.indexOf('re', 2); // 3
   ///
-  /// Returns -1 if [element] is not found.
+  /// Returns -1 if [value] is not found.
   ///
   ///     notes.indexOf('fa');    // -1
-  int indexOf(T element, [int start = 0]) => _list.indexOf(element, start);
+  int indexOf(T value, [int start = 0]) => _list.indexOf(value, start);
 
   /// Returns the first index in the list that satisfies the given [predicate].
   ///
@@ -542,26 +565,29 @@ class ImmortalList<T> {
   /// Returns -1 if no element fulfilling [predicate] was found.
   ///
   ///     notes.indexWhere((note) => note.startsWith('k'));    // -1
-  int indexWhere(bool Function(T element) predicate, [int start = 0]) =>
+  int indexWhere(bool Function(T value) predicate, [int start = 0]) =>
       _list.indexWhere(predicate, start);
 
-  /// Returns all indices of [element] in this list.
-  ImmortalList<int> indicesOf(T element) => indicesWhere((e) => e == element);
+  /// Returns all indices of [lookupValue] in this list.
+  ImmortalList<int> indicesOf(T lookupValue) =>
+      indicesWhere((value) => value == lookupValue);
 
   /// Returns all indices in the list that satisfy the given [predicate].
-  ImmortalList<int> indicesWhere(bool Function(T) predicate) =>
-      mapIndexed((index, e) => predicate(e) ? index : -1).where((i) => i != -1);
+  ImmortalList<int> indicesWhere(bool Function(T value) predicate) =>
+      mapIndexed((index, value) => predicate(value) ? index : -1)
+          .where((result) => result != -1);
 
-  /// Returns a copy of this list where [element] is inserted at position
-  /// [index].
+  /// Returns a copy of this list where [value] is inserted at position [index].
   ///
   /// All objects at or after the index are shifted towards the end of the list.
   ///
   /// The provided [index] is adjusted to fit inside the boundaries of the list,
   /// i.e. to fulfill `0 <= index <= length`.
-  ImmortalList<T> insert(int index, T element) {
+  ImmortalList<T> insert(int index, T value) {
     final validIndex = max(0, min(index, length));
-    return ImmortalList._internal(toMutableList()..insert(validIndex, element));
+    return ImmortalList._internal(
+      toMutableList()..insert(validIndex, value),
+    );
   }
 
   /// Returns a copy of this list where all objects of [other] are inserted at
@@ -585,7 +611,8 @@ class ImmortalList<T> {
   ImmortalList<T> insertIterable(int index, Iterable<T> iterable) {
     final validIndex = max(0, min(index, length));
     return ImmortalList._internal(
-        toMutableList()..insertAll(validIndex, iterable));
+      toMutableList()..insertAll(validIndex, iterable),
+    );
   }
 
   /// Returns `true` if there are no elements in this list.
@@ -599,9 +626,8 @@ class ImmortalList<T> {
 
   /// Converts each element to a [String] and concatenates the strings.
   ///
-  /// Iterates through elements of this list,
-  /// converts each one to a [String] by calling [Object.toString],
-  /// and then concatenates the strings, with the
+  /// Iterates through elements of this list, converts each one to a [String] by
+  /// calling [Object.toString], and then concatenates the strings, with the
   /// [separator] string interleaved between the elements.
   String join([String separator = '']) => _list.join(separator);
 
@@ -612,8 +638,8 @@ class ImmortalList<T> {
   ///
   /// This lookup can not distinguish between the list being empty and
   /// containing the `null` value as last element.
-  /// Methods like [contains] or [length] can be used if the distinction
-  /// is important.
+  /// Methods like [contains] or [length] can be used if the distinction is
+  /// important.
   Optional<T> get last {
     if (isEmpty) {
       return Optional.empty();
@@ -621,29 +647,27 @@ class ImmortalList<T> {
     return Optional.ofNullable(_list.last);
   }
 
-  /// Returns the last index of [element] in this list.
+  /// Returns the last index of [value] in this list.
   ///
   /// Searches the list backwards from index [start] to 0.
-  /// If [start] is not provided, this method searches from the end of the
-  /// list.
+  /// If [start] is not provided, this method searches from the end of the list.
   ///
-  /// The first time an object [:o:] is encountered so that [:o == element:],
-  /// the index of [:o:] is returned.
+  /// The first time an object [:o:] is encountered so that [:o == value:], the
+  /// index of [:o:] is returned.
   ///
   ///     final notes = ImmortalList(['do', 're', 'mi', 're']);
   ///     notes.lastIndexOf('re');    // 3
   ///     notes.lastIndexOf('re', 2); // 1
   ///
-  /// Returns -1 if [element] is not found.
+  /// Returns -1 if [value] is not found.
   ///
   ///     notes.lastIndexOf('fa');    // -1
-  int lastIndexOf(T element, [int start]) => _list.lastIndexOf(element, start);
+  int lastIndexOf(T value, [int start]) => _list.lastIndexOf(value, start);
 
   /// Returns the last index in the list that satisfies the given [predicate].
   ///
   /// Searches the list from index [start] to 0.
-  /// If [start] is not provided, this method searches from the end of the
-  /// list.
+  /// If [start] is not provided, this method searches from the end of the list.
   ///
   /// The first time an object `o` is encountered so that `predicate(o)` is
   /// `true`, the index of `o` is returned.
@@ -655,11 +679,11 @@ class ImmortalList<T> {
   /// Returns -1 if no element fulfilling [predicate] was found.
   ///
   ///     notes.lastIndexWhere((note) => note.startsWith('k'));    // -1
-  int lastIndexWhere(bool Function(T element) predicate, [int start]) =>
+  int lastIndexWhere(bool Function(T value) predicate, [int start]) =>
       _list.lastIndexWhere(predicate, start);
 
-  /// Returns an [Optional] containing the last element that satisfies the
-  /// given [predicate], or [Optional.empty] if none was found.
+  /// Returns an [Optional] containing the last element that satisfies the given
+  /// [predicate], or [Optional.empty] if none was found.
   ///
   /// Iterates through elements and returns the last one to satisfy [predicate].
   ///
@@ -670,20 +694,25 @@ class ImmortalList<T> {
   /// containing the `null` value satisfying the predicate.
   /// Methods like [contains] or [lastIndexWhere] can be used if the distinction
   /// is important.
-  Optional<T> lastWhere(bool Function(T element) predicate) =>
-      Optional.ofNullable(_list.lastWhere(predicate, orElse: () => null));
+  Optional<T> lastWhere(bool Function(T value) predicate) =>
+      Optional.ofNullable(
+        _list.lastWhere(predicate, orElse: () => null),
+      );
 
   /// Returns the number of objects in this list.
   int get length => _list.length;
 
   /// Returns a new list with elements that are created by calling [f] on each
   /// element of this list in iteration order.
-  ImmortalList<R> map<R>(R Function(T e) f) => ImmortalList(_list.map(f));
+  ImmortalList<R> map<R>(R Function(T value) f) => ImmortalList(_list.map(f));
 
   /// Returns a new list with elements that are created by calling [f] on each
   /// element of this list and its respective index.
-  ImmortalList<R> mapIndexed<R>(R Function(int i, T e) f) =>
-      ImmortalList(_list.asMap().map((i, e) => MapEntry(i, f(i, e))).values);
+  ImmortalList<R> mapIndexed<R>(R Function(int index, T value) f) =>
+      ImmortalList(_list
+          .asMap()
+          .map((index, value) => MapEntry(index, f(index, value)))
+          .values);
 
   /// Returns a tuple of two new lists by splitting the list into two depending
   /// on the result of the given [predicate].
@@ -692,7 +721,7 @@ class ImmortalList<T> {
   /// remaining elements will produce the second list. The iteration order is
   /// preserved in both lists.
   Tuple2<ImmortalList<T>, ImmortalList<T>> partition(
-    bool Function(T element) predicate,
+    bool Function(T value) predicate,
   ) =>
       Tuple2(where(predicate), removeWhere(predicate));
 
@@ -702,34 +731,34 @@ class ImmortalList<T> {
   /// See [set].
   ImmortalList<T> put(int index, T value) => set(index, value);
 
-  /// Returns a copy of this list replacing each element that fulfills the
-  /// given [predicate] by [value].
+  /// Returns a copy of this list replacing each element that fulfills the given
+  /// [predicate] by [value].
   ///
   /// See [setWhere].
-  ImmortalList<T> putWhere(bool Function(T element) predicate, T value) =>
+  ImmortalList<T> putWhere(bool Function(T value) predicate, T value) =>
       setWhere(predicate, value);
 
-  /// Returns a copy of this list replacing each element that fulfills the
-  /// given [predicate] with its respective index by [value].
+  /// Returns a copy of this list replacing each element that fulfills the given
+  /// [predicate] with its respective index by [value].
   ///
   /// See [setWhereIndexed].
   ImmortalList<T> putWhereIndexed(
-    bool Function(int i, T element) predicate,
+    bool Function(int index, T value) predicate,
     T value,
   ) =>
       setWhereIndexed(predicate, value);
 
-  /// Returns a copy of this list where the first occurrence of [value] is
+  /// Returns a copy of this list where the first occurrence of [element] is
   /// removed from if present.
-  ImmortalList<T> remove(Object value) =>
-      ImmortalList._internal(toMutableList()..remove(value));
+  ImmortalList<T> remove(Object element) =>
+      ImmortalList._internal(toMutableList()..remove(element));
 
   /// Returns a copy of this list where all values in [other] are removed from
   /// if present.
   ///
   /// Unlike [remove] all occurrences of a value are removed.
-  ImmortalList<T> removeAll(ImmortalList<T> other) => ImmortalList._internal(
-      toMutableList()..removeWhere((value) => other.contains(value)));
+  ImmortalList<T> removeAll(ImmortalList<T> other) =>
+      ImmortalList._internal(toMutableList()..removeWhere(other.contains));
 
   /// Returns a copy of this list removing the object at position [index] if
   /// present.
@@ -744,15 +773,15 @@ class ImmortalList<T> {
     return ImmortalList._internal(toMutableList()..removeAt(validIndex));
   }
 
-  /// Returns a copy of this list where all values in the iterable [other] are
-  /// removed from if present.
+  /// Returns a copy of this list where all values in [iterable] are removed
+  /// from if present.
   ///
   /// See [removeAll].
   ///
-  /// It iterates over [other], which must therefore not change during the
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> removeIterable(Iterable<T> other) =>
-      removeAll(ImmortalList._internal(other));
+  ImmortalList<T> removeIterable(Iterable<T> iterable) =>
+      removeAll(ImmortalList._internal(iterable));
 
   /// Returns a copy of this list removing the last object if there is one,
   /// otherwise the list is returned unchanged.
@@ -778,7 +807,8 @@ class ImmortalList<T> {
       return this;
     }
     return ImmortalList._internal(
-        toMutableList()..removeRange(validStart, validEnd));
+      toMutableList()..removeRange(validStart, validEnd),
+    );
   }
 
   /// Returns a copy of this list where all values that satisfy the given
@@ -791,7 +821,7 @@ class ImmortalList<T> {
   ///     final numbers = ImmortalList(['one', 'two', 'three', 'four']);
   ///     final removed = numbers.removeWhere((item) => item.length == 3);
   ///     removed.join(', '); // 'three, four'
-  ImmortalList<T> removeWhere(bool Function(T element) predicate) =>
+  ImmortalList<T> removeWhere(bool Function(T value) predicate) =>
       ImmortalList._internal(toMutableList()..removeWhere(predicate));
 
   /// Returns a copy of this list replacing the value at the given [index] with
@@ -802,7 +832,7 @@ class ImmortalList<T> {
 
   /// Returns a copy of this list where all objects in the range [start]
   /// inclusive to [end] exclusive are removed from and replaced by the contents
-  /// of [replacement].
+  /// of [other].
   ///
   /// Example:
   ///
@@ -815,24 +845,24 @@ class ImmortalList<T> {
   /// `0 <= start <= end <= len`, where `len` is this list's [length].
   ///
   /// The resulting list might be longer than the original list.
-  ImmortalList<T> replaceRange(
-    int start,
-    int end,
-    ImmortalList<T> replacement,
-  ) =>
-      replaceRangeIterable(start, end, replacement.toMutableList());
+  ImmortalList<T> replaceRange(int start, int end, ImmortalList<T> other) =>
+      replaceRangeIterable(
+        start,
+        end,
+        other.toMutableList(),
+      );
 
   /// Returns a copy of this list where all objects in the range [start]
   /// inclusive to [end] exclusive are removed from and replaced by the contents
-  /// of the iterable [replacement].
+  /// of [iterable].
   ///
   /// See [replaceRange].
-  /// It iterates over [replacement], which must therefore not change during the
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
   ImmortalList<T> replaceRangeIterable(
     int start,
     int end,
-    Iterable<T> replacement,
+    Iterable<T> iterable,
   ) {
     final validStart = max(min(start, length), 0);
     final validEnd = max(validStart, min(end, length));
@@ -840,23 +870,23 @@ class ImmortalList<T> {
       ..replaceRange(
         validStart,
         validEnd,
-        replacement,
+        iterable,
       ));
   }
 
-  /// Returns a copy of this list replacing each element that fulfills the
-  /// given [predicate] by [value].
+  /// Returns a copy of this list replacing each element that fulfills the given
+  /// [predicate] by [value].
   ///
   /// See [setWhere].
-  ImmortalList<T> replaceWhere(bool Function(T element) predicate, T value) =>
+  ImmortalList<T> replaceWhere(bool Function(T value) predicate, T value) =>
       setWhere(predicate, value);
 
-  /// Returns a copy of this list replacing each element that fulfills the
-  /// given [predicate] with its respective index by [value].
+  /// Returns a copy of this list replacing each element that fulfills the given
+  /// [predicate] with its respective index by [value].
   ///
   /// See [setWhereIndexed].
   ImmortalList<T> replaceWhereIndexed(
-    bool Function(int i, T element) predicate,
+    bool Function(int index, T value) predicate,
     T value,
   ) =>
       setWhereIndexed(predicate, value);
@@ -871,7 +901,7 @@ class ImmortalList<T> {
   ///     final numbers = ImmortalList(['one', 'two', 'three', 'four']);
   ///     final retained = numbers.retainWhere((item) => item.length == 3);
   ///     retained.join(', '); // 'one, two'
-  ImmortalList<T> retainWhere(bool Function(T element) predicate) =>
+  ImmortalList<T> retainWhere(bool Function(T value) predicate) =>
       ImmortalList._internal(toMutableList()..retainWhere(predicate));
 
   /// Returns a list containing the objects of this list in reverse order.
@@ -886,7 +916,9 @@ class ImmortalList<T> {
   /// The resulting list will have the same length as the original list.
   ImmortalList<T> set(int index, T value) {
     final validIndex = max(0, min(index, length - 1));
-    return ImmortalList._internal(toMutableList()..[validIndex] = value);
+    return ImmortalList._internal(
+      toMutableList()..[validIndex] = value,
+    );
   }
 
   /// Returns a copy of this list replacing the objects starting at position
@@ -909,20 +941,20 @@ class ImmortalList<T> {
       setIterable(index, other.toMutableList());
 
   /// Returns a copy of this list replacing the objects starting at position
-  /// [index] with the objects of iterable [elements].
+  /// [index] with the objects of [iterable].
   ///
   /// See [setAll].
-  /// It iterates over [elements], which must therefore not change during the
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> setIterable(int index, Iterable<T> elements) {
-    if (elements.isEmpty) {
+  ImmortalList<T> setIterable(int index, Iterable<T> iterable) {
+    if (iterable.isEmpty) {
       return this;
     }
     final validIndex = max(0, min(index, length));
     return ImmortalList._internal(toMutableList()
       ..setAll(
         validIndex,
-        elements.take(length - validIndex),
+        iterable.take(length - validIndex),
       ));
   }
 
@@ -955,50 +987,57 @@ class ImmortalList<T> {
     ImmortalList<T> other, [
     int skipCount = 0,
   ]) =>
-      setRangeIterable(start, end, other.toMutableList(), skipCount);
+      setRangeIterable(
+        start,
+        end,
+        other.toMutableList(),
+        skipCount,
+      );
 
   /// Returns a copy of this list where the objects in the range [start]
-  /// inclusive to [end] exclusive are replaced by the objects of the iterable
-  /// [elements] while skipping [skipCount] objects first.
+  /// inclusive to [end] exclusive are replaced by the objects of [iterable]
+  /// while skipping [skipCount] objects first.
   ///
   /// See [setRange].
-  /// It iterates over [elements], which must therefore not change during the
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
   ImmortalList<T> setRangeIterable(
     int start,
     int end,
-    Iterable<T> elements, [
+    Iterable<T> iterable, [
     int skipCount = 0,
   ]) {
     final validStart = max(min(start, length), 0);
     final validEnd = max(
       validStart,
-      min(end, min(length, elements.length + validStart)),
+      min(end, min(length, iterable.length + validStart)),
     );
-    if (elements.isEmpty || validStart == validEnd) {
+    if (iterable.isEmpty || validStart == validEnd) {
       return this;
     }
     return ImmortalList._internal(toMutableList()
       ..setRange(
         validStart,
         validEnd,
-        elements,
+        iterable,
         skipCount,
       ));
   }
 
-  /// Returns a copy of this list replacing each element that fulfills the
-  /// given [predicate] by [value].
-  ImmortalList<T> setWhere(bool Function(T value) predicate, T value) =>
-      map((e) => predicate(e) ? value : e);
+  /// Returns a copy of this list replacing each element that fulfills the given
+  /// [predicate] by [newValue].
+  ImmortalList<T> setWhere(bool Function(T value) predicate, T newValue) =>
+      map((value) => predicate(value) ? newValue : value);
 
-  /// Returns a copy of this list replacing each element that fulfills the
-  /// given [predicate] with its respective index by [value].
+  /// Returns a copy of this list replacing each element that fulfills the given
+  /// [predicate] with its respective index by [newValue].
   ImmortalList<T> setWhereIndexed(
     bool Function(int index, T value) predicate,
-    T value,
+    T newValue,
   ) =>
-      mapIndexed((i, e) => predicate(i, e) ? value : e);
+      mapIndexed(
+        (index, value) => predicate(index, value) ? newValue : value,
+      );
 
   /// Returns a copy of this list randomly shuffling the elements.
   ImmortalList<T> shuffle([Random random]) =>
@@ -1009,8 +1048,8 @@ class ImmortalList<T> {
   ///
   /// This lookup can not distinguish between the list being empty and
   /// containing the `null` value as only element.
-  /// Methods like [contains] or [length] can be used if the distinction
-  /// is important.
+  /// Methods like [contains] or [length] can be used if the distinction is
+  /// important.
   Optional<T> get single {
     if (length != 1) {
       return Optional.empty();
@@ -1031,8 +1070,10 @@ class ImmortalList<T> {
   /// distinguish between not having exactly one element satisfying the
   /// predicate and containing only the `null` value satisfying the predicate.
   /// Methods like [contains] can be used if the distinction is important.
-  Optional<T> singleWhere(bool Function(T element) predicate) =>
-      Optional.ofNullable(_list.singleWhere(predicate, orElse: () => null));
+  Optional<T> singleWhere(bool Function(T value) predicate) =>
+      Optional.ofNullable(
+        _list.singleWhere(predicate, orElse: () => null),
+      );
 
   /// Returns a copy of this list that contains all but the fist [count]
   /// elements.
@@ -1080,13 +1121,13 @@ class ImmortalList<T> {
   ///
   /// A [Comparator] may compare objects as equal (return zero), even if they
   /// are distinct objects.
-  /// The sort function is not guaranteed to be stable, so distinct objects
-  /// that compare as equal may occur in any order in the result:
+  /// The sort function is not guaranteed to be stable, so distinct objects that
+  /// compare as equal may occur in any order in the result:
   ///
   ///     final numbers = ImmortalList(['one', 'two', 'three', 'four']);
   ///     final sorted = numbers.sort((a, b) => a.length.compareTo(b.length));
   ///     print(sorted);  // [one, two, four, three] OR [two, one, four, three]
-  ImmortalList<T> sort([int Function(T a, T b) compare]) =>
+  ImmortalList<T> sort([int Function(T value, T otherValue) compare]) =>
       ImmortalList._internal(toMutableList()..sort(compare));
 
   /// Returns a copy of this containing all elements between [start] and [end].
@@ -1155,36 +1196,41 @@ class ImmortalList<T> {
   String toString() => 'Immortal${_list.toString()}';
 
   /// Returns a copy of this list replacing the value at the given [index] by
-  /// applying the function [f] to its value.
+  /// applying the function [update] to its value.
   ///
   /// If there is no element at the provided [index], the list is returned
   /// unchanged.
   /// The resulting list will have the same length as the original list.
-  ImmortalList<T> updateAt(int index, T Function(T e) f) =>
-      elementAt(index).map((e) => set(index, f(e))).orElse(this);
+  ImmortalList<T> updateAt(int index, T Function(T value) update) =>
+      elementAt(index)
+          .map(
+            (value) => set(index, update(value)),
+          )
+          .orElse(this);
 
-  /// Returns a copy of this list by applying [f] on each element that fulfills
-  /// the given [predicate].
+  /// Returns a copy of this list by applying [update] on each element that
+  /// fulfills the given [predicate].
   ImmortalList<T> updateWhere(
-    bool Function(T element) predicate,
-    T Function(T e) f,
+    bool Function(T value) predicate,
+    T Function(T value) update,
   ) =>
-      map((e) => predicate(e) ? f(e) : e);
+      map((value) => predicate(value) ? update(value) : value);
 
-  /// Returns a copy of this list by applying [f] on each element and its
+  /// Returns a copy of this list by applying [update] on each element and its
   /// respective index that fulfill the given [predicate].
   ImmortalList<T> updateWhereIndexed(
-    bool Function(int i, T element) predicate,
-    T Function(int i, T e) f,
+    bool Function(int index, T value) predicate,
+    T Function(int index, T value) update,
   ) =>
-      mapIndexed((i, e) => predicate(i, e) ? f(i, e) : e);
+      mapIndexed((index, value) =>
+          predicate(index, value) ? update(index, value) : value);
 
   /// Returns a new list with all elements of this list that satisfy the given
   /// [predicate].
   ///
   /// The matching elements have the same order in the returned list as they
   /// have in [iterator].
-  ImmortalList<T> where(bool Function(T element) predicate) =>
+  ImmortalList<T> where(bool Function(T value) predicate) =>
       ImmortalList(_list.where(predicate));
 
   /// Returns a new list containing all elements that satisfy the given
@@ -1192,13 +1238,13 @@ class ImmortalList<T> {
   ///
   /// The matching elements have the same order in the returned list as they
   /// have in [iterator].
-  ImmortalList<T> whereIndexed(bool Function(int, T) predicate) =>
+  ImmortalList<T> whereIndexed(bool Function(int index, T value) predicate) =>
       asMap().where(predicate).values;
 
   /// Returns a new list with all elements of this list that have type [R].
   ///
-  /// The matching elements have the same order in the returned list
-  /// as they have in [iterator].
+  /// The matching elements have the same order in the returned list as they
+  /// have in [iterator].
   ImmortalList<R> whereType<R>() => ImmortalList(_list.whereType<R>());
 
   /// Returns a new list consisting of tuples with elements from this list and
@@ -1216,9 +1262,9 @@ class ImmortalList<T> {
           ));
 
   /// Returns a new list consisting of tuples with elements from this list and
-  /// the iterable [other].
+  /// the [iterable].
   ///
   /// See [zip].
-  ImmortalList<Tuple2<T, R>> zipIterable<R>(Iterable<R> other) =>
-      zip(ImmortalList._internal(other));
+  ImmortalList<Tuple2<T, R>> zipIterable<R>(Iterable<R> iterable) =>
+      zip(ImmortalList._internal(iterable));
 }

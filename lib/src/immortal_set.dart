@@ -35,45 +35,47 @@ class ImmortalSet<T> {
   /// See [ImmortalSet.of].
   factory ImmortalSet.from(ImmortalSet<T> other) => ImmortalSet.of(other);
 
-  /// Creates an [ImmortalSet] that contains all elements of [other].
+  /// Creates an [ImmortalSet] that contains all elements of [iterable].
   ///
   /// See [ImmortalSet.ofIterable].
-  factory ImmortalSet.fromIterable(Iterable<T> other) => ImmortalSet(other);
+  /// It iterates over [iterable], which must therefore not change during the
+  /// iteration.
+  factory ImmortalSet.fromIterable(Iterable<T> iterable) =>
+      ImmortalSet(iterable);
 
   /// Creates an [ImmortalSet] as copy of [other].
   ///
   /// See [copy].
   factory ImmortalSet.of(ImmortalSet<T> other) => other.copy();
 
-  /// Creates an [ImmortalSet] that contains all elements of [other].
+  /// Creates an [ImmortalSet] that contains all elements of [iterable].
   ///
-  /// All the elements of [other] should be instances of [T].
-  /// The [other] itself can have any type.
-  /// It iterates over [other], which must therefore not change during the
+  /// All the elements of [iterable] should be instances of [T].
+  /// The [iterable] itself can have any type.
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
   ///
   /// The set considers elements that are equal (using the `==` operator) to be
   /// indistinguishable and requires them to have a compatible `hashCode`
   /// implementation.
   /// It is allowed although not advised to use `null` as value.
-  factory ImmortalSet.ofIterable(Iterable<T> other) => ImmortalSet(other);
+  factory ImmortalSet.ofIterable(Iterable<T> iterable) => ImmortalSet(iterable);
 
-  /// Returns a copy of [source] casting all elements to instances of [R].
+  /// Returns a copy of [other] casting all elements to instances of [R].
   ///
   /// See [cast].
-  static ImmortalSet<R> castFrom<T, R>(ImmortalSet<T> source) =>
-      source.cast<R>();
+  static ImmortalSet<R> castFrom<T, R>(ImmortalSet<T> other) => other.cast<R>();
 
-  /// Creates an [ImmortalSet] by casting all elements of [source] to instances
-  /// of [R].
+  /// Creates an [ImmortalSet] by casting all elements of [iterable] to
+  /// instances of [R].
   ///
-  /// If [source] contains only instances of [R], the set will be created
+  /// If [iterable] contains only instances of [R], the set will be created
   /// correctly, otherwise an exception will be thrown.
   ///
-  /// It iterates over [source], which must therefore not change during the
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  static ImmortalSet<R> castFromIterable<T, R>(Iterable<T> source) =>
-      ImmortalSet(source.cast<R>());
+  static ImmortalSet<R> castFromIterable<T, R>(Iterable<T> iterable) =>
+      ImmortalSet(iterable.cast<R>());
 
   final Set<T> _set;
 
@@ -131,32 +133,34 @@ class ImmortalSet<T> {
   ImmortalSet<T> addAll(ImmortalSet<T> other) =>
       addIterable(other.toMutableSet());
 
-  /// Returns a copy of this set where all elements of [elements] are added.
+  /// Returns a copy of this set where all elements of [iterable] are added.
   ///
   /// See [addAll].
-  /// It iterates over [elements], which must therefore not change during the
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalSet<T> addIterable(Iterable<T> elements) {
-    if (elements.isEmpty) {
+  ImmortalSet<T> addIterable(Iterable<T> iterable) {
+    if (iterable.isEmpty) {
       return this;
     }
-    return ImmortalSet._internal(toMutableSet()..addAll(elements));
+    return ImmortalSet._internal(toMutableSet()..addAll(iterable));
   }
 
   /// Checks whether any element of this set satisfies the given [predicate].
   ///
   /// Returns `true` if any element makes [predicate] return `true`, otherwise
   /// returns false.
-  bool any(bool Function(T element) predicate) => _set.any(predicate);
+  bool any(bool Function(T value) predicate) => _set.any(predicate);
 
-  /// Returns an [ImmortalMap] using the given function [f] as key generator.
+  /// Returns an [ImmortalMap] using the given [keyGenerator].
   ///
   /// Iterates over all elements and creates the key for each element by
-  /// applying [f] to its value.
+  /// applying [keyGenerator] to its value.
   /// If a key is already present in the map, the corresponding value is
   /// overwritten.
-  ImmortalMap<K, T> asMapWithKeys<K>(K Function(T) f) =>
-      ImmortalMap.fromEntries(toList().map((v) => MapEntry(f(v), v)));
+  ImmortalMap<K, T> asMapWithKeys<K>(K Function(T value) keyGenerator) =>
+      ImmortalMap.fromEntries(toList().map(
+        (value) => MapEntry(keyGenerator(value), value),
+      ));
 
   /// Returns a copy of this set casting all elements to instances of [R].
   ///
@@ -164,20 +168,20 @@ class ImmortalSet<T> {
   /// correctly, otherwise an exception will be thrown.
   ImmortalSet<R> cast<R>() => ImmortalSet(_set.cast<R>());
 
-  /// Returns `true` if [value] is in the set according to the `==` operator.
-  bool contains(Object value) => _set.contains(value);
+  /// Returns `true` if [element] is in the set according to the `==` operator.
+  bool contains(Object element) => _set.contains(element);
 
   /// Returns whether this set contains all the elements of [other].
   bool containsAll(ImmortalSet<Object> other) =>
       containsIterable(other.toMutableSet());
 
-  /// Returns whether this set contains all the elements of the iterable
-  /// [other].
+  /// Returns whether this set contains all the elements of [iterable].
   ///
   /// See [containsAll].
-  /// It iterates over [other], which must therefore not change during the
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  bool containsIterable(Iterable<Object> other) => _set.containsAll(other);
+  bool containsIterable(Iterable<Object> iterable) =>
+      _set.containsAll(iterable);
 
   /// Returns a copy of this set.
   ImmortalSet<T> copy() => ImmortalSet(_set);
@@ -216,13 +220,13 @@ class ImmortalSet<T> {
       this == other ||
       other is ImmortalSet<T> &&
           length == other.length &&
-          every((value) => other.contains(value));
+          every(other.contains);
 
   /// Checks whether every element of this set satisfies the given [predicate].
   ///
   /// Returns `false` if any element makes [predicate] return `false`, otherwise
   /// returns `true`.
-  bool every(bool Function(T element) predicate) => _set.every(predicate);
+  bool every(bool Function(T value) predicate) => _set.every(predicate);
 
   /// Returns a new set expanding each element of this set into a set of zero or
   /// more elements.
@@ -239,8 +243,8 @@ class ImmortalSet<T> {
   ///     final input = ImmortalSet({1, 2, 3});
   ///     final timesTwo = input.flatMap((i) => ImmortalSet({i, i * 2}));
   ///     print(timesTwo); // => Immortal{1, 2, 4, 3, 6};
-  ImmortalSet<R> expand<R>(ImmortalSet<R> Function(T element) f) =>
-      expandIterable((element) => f(element).toMutableSet());
+  ImmortalSet<R> expand<R>(ImmortalSet<R> Function(T value) f) =>
+      expandIterable((value) => f(value).toMutableSet());
 
   /// Returns a new set expanding each element of this set into an iterable of
   /// zero or more elements.
@@ -248,14 +252,14 @@ class ImmortalSet<T> {
   /// See [expand].
   /// The iterables returnd by [f] are iterated over and must therefore not
   /// change during the iteration.
-  ImmortalSet<R> expandIterable<R>(Iterable<R> Function(T element) f) =>
+  ImmortalSet<R> expandIterable<R>(Iterable<R> Function(T value) f) =>
       ImmortalSet(_set.expand(f));
 
   /// Returns a new set with all elements of this set that satisfy the given
   /// [predicate].
   ///
   /// See [where].
-  ImmortalSet<T> filter(bool Function(T element) predicate) => where(predicate);
+  ImmortalSet<T> filter(bool Function(T value) predicate) => where(predicate);
 
   /// Returns a new set with all elements of this set that have type [R].
   ///
@@ -266,7 +270,7 @@ class ImmortalSet<T> {
   /// more elements.
   ///
   /// See [expand].
-  ImmortalSet<R> flatMap<R>(ImmortalSet<R> Function(T element) f) => expand(f);
+  ImmortalSet<R> flatMap<R>(ImmortalSet<R> Function(T value) f) => expand(f);
 
   /// Returns a new set expanding each element of this set into an iterable of
   /// zero or more elements.
@@ -274,36 +278,39 @@ class ImmortalSet<T> {
   /// See [expand].
   /// The iterables returnd by [f] are iterated over and must therefore not
   /// change during the iteration.
-  ImmortalSet<R> flatMapIterable<R>(Iterable<R> Function(T element) f) =>
+  ImmortalSet<R> flatMapIterable<R>(Iterable<R> Function(T value) f) =>
       expandIterable(f);
 
   /// Flattens a set of immortal sets by combining their values to a single set.
   ///
-  /// If this set contains only instances of [ImmortalSet<R>] the new set
-  /// will be created correctly, otherwise an exception is thrown.
-  ImmortalSet<R> flatten<R>() => cast<ImmortalSet<R>>().expand<R>((l) => l);
+  /// If this set contains only instances of [ImmortalSet<R>] the new set will
+  /// be created correctly, otherwise an exception is thrown.
+  ImmortalSet<R> flatten<R>() =>
+      cast<ImmortalSet<R>>().expand<R>((value) => value);
 
   /// Flattens a set of iterables by combining their values to a single set.
   ///
-  /// If this set contains only instances of [Iterable<R>] the new set
-  /// will be created correctly, otherwise an exception is thrown.
+  /// If this set contains only instances of [Iterable<R>] the new set will be
+  /// created correctly, otherwise an exception is thrown.
+  /// The iterable values are iterated over and must therefore not change
+  /// during the iteration.
   ImmortalSet<R> flattenIterables<R>() =>
-      cast<Iterable<R>>().expandIterable<R>((l) => l);
+      cast<Iterable<R>>().expandIterable<R>((value) => value);
 
   /// Flattens a set of immortal lists by combining their values to a single
   /// set.
   ///
-  /// If this set contains only instances of [ImmortalList<R>] the new set
-  /// will be created correctly, otherwise an exception is thrown.
+  /// If this set contains only instances of [ImmortalList<R>] the new set will
+  /// be created correctly, otherwise an exception is thrown.
   ImmortalSet<R> flattenLists<R>() =>
-      cast<ImmortalList<R>>().expand<R>((l) => l.toSet());
+      cast<ImmortalList<R>>().expand<R>((value) => value.toSet());
 
   /// Reduces the set to a single value by iteratively combining each element of
   /// this set with an existing value.
   ///
-  /// Uses [initialValue] as the initial value,
-  /// then iterates through the elements and updates the value with
-  /// each element using the [combine] function, as if by:
+  /// Uses [initialValue] as the initial value, then iterates through the
+  /// elements and updates the value with each element using the [combine]
+  /// function, as if by:
   ///
   ///     var value = initialValue;
   ///     for (E element in this) {
@@ -314,11 +321,11 @@ class ImmortalSet<T> {
   /// Example of calculating the sum of a set:
   ///
   ///     set.fold(0, (prev, element) => prev + element);
-  R fold<R>(R initialValue, R Function(R previousValue, T element) combine) =>
+  R fold<R>(R initialValue, R Function(R previousResult, T value) combine) =>
       _set.fold(initialValue, combine);
 
   /// Applies the function [f] to each element of this set.
-  void forEach(void Function(T element) f) => _set.forEach(f);
+  void forEach(void Function(T value) f) => _set.forEach(f);
 
   /// Returns a new set which is the intersection between this set and [other].
   ///
@@ -347,105 +354,104 @@ class ImmortalSet<T> {
 
   /// Converts each element to a [String] and concatenates the strings.
   ///
-  /// Iterates through elements of this set,
-  /// converts each one to a [String] by calling [Object.toString],
-  /// and then concatenates the strings, with the
+  /// Iterates through elements of this set, converts each one to a [String] by
+  /// calling [Object.toString], and then concatenates the strings, with the
   /// [separator] string interleaved between the elements.
   String join([String separator = '']) => _set.join(separator);
 
   /// Returns the number of elements in this set.
   int get length => _set.length;
 
-  /// Returns an [Optional] containing an element equal to [object] if there is
+  /// Returns an [Optional] containing an element equal to [element] if there is
   /// one in this set, otherwise returns [Optional.empty].
   ///
-  /// Checks whether [object] is in the set, like [contains], and if so,
+  /// Checks whether [element] is in the set, like [contains], and if so,
   /// returns the object in the set wrapped in an [Optional], otherwise returns
   /// [Optional.empty].
   ///
   /// This lookup can not distinguish between an object not being in the set or
   /// being the `null` value.
   /// The method [contains] can be used if the distinction is important.
-  Optional<T> lookup(Object object) => Optional.ofNullable(_set.lookup(object));
+  Optional<T> lookup(Object element) =>
+      Optional.ofNullable(_set.lookup(element));
 
   /// Returns a new set with elements that are created by calling [f] on each
   /// element of this set.
-  ImmortalSet<R> map<R>(R Function(T e) f) => ImmortalSet(_set.map(f));
+  ImmortalSet<R> map<R>(R Function(T value) f) => ImmortalSet(_set.map(f));
 
-  /// Returns a tuple of two new sets by splitting the set into two depending
-  /// on the result of the given [predicate].
+  /// Returns a tuple of two new sets by splitting the set into two depending on
+  /// the result of the given [predicate].
   ///
   /// The first set will contain all elements that satisfy [predicate] and the
   /// remaining elements will produce the second set.
   Tuple2<ImmortalSet<T>, ImmortalSet<T>> partition(
-    bool Function(T element) predicate,
+    bool Function(T value) predicate,
   ) =>
       Tuple2(where(predicate), removeWhere(predicate));
 
-  /// Returns a copy of this set where [value] is removed from if present,
+  /// Returns a copy of this set where [element] is removed from if present,
   /// otherwise the set is returned unchanged.
-  ImmortalSet<T> remove(Object value) {
+  ImmortalSet<T> remove(Object element) {
     final newSet = toMutableSet();
-    if (newSet.remove(value)) {
+    if (newSet.remove(element)) {
       return ImmortalSet._internal(newSet);
     }
     return this;
   }
 
-  /// Returns a copy of this set where each element in [other] is removed
-  /// from.
+  /// Returns a copy of this set where each element in [other] is removed from.
   ///
   /// If [other] is empty, the set is returned unchanged.
   ImmortalSet<T> removeAll(ImmortalSet<Object> other) =>
       removeIterable(other.toMutableSet());
 
-  /// Returns a copy of this set where each element in the iterable [elements]
-  /// is removed from.
+  /// Returns a copy of this set where each element in the [iterable] is
+  /// removed from.
   ///
   /// See [removeAll].
-  /// It iterates over [elements], which must therefore not change during the
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalSet<T> removeIterable(Iterable<Object> elements) {
-    if (elements.isEmpty) {
+  ImmortalSet<T> removeIterable(Iterable<Object> iterable) {
+    if (iterable.isEmpty) {
       return this;
     }
-    return ImmortalSet._internal(toMutableSet()..removeAll(elements));
+    return ImmortalSet._internal(toMutableSet()..removeAll(iterable));
   }
 
   /// Returns a copy of this set where all values that satisfy the given
   /// [predicate] are removed from.
-  ImmortalSet<T> removeWhere(bool Function(T element) predicate) =>
+  ImmortalSet<T> removeWhere(bool Function(T value) predicate) =>
       ImmortalSet._internal(toMutableSet()..removeWhere(predicate));
 
-  /// Returns a copy of this set where are all elements that are not in
-  /// [other] are removed from.
+  /// Returns a copy of this set where are all elements that are not in [other]
+  /// are removed from.
   ///
-  /// Checks for each element of [other] whether there is an element in this
-  /// set that is equal to it (according to [contains]), and if so, the
-  /// equal element in this set is retained in the copy, and elements that are
-  /// not equal to any element in [other] are removed from the copy.
+  /// Checks for each element of [other] whether there is an element in this set
+  /// that is equal to it (according to [contains]), and if so, the equal
+  /// element in this set is retained in the copy, and elements that are not
+  /// equal to any element in [other] are removed from the copy.
   ImmortalSet<T> retainAll(ImmortalSet<Object> other) =>
       retainIterable(other.toMutableSet());
 
-  /// Returns a copy of this set where are all elements that are not in the
-  /// iterable [elements] are removed from.
+  /// Returns a copy of this set where are all elements that are not in
+  /// [iterable] are removed from.
   ///
   /// See [retainAll].
-  /// It iterates over [elements], which must therefore not change during the
+  /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalSet<T> retainIterable(Iterable<Object> elements) =>
-      ImmortalSet._internal(toMutableSet()..retainAll(elements));
+  ImmortalSet<T> retainIterable(Iterable<Object> iterable) =>
+      ImmortalSet._internal(toMutableSet()..retainAll(iterable));
 
   /// Returns a copy of this set where all values that fail to satisfy the given
   /// [predicate] are removed from.
-  ImmortalSet<T> retainWhere(bool Function(T element) predicate) =>
+  ImmortalSet<T> retainWhere(bool Function(T value) predicate) =>
       ImmortalSet._internal(toMutableSet()..retainWhere(predicate));
 
   /// Returns an [Optional] containing the only element of the set if it has
   /// exactly one element, otherwise returns [Optional.empty].
   ///
-  /// This lookup can not distinguish between not having exactly one element
-  /// and containing only the `null` value.
+  /// This lookup can not distinguish between not having exactly one element and
+  /// containing only the `null` value.
   /// Methods like [length] can be used if the distinction is important.
   Optional<T> get single {
     if (length != 1) {
@@ -467,15 +473,18 @@ class ImmortalSet<T> {
   /// distinguish between not having exactly one element satisfying the
   /// predicate and only containing the `null` value satisfying the predicate.
   /// Methods like [contains] can be used if the distinction is important.
-  Optional<T> singleWhere(bool Function(T element) predicate) =>
-      Optional.ofNullable(_set.singleWhere(predicate, orElse: () => null));
+  Optional<T> singleWhere(bool Function(T value) predicate) =>
+      Optional.ofNullable(_set.singleWhere(
+        predicate,
+        orElse: () => null,
+      ));
 
-  /// Returns a copy of this set by toggling the presence of [element].
+  /// Returns a copy of this set by toggling the presence of [value].
   ///
-  /// If [element] is already contained, it will be removed from the resulting
+  /// If [value] is already contained, it will be removed from the resulting
   /// copy, otherwise it is added.
-  ImmortalSet<T> toggle(T element) =>
-      contains(element) ? remove(element) : add(element);
+  ImmortalSet<T> toggle(T value) =>
+      contains(value) ? remove(value) : add(value);
 
   /// Returns an [ImmortalList] containing the elements of this set.
   ImmortalList<T> toList() => ImmortalList(_set.toList());
@@ -515,17 +524,17 @@ class ImmortalSet<T> {
     return ImmortalSet._internal(_set.union(other));
   }
 
-  /// Returns a copy of this set by applying [f] to all elements that fulfill
-  /// the given [predicate].
+  /// Returns a copy of this set by applying [update] to all elements that
+  /// fulfill the given [predicate].
   ImmortalSet<T> updateWhere(
-    bool Function(T element) predicate,
-    T Function(T element) f,
+    bool Function(T value) predicate,
+    T Function(T value) update,
   ) =>
-      map((e) => predicate(e) ? f(e) : e);
+      map((value) => predicate(value) ? update(value) : value);
 
   /// Returns a new set with all elements of this set that satisfy the given
   /// [predicate].
-  ImmortalSet<T> where(bool Function(T element) predicate) =>
+  ImmortalSet<T> where(bool Function(T value) predicate) =>
       ImmortalSet(_set.where(predicate));
 
   /// Returns a new set with all elements of this set that have type [R].
