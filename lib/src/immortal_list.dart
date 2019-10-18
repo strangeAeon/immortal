@@ -4,6 +4,20 @@ import 'package:optional/optional.dart';
 import 'package:tuple/tuple.dart';
 
 import '../immortal.dart';
+import 'utils.dart';
+
+class _Range {
+  const _Range(this.start, this.end);
+
+  final int start;
+  final int end;
+
+  bool get isEmpty => start == end;
+
+  bool get isNotEmpty => !isEmpty;
+
+  bool spansWholeList(int length) => start == 0 && end == length;
+}
 
 /// An immutable indexable collection of objects with a length.
 ///
@@ -116,6 +130,42 @@ class ImmortalList<T> {
 
   final List<T> _list;
 
+  bool _isValidIndex(int index) => index >= 0 && index < length;
+
+  ImmortalList<T> _mutateAsList(Iterable<T> Function(List<T>) f) =>
+      ImmortalList._internal(f(toMutableList()));
+
+  ImmortalList<T> _mutateAsListIf(
+    bool condition,
+    Iterable<T> Function(List<T>) f,
+  ) =>
+      condition ? _mutateAsList(f) : this;
+
+  int _validIndex(int index, {int start = 0, int end}) =>
+      max(start, min(index, end ?? length - 1));
+
+  int _validIndexOrEnd(int index, {int start = 0}) =>
+      _validIndex(index, start: start, end: length);
+
+  _Range _validRange(int start, int end) {
+    final validStart = _validIndexOrEnd(start);
+    final validEnd = _validIndexOrEnd(end, start: validStart);
+    return _Range(validStart, validEnd);
+  }
+
+  _Range _validRangeWithOtherList(int start, int end, int otherListLength) {
+    final validStart = _validIndexOrEnd(start);
+    final validEnd = _validIndex(
+      end,
+      start: validStart,
+      end: min(length, otherListLength + validStart),
+    );
+    return _Range(validStart, validEnd);
+  }
+
+  R _withRange<R>(int start, int end, R Function(_Range) f) =>
+      f(_validRange(start, end));
+
   /// Returns a copy of this list concatenating [other].
   ///
   /// See [followedBy].
@@ -134,8 +184,7 @@ class ImmortalList<T> {
   Optional<T> operator [](int index) => elementAt(index);
 
   /// Returns a copy of this list where [value] is added to the end.
-  ImmortalList<T> add(T value) =>
-      ImmortalList._internal(toMutableList()..add(value));
+  ImmortalList<T> add(T value) => _mutateAsList((list) => list..add(value));
 
   /// Returns a copy of this list where all elements of [other] are added to the
   /// end.
@@ -150,12 +199,10 @@ class ImmortalList<T> {
   /// See [addAll].
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> addIterable(Iterable<T> iterable) {
-    if (iterable.isEmpty) {
-      return this;
-    }
-    return ImmortalList._internal(toMutableList()..addAll(iterable));
-  }
+  ImmortalList<T> addIterable(Iterable<T> iterable) => _mutateAsListIf(
+        iterable.isNotEmpty,
+        (list) => list..addAll(iterable),
+      );
 
   /// Checks whether any element of this list satisfies the given [predicate].
   ///
@@ -168,7 +215,7 @@ class ImmortalList<T> {
   ///
   /// See [any].
   bool anyIndexed(bool Function(int index, T value) predicate) =>
-      mapIndexed(predicate).any((result) => result);
+      mapIndexed(predicate).any(isTrue);
 
   /// Returns an [ImmortalMap] using the indices of this list as keys and the
   /// corresponding objects as values.
@@ -243,12 +290,8 @@ class ImmortalList<T> {
   /// containing the value `null` at the requested index.
   /// Methods like [contains] or [length] can be used if the distinction is
   /// important.
-  Optional<T> elementAt(int index) {
-    if (index < 0 || index >= length) {
-      return Optional.empty();
-    }
-    return Optional.ofNullable(_list.elementAt(index));
-  }
+  Optional<T> elementAt(int index) =>
+      getValueIf(_isValidIndex(index), () => _list.elementAt(index));
 
   /// Checks whether this list is equal to [other].
   ///
@@ -262,9 +305,8 @@ class ImmortalList<T> {
       this == other ||
       other is ImmortalList<T> &&
           length == other.length &&
-          mapIndexed((index, value) => other[index]
-              .map((otherValue) => otherValue == value)
-              .orElse(false)).every((result) => result);
+          mapIndexed((index, value) =>
+              other[index].map(equalTo(value)).orElse(false)).every(isTrue);
 
   /// Checks whether every element of this list satisfies the given [predicate].
   ///
@@ -277,7 +319,7 @@ class ImmortalList<T> {
   ///
   /// See [every].
   bool everyIndexed(bool Function(int index, T value) predicate) =>
-      mapIndexed(predicate).every((result) => result);
+      mapIndexed(predicate).every(isTrue);
 
   /// Returns a new list expanding each element of this list into a list of zero
   /// or more elements.
@@ -305,7 +347,7 @@ class ImmortalList<T> {
   ImmortalList<R> expandIndexed<R>(
     ImmortalList<R> Function(int index, T value) f,
   ) =>
-      mapIndexed(f).expand((result) => result);
+      mapIndexed(f).expand(identity);
 
   /// Returns a new list expanding each element of this list into an iterable of
   /// zero or more elements.
@@ -326,7 +368,7 @@ class ImmortalList<T> {
   ImmortalList<R> expandIterableIndexed<R>(
     Iterable<R> Function(int index, T value) f,
   ) =>
-      mapIndexed(f).expandIterable((result) => result);
+      mapIndexed(f).expandIterable(identity);
 
   /// Returns a copy of this list setting the objects in the range [start]
   /// inclusive to [end] exclusive to the given [fillValue].
@@ -344,19 +386,17 @@ class ImmortalList<T> {
   ///     final list = ImmortalList([1, 2, 3]);
   ///     final filledList = list.fillRange(0, 2, 4);
   ///     print(filledList); //  Immortal[4, 4, 3]
-  ImmortalList<T> fillRange(int start, int end, [T fillValue]) {
-    final validStart = max(min(start, length), 0);
-    final validEnd = max(validStart, min(end, length));
-    if (validStart == validEnd) {
-      return this;
-    }
-    return ImmortalList._internal(toMutableList()
-      ..fillRange(
-        validStart,
-        validEnd,
-        fillValue,
-      ));
-  }
+  ImmortalList<T> fillRange(int start, int end, [T fillValue]) => _withRange(
+      start,
+      end,
+      (range) => _mutateAsListIf(
+          range.isNotEmpty,
+          (list) => list
+            ..fillRange(
+              range.start,
+              range.end,
+              fillValue,
+            )));
 
   /// Returns a new list with all elements of this list that satisfy the given
   /// [predicate].
@@ -386,12 +426,7 @@ class ImmortalList<T> {
   /// containing the `null` value as first element.
   /// Methods like [contains] or [length] can be used if the distinction is
   /// important.
-  Optional<T> get first {
-    if (isEmpty) {
-      return Optional.empty();
-    }
-    return Optional.ofNullable(_list.first);
-  }
+  Optional<T> get first => getValueIf(isNotEmpty, () => _list.first);
 
   /// Returns an [Optional] containing the first element that satisfies the
   /// given [predicate], or [Optional.empty] if none was found.
@@ -408,7 +443,7 @@ class ImmortalList<T> {
   /// important.
   Optional<T> firstWhere(bool Function(T value) predicate) =>
       Optional.ofNullable(
-        _list.firstWhere(predicate, orElse: () => null),
+        _list.firstWhere(predicate, orElse: returnNull),
       );
 
   /// Returns a new list expanding each element of this list into a list of zero
@@ -453,8 +488,7 @@ class ImmortalList<T> {
   ///
   /// If this list contains only instances of [ImmortalList<R>] the new list
   /// will be created correctly, otherwise an exception is thrown.
-  ImmortalList<R> flatten<R>() =>
-      cast<ImmortalList<R>>().expand<R>((value) => value);
+  ImmortalList<R> flatten<R>() => cast<ImmortalList<R>>().expand<R>(identity);
 
   /// Flattens a list of iterables by concatenating the values in iteration
   /// order.
@@ -465,7 +499,7 @@ class ImmortalList<T> {
   /// The iterables are iterated over and must therefore not change during the
   /// iteration.
   ImmortalList<R> flattenIterables<R>() =>
-      cast<Iterable<R>>().expandIterable<R>((value) => value);
+      cast<Iterable<R>>().expandIterable<R>(identity);
 
   /// Reduces the list to a single value by iteratively combining each element
   /// of this list with an existing value.
@@ -500,12 +534,9 @@ class ImmortalList<T> {
   /// See [followedBy].
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> followedByIterable(Iterable<T> iterable) {
-    if (iterable.isEmpty) {
-      return this;
-    }
-    return ImmortalList(_list.followedBy(iterable));
-  }
+  ImmortalList<T> followedByIterable(Iterable<T> iterable) => iterable.isEmpty
+      ? this
+      : ImmortalList.fromIterable(_list.followedBy(iterable));
 
   /// Applies the function [f] to each element of this list.
   void forEach(void Function(T value) f) => _list.forEach(f);
@@ -527,14 +558,12 @@ class ImmortalList<T> {
   ///     final colors = ImmortalList(['red', 'green', 'blue', 'cyan', 'pink']);
   ///     final range = colors.getRange(1, 4);
   ///     range.join(', ');  // 'green, blue, cyan'
-  ImmortalList<T> getRange(int start, int end) {
-    final validStart = max(min(start, length), 0);
-    final validEnd = max(validStart, min(end, length));
-    if (validStart == 0 && end == length) {
-      return this;
-    }
-    return ImmortalList(_list.getRange(validStart, validEnd));
-  }
+  ImmortalList<T> getRange(int start, int end) => _withRange(
+      start,
+      end,
+      (range) => range.spansWholeList(length)
+          ? this
+          : ImmortalList(_list.getRange(range.start, range.end)));
 
   /// Returns the first index of [value] in this list.
   ///
@@ -570,12 +599,12 @@ class ImmortalList<T> {
 
   /// Returns all indices of [lookupValue] in this list.
   ImmortalList<int> indicesOf(T lookupValue) =>
-      indicesWhere((value) => value == lookupValue);
+      indicesWhere(equalTo(lookupValue));
 
   /// Returns all indices in the list that satisfy the given [predicate].
   ImmortalList<int> indicesWhere(bool Function(T value) predicate) =>
       mapIndexed((index, value) => predicate(value) ? index : -1)
-          .where((result) => result != -1);
+          .where(not(equalTo(-1)));
 
   /// Returns a copy of this list where [value] is inserted at position [index].
   ///
@@ -583,12 +612,9 @@ class ImmortalList<T> {
   ///
   /// The provided [index] is adjusted to fit inside the boundaries of the list,
   /// i.e. to fulfill `0 <= index <= length`.
-  ImmortalList<T> insert(int index, T value) {
-    final validIndex = max(0, min(index, length));
-    return ImmortalList._internal(
-      toMutableList()..insert(validIndex, value),
-    );
-  }
+  ImmortalList<T> insert(int index, T value) => _mutateAsList(
+        (list) => list..insert(_validIndexOrEnd(index), value),
+      );
 
   /// Returns a copy of this list where all objects of [other] are inserted at
   /// position [index].
@@ -599,6 +625,7 @@ class ImmortalList<T> {
   /// i.e. to fulfill `0 <= index <= length`.
   ///
   /// This returned list might be longer than the original list.
+  /// The list is returned unchanged, if [other] is empty.
   ImmortalList<T> insertAll(int index, ImmortalList<T> other) =>
       insertIterable(index, other.toMutableList());
 
@@ -608,12 +635,11 @@ class ImmortalList<T> {
   /// See [insertAll].
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> insertIterable(int index, Iterable<T> iterable) {
-    final validIndex = max(0, min(index, length));
-    return ImmortalList._internal(
-      toMutableList()..insertAll(validIndex, iterable),
-    );
-  }
+  ImmortalList<T> insertIterable(int index, Iterable<T> iterable) =>
+      _mutateAsListIf(
+        iterable.isNotEmpty,
+        (list) => list..insertAll(_validIndexOrEnd(index), iterable),
+      );
 
   /// Returns `true` if there are no elements in this list.
   bool get isEmpty => _list.isEmpty;
@@ -640,12 +666,7 @@ class ImmortalList<T> {
   /// containing the `null` value as last element.
   /// Methods like [contains] or [length] can be used if the distinction is
   /// important.
-  Optional<T> get last {
-    if (isEmpty) {
-      return Optional.empty();
-    }
-    return Optional.ofNullable(_list.last);
-  }
+  Optional<T> get last => getValueIf(isNotEmpty, () => _list.last);
 
   /// Returns the last index of [value] in this list.
   ///
@@ -696,7 +717,7 @@ class ImmortalList<T> {
   /// is important.
   Optional<T> lastWhere(bool Function(T value) predicate) =>
       Optional.ofNullable(
-        _list.lastWhere(predicate, orElse: () => null),
+        _list.lastWhere(predicate, orElse: returnNull),
       );
 
   /// Returns the number of objects in this list.
@@ -751,14 +772,14 @@ class ImmortalList<T> {
   /// Returns a copy of this list where the first occurrence of [element] is
   /// removed from if present.
   ImmortalList<T> remove(Object element) =>
-      ImmortalList._internal(toMutableList()..remove(element));
+      _mutateAsList((list) => list..remove(element));
 
   /// Returns a copy of this list where all values in [other] are removed from
   /// if present.
   ///
   /// Unlike [remove] all occurrences of a value are removed.
   ImmortalList<T> removeAll(ImmortalList<T> other) =>
-      ImmortalList._internal(toMutableList()..removeWhere(other.contains));
+      removeIterable(other.toMutableList());
 
   /// Returns a copy of this list removing the object at position [index] if
   /// present.
@@ -768,10 +789,9 @@ class ImmortalList<T> {
   ///
   /// The provided [index] is adjusted to fit inside the boundaries of the list,
   /// i.e. to fulfill `0 <= index < length`.
-  ImmortalList<T> removeAt(int index) {
-    final validIndex = max(0, min(index, length - 1));
-    return ImmortalList._internal(toMutableList()..removeAt(validIndex));
-  }
+  /// Empty lists are returned unchanged.
+  ImmortalList<T> removeAt(int index) =>
+      _mutateAsListIf(isNotEmpty, (list) => list..removeAt(_validIndex(index)));
 
   /// Returns a copy of this list where all values in [iterable] are removed
   /// from if present.
@@ -780,17 +800,13 @@ class ImmortalList<T> {
   ///
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> removeIterable(Iterable<T> iterable) =>
-      removeAll(ImmortalList._internal(iterable));
+  ImmortalList<T> removeIterable(Iterable<T> iterable) => _mutateAsListIf(
+      iterable.isNotEmpty, (list) => list..removeWhere(iterable.contains));
 
   /// Returns a copy of this list removing the last object if there is one,
   /// otherwise the list is returned unchanged.
-  ImmortalList<T> removeLast() {
-    if (isEmpty) {
-      return this;
-    }
-    return ImmortalList._internal(toMutableList()..removeLast());
-  }
+  ImmortalList<T> removeLast() =>
+      _mutateAsListIf(isNotEmpty, (list) => list..removeLast());
 
   /// Returns a copy of this list where the objects in the range [start]
   /// inclusive to [end] exclusive are removed from.
@@ -800,16 +816,13 @@ class ImmortalList<T> {
   /// `0 <= start <= end <= len`, where `len` is this list's [length].
   ///
   /// If the resulting range is empty, the list is returned unchanged.
-  ImmortalList<T> removeRange(int start, int end) {
-    final validStart = max(min(start, length), 0);
-    final validEnd = max(validStart, min(end, length));
-    if (validStart == validEnd) {
-      return this;
-    }
-    return ImmortalList._internal(
-      toMutableList()..removeRange(validStart, validEnd),
-    );
-  }
+  ImmortalList<T> removeRange(int start, int end) => _withRange(
+      start,
+      end,
+      (range) => _mutateAsListIf(
+            range.isNotEmpty,
+            (list) => list..removeRange(range.start, range.end),
+          ));
 
   /// Returns a copy of this list where all values that satisfy the given
   /// [predicate] are removed from.
@@ -822,7 +835,7 @@ class ImmortalList<T> {
   ///     final removed = numbers.removeWhere((item) => item.length == 3);
   ///     removed.join(', '); // 'three, four'
   ImmortalList<T> removeWhere(bool Function(T value) predicate) =>
-      ImmortalList._internal(toMutableList()..removeWhere(predicate));
+      _mutateAsList((list) => list..removeWhere(predicate));
 
   /// Returns a copy of this list replacing the value at the given [index] with
   /// [value].
@@ -863,16 +876,16 @@ class ImmortalList<T> {
     int start,
     int end,
     Iterable<T> iterable,
-  ) {
-    final validStart = max(min(start, length), 0);
-    final validEnd = max(validStart, min(end, length));
-    return ImmortalList._internal(toMutableList()
-      ..replaceRange(
-        validStart,
-        validEnd,
-        iterable,
-      ));
-  }
+  ) =>
+      _withRange(
+          start,
+          end,
+          (range) => _mutateAsList((list) => list
+            ..replaceRange(
+              range.start,
+              range.end,
+              iterable,
+            )));
 
   /// Returns a copy of this list replacing each element that fulfills the given
   /// [predicate] by [value].
@@ -902,7 +915,7 @@ class ImmortalList<T> {
   ///     final retained = numbers.retainWhere((item) => item.length == 3);
   ///     retained.join(', '); // 'one, two'
   ImmortalList<T> retainWhere(bool Function(T value) predicate) =>
-      ImmortalList._internal(toMutableList()..retainWhere(predicate));
+      _mutateAsList((list) => list..retainWhere(predicate));
 
   /// Returns a list containing the objects of this list in reverse order.
   ImmortalList<T> get reversed => ImmortalList(_list.reversed);
@@ -914,12 +927,9 @@ class ImmortalList<T> {
   /// i.e. to fulfill `0 <= index < length`.
   ///
   /// The resulting list will have the same length as the original list.
-  ImmortalList<T> set(int index, T value) {
-    final validIndex = max(0, min(index, length - 1));
-    return ImmortalList._internal(
-      toMutableList()..[validIndex] = value,
-    );
-  }
+  /// Empty lists are returned unchanged.
+  ImmortalList<T> set(int index, T value) =>
+      _mutateAsListIf(isNotEmpty, (list) => list..[_validIndex(index)] = value);
 
   /// Returns a copy of this list replacing the objects starting at position
   /// [index] with the objects of [other].
@@ -946,17 +956,15 @@ class ImmortalList<T> {
   /// See [setAll].
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> setIterable(int index, Iterable<T> iterable) {
-    if (iterable.isEmpty) {
-      return this;
-    }
-    final validIndex = max(0, min(index, length));
-    return ImmortalList._internal(toMutableList()
-      ..setAll(
-        validIndex,
-        iterable.take(length - validIndex),
-      ));
-  }
+  ImmortalList<T> setIterable(int index, Iterable<T> iterable) =>
+      _mutateAsListIf(iterable.isNotEmpty, (list) {
+        final validIndex = _validIndexOrEnd(index);
+        return list
+          ..setAll(
+            validIndex,
+            iterable.take(length - validIndex),
+          );
+      });
 
   /// Returns a copy of this list where the objects in the range [start]
   /// inclusive to [end] exclusive are replaced by the objects of [other] while
@@ -1007,21 +1015,16 @@ class ImmortalList<T> {
     Iterable<T> iterable, [
     int skipCount = 0,
   ]) {
-    final validStart = max(min(start, length), 0);
-    final validEnd = max(
-      validStart,
-      min(end, min(length, iterable.length + validStart)),
-    );
-    if (iterable.isEmpty || validStart == validEnd) {
-      return this;
-    }
-    return ImmortalList._internal(toMutableList()
-      ..setRange(
-        validStart,
-        validEnd,
-        iterable,
-        skipCount,
-      ));
+    final range = _validRangeWithOtherList(start, end, iterable.length);
+    return _mutateAsListIf(
+        iterable.isNotEmpty && range.isNotEmpty,
+        (list) => list
+          ..setRange(
+            range.start,
+            range.end,
+            iterable,
+            skipCount,
+          ));
   }
 
   /// Returns a copy of this list replacing each element that fulfills the given
@@ -1041,7 +1044,7 @@ class ImmortalList<T> {
 
   /// Returns a copy of this list randomly shuffling the elements.
   ImmortalList<T> shuffle([Random random]) =>
-      ImmortalList._internal(toMutableList()..shuffle(random));
+      _mutateAsList((list) => list..shuffle(random));
 
   /// Returns an [Optional] containing the only element of this list if it has
   /// exactly one element, otherwise returns [Optional.empty].
@@ -1050,12 +1053,7 @@ class ImmortalList<T> {
   /// containing the `null` value as only element.
   /// Methods like [contains] or [length] can be used if the distinction is
   /// important.
-  Optional<T> get single {
-    if (length != 1) {
-      return Optional.empty();
-    }
-    return Optional.ofNullable(_list.single);
-  }
+  Optional<T> get single => getValueIf(length == 1, () => _list.single);
 
   /// Returns an [Optional] containing the only element satisfying the given
   /// [predicate] if there is exactly one, otherwise returns [Optional.empty].
@@ -1072,7 +1070,7 @@ class ImmortalList<T> {
   /// Methods like [contains] can be used if the distinction is important.
   Optional<T> singleWhere(bool Function(T value) predicate) =>
       Optional.ofNullable(
-        _list.singleWhere(predicate, orElse: () => null),
+        _list.singleWhere(predicate, orElse: returnNull),
       );
 
   /// Returns a copy of this list that contains all but the fist [count]
@@ -1084,12 +1082,8 @@ class ImmortalList<T> {
   /// empty.
   ///
   /// If the passed [count] is zero or negative, the list is returned unchanged.
-  ImmortalList<T> skip(int count) {
-    if (count <= 0) {
-      return this;
-    }
-    return ImmortalList(_list.skip(count));
-  }
+  ImmortalList<T> skip(int count) =>
+      count <= 0 ? this : ImmortalList(_list.skip(count));
 
   /// Returns a copy of this list containing all elements except the leading
   /// elements while the given [predicate] is satisfied.
@@ -1128,7 +1122,7 @@ class ImmortalList<T> {
   ///     final sorted = numbers.sort((a, b) => a.length.compareTo(b.length));
   ///     print(sorted);  // [one, two, four, three] OR [two, one, four, three]
   ImmortalList<T> sort([int Function(T value, T otherValue) compare]) =>
-      ImmortalList._internal(toMutableList()..sort(compare));
+      _mutateAsList((list) => list..sort(compare));
 
   /// Returns a copy of this containing all elements between [start] and [end].
   ///
@@ -1145,14 +1139,12 @@ class ImmortalList<T> {
   ///
   /// If the resulting range covers the whole list, it will be returned
   /// unchanged.
-  ImmortalList<T> sublist(int start, [int end]) {
-    final validStart = max(min(start, length), 0);
-    final validEnd = max(validStart, min(end ?? length, length));
-    if (validStart == 0 && validEnd == length) {
-      return this;
-    }
-    return ImmortalList._internal(_list.sublist(validStart, validEnd));
-  }
+  ImmortalList<T> sublist(int start, [int end]) => _withRange(
+      start,
+      end ?? length,
+      (range) => range.spansWholeList(length)
+          ? this
+          : ImmortalList._internal(_list.sublist(range.start, range.end)));
 
   /// Returns a copy of this list containing the [count] first elements.
   ///
@@ -1163,15 +1155,9 @@ class ImmortalList<T> {
   ///
   /// If [count] is equal to or grater than the list's length, the list is
   /// returned unchanged.
-  ImmortalList<T> take(int count) {
-    if (count >= length) {
-      return this;
-    }
-    if (count <= 0) {
-      return ImmortalList<T>();
-    }
-    return ImmortalList(_list.take(count));
-  }
+  ImmortalList<T> take(int count) => count >= length
+      ? this
+      : ImmortalList(count <= 0 ? <T>[] : _list.take(count));
 
   /// Returns a copy of this list containing the leading elements satisfying the
   /// given [predicate].

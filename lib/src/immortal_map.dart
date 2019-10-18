@@ -2,6 +2,9 @@ import 'package:optional/optional.dart';
 import 'package:tuple/tuple.dart';
 
 import '../immortal.dart';
+import 'utils.dart';
+
+R Function(K, V) _mapValue<K, V, R>(R Function(V value) f) => (_, v) => f(v);
 
 /// An immutable collection of key/value pairs, from which you retrieve a value
 /// using its associated key.
@@ -189,6 +192,15 @@ class ImmortalMap<K, V> {
 
   final Map<K, V> _map;
 
+  ImmortalMap<K, V> _mutateAsMap(Map<K, V> Function(Map<K, V>) f) =>
+      ImmortalMap._internal(f(toMutableMap()));
+
+  ImmortalMap<K, V> _mutateAsMapIf(
+    bool condition,
+    Map<K, V> Function(Map<K, V>) f,
+  ) =>
+      condition ? _mutateAsMap(f) : this;
+
   /// Returns a copy of this map where all key/value pairs of [other] are added.
   ///
   /// See [addAll].
@@ -231,12 +243,8 @@ class ImmortalMap<K, V> {
   /// See [addEntries].
   /// It iterates over [entries], which must therefore not change during the
   /// iteration.
-  ImmortalMap<K, V> addEntriesIterable(Iterable<MapEntry<K, V>> entries) {
-    if (entries.isEmpty) {
-      return this;
-    }
-    return ImmortalMap._internal(toMutableMap()..addEntries(entries));
-  }
+  ImmortalMap<K, V> addEntriesIterable(Iterable<MapEntry<K, V>> entries) =>
+      _mutateAsMapIf(entries.isNotEmpty, (map) => map..addEntries(entries));
 
   /// Returns a copy of this map where the key/value pair [entry] is added.
   ///
@@ -263,12 +271,8 @@ class ImmortalMap<K, V> {
   /// See [addAll].
   /// It iterates over [other], which must therefore not change during the
   /// iteration.
-  ImmortalMap<K, V> addMap(Map<K, V> other) {
-    if (other.isEmpty) {
-      return this;
-    }
-    return ImmortalMap._internal(toMutableMap()..addAll(other));
-  }
+  ImmortalMap<K, V> addMap(Map<K, V> other) =>
+      _mutateAsMapIf(other.isNotEmpty, (map) => map..addAll(other));
 
   /// Returns a copy of this map where the elements of [pair] are added as a new
   /// map entry.
@@ -339,10 +343,8 @@ class ImmortalMap<K, V> {
       other is ImmortalMap<K, V> &&
           length == other.length &&
           mapEntries(
-            (key, value) => other[key]
-                .map((otherValue) => otherValue == value)
-                .orElse(false),
-          ).every((result) => result);
+            (key, value) => other[key].map(equalTo(value)).orElse(false),
+          ).every(isTrue);
 
   /// Returns a copy of this map containing all entries that satisfy the given
   /// [predicate].
@@ -410,7 +412,7 @@ class ImmortalMap<K, V> {
   /// Returns an immortal list of all keys with a value equal to the given
   /// [lookupValue] according to the `==` operator.
   ImmortalList<K> lookupKeysForValue(V lookupValue) =>
-      where((_, value) => value == lookupValue).keys;
+      where(_mapValue(equalTo(lookupValue))).keys;
 
   /// Returns a new map where all entries of this map are transformed by the
   /// given [f] function.
@@ -480,7 +482,7 @@ class ImmortalMap<K, V> {
   ///     scores['Rohan'];    //  5
   ///     scores['Sophena'];  //  7
   ImmortalMap<K, V> putIfAbsent(K key, V Function() ifAbsent) =>
-      ImmortalMap._internal(toMutableMap()..putIfAbsent(key, ifAbsent));
+      _mutateAsMap((map) => map..putIfAbsent(key, ifAbsent));
 
   /// Returns a copy of this map replacing the values of all key/value pairs
   /// fulfilling the given [predicate] with [newValue].
@@ -493,17 +495,17 @@ class ImmortalMap<K, V> {
   /// Returns a copy of this map where [key] and its associated value are
   /// removed if present.
   ImmortalMap<K, V> remove(Object key) =>
-      ImmortalMap._internal(toMutableMap()..remove(key));
+      _mutateAsMap((map) => map..remove(key));
 
   /// Returns a copy of this map where all keys and their associated values
   /// contained in [keysToRemove] are removed from.
   ImmortalMap<K, V> removeAll(ImmortalList<K> keysToRemove) =>
-      removeWhere((key, _) => keysToRemove.contains(key));
+      removeWhereKey(keysToRemove.contains);
 
   /// Returns a copy of this map where all entries with a value contained in
   /// [valuesToRemove] are removed from.
   ImmortalMap<K, V> removeAllValues(ImmortalList<V> valuesToRemove) =>
-      removeWhere((_, value) => valuesToRemove.contains(value));
+      removeWhereValue(valuesToRemove.contains);
 
   /// Returns a copy of this map where all keys and their associated values
   /// contained in the iterable [keysToRemove] are removed from.
@@ -512,24 +514,34 @@ class ImmortalMap<K, V> {
   /// It iterates over [keysToRemove], which must therefore not change during
   /// the iteration.
   ImmortalMap<K, V> removeIterable(Iterable<K> keysToRemove) =>
-      removeWhere((key, _) => keysToRemove.contains(key));
+      removeWhereKey(keysToRemove.contains);
 
   /// Returns a copy of this map where all entries are removed that contain a
   /// value equal to [valueToRemove] according to the `==` operator.
   ImmortalMap<K, V> removeValue(Object valueToRemove) =>
-      removeWhere((_, value) => value == valueToRemove);
+      removeWhereValue(equalTo(valueToRemove));
 
   /// Returns a copy of this map where all entries with a value contained in the
   /// iterable [valuesToRemove] are removed from.
   /// It iterates over [valuesToRemove], which must therefore not change during
   /// the iteration.
   ImmortalMap<K, V> removeValuesIterable(Iterable<V> valuesToRemove) =>
-      removeWhere((_, value) => valuesToRemove.contains(value));
+      removeWhereValue(valuesToRemove.contains);
 
   /// Returns a copy of this map where all entries that satisfy the given
   /// [predicate] are removed.
   ImmortalMap<K, V> removeWhere(bool Function(K key, V value) predicate) =>
-      ImmortalMap._internal(toMutableMap()..removeWhere(predicate));
+      _mutateAsMap((map) => map..removeWhere(predicate));
+
+  /// Returns a copy of this map removing all entries with keys fulfilling the
+  /// given [predicate].
+  ImmortalMap<K, V> removeWhereKey(bool Function(K key) predicate) =>
+      _mutateAsMap((map) => map..removeWhere((key, _) => predicate(key)));
+
+  /// Returns a copy of this map removing all entries with values fulfilling
+  /// the given [predicate].
+  ImmortalMap<K, V> removeWhereValue(bool Function(V value) predicate) =>
+      _mutateAsMap((map) => map..removeWhere(_mapValue(predicate)));
 
   /// Returns a copy of this map where the value of [key] is set to [newValue]
   /// if already present.
@@ -644,21 +656,16 @@ class ImmortalMap<K, V> {
     K key,
     V Function(V value) update, {
     V Function() ifAbsent,
-  }) {
-    if (ifAbsent == null && !containsKey(key)) {
-      return this;
-    }
-    return ImmortalMap._internal(
-      toMutableMap()..update(key, update, ifAbsent: ifAbsent),
-    );
-  }
+  }) =>
+      _mutateAsMapIf(ifAbsent != null || containsKey(key),
+          (map) => map..update(key, update, ifAbsent: ifAbsent));
 
   /// Returns a copy of this map updating all values.
   ///
   /// Iterates over all entries in the copied map and updates them with the
   /// result of invoking [update].
   ImmortalMap<K, V> updateAll(V Function(K key, V value) update) =>
-      ImmortalMap._internal(toMutableMap()..updateAll(update));
+      _mutateAsMap((map) => map..updateAll(update));
 
   /// Returns a copy of this map updating the entry for the provided [key].
   ///
@@ -709,21 +716,15 @@ class ImmortalMap<K, V> {
   /// Returns a copy of this map containing all entries that satisfy the given
   /// [predicate].
   ImmortalMap<K, V> where(bool Function(K key, V value) predicate) =>
-      ImmortalMap._internal(
-        toMutableMap()..removeWhere((key, value) => !predicate(key, value)),
-      );
+      removeWhere((key, value) => !predicate(key, value));
 
   /// Returns a copy of this map containing all entries with keys that satisfy
   /// the given [predicate].
   ImmortalMap<K, V> whereKey(bool Function(K key) predicate) =>
-      ImmortalMap._internal(
-        toMutableMap()..removeWhere((key, _) => !predicate(key)),
-      );
+      removeWhereKey(not(predicate));
 
   /// Returns a copy of this map containing all entries with values that satisfy
   /// the given [predicate].
   ImmortalMap<K, V> whereValue(bool Function(V value) predicate) =>
-      ImmortalMap._internal(
-        toMutableMap()..removeWhere((_, value) => !predicate(value)),
-      );
+      removeWhereValue(not(predicate));
 }

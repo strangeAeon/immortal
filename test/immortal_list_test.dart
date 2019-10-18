@@ -91,6 +91,8 @@ void main() {
     expect(multiList.elementAt(2), Optional.of(3));
     expect(multiList[3], Optional.empty());
     expect(multiList.elementAt(3), Optional.empty());
+    expect(emptyList[0], Optional.empty());
+    expect(emptyList.elementAt(0), Optional.empty());
   });
 
   test('should add single value', () {
@@ -487,6 +489,7 @@ void main() {
       multiList.insertAll(5, multiList),
       ImmortalList([1, 2, 3, 1, 2, 3]),
     );
+    expect(singleList.insertAll(0, ImmortalList()), singleList);
   });
 
   test('should insert iterable at index', () {
@@ -500,6 +503,7 @@ void main() {
       multiList.insertIterable(5, [1, 2, 3]),
       ImmortalList([1, 2, 3, 1, 2, 3]),
     );
+    expect(singleList.insertIterable(0, []), singleList);
   });
 
   test('should return if list is empty', () {
@@ -606,6 +610,7 @@ void main() {
       ImmortalList([1, 2, 1, 2, 1]) - singleList,
       ImmortalList([2, 2]),
     );
+    expect(singleList.removeAll(ImmortalList()), singleList);
   });
 
   test('should remove element at index', () {
@@ -613,6 +618,7 @@ void main() {
     expectList(multiList.removeAt(5), ImmortalList([1, 2]));
     expectList(singleList.removeAt(0), emptyList);
     expectList(multiList.removeAt(1), ImmortalList([1, 3]));
+    expect(emptyList.removeAt(0), emptyList);
   });
 
   test('should remove all elements from iterable', () {
@@ -622,6 +628,7 @@ void main() {
       ImmortalList([1, 2, 1, 2, 1]).removeIterable([1]),
       ImmortalList([2, 2]),
     );
+    expect(singleList.removeIterable([]), singleList);
   });
 
   test('should remove last element', () {
@@ -691,14 +698,17 @@ void main() {
     expectList(multiList.set(5, 4), ImmortalList([1, 2, 4]));
     expectList(singleList.set(0, 2), ImmortalList([2]));
     expectList(multiList.set(1, 4), ImmortalList([1, 4, 3]));
+    expect(emptyList.set(0, 1), emptyList);
     expectList(multiList.put(-1, 4), ImmortalList([4, 2, 3]));
     expectList(multiList.put(5, 4), ImmortalList([1, 2, 4]));
     expectList(singleList.put(0, 2), ImmortalList([2]));
     expectList(multiList.put(1, 4), ImmortalList([1, 4, 3]));
+    expect(emptyList.put(0, 1), emptyList);
     expectList(multiList.replaceAt(-1, 4), ImmortalList([4, 2, 3]));
     expectList(multiList.replaceAt(5, 4), ImmortalList([1, 2, 4]));
     expectList(singleList.replaceAt(0, 2), ImmortalList([2]));
     expectList(multiList.replaceAt(1, 4), ImmortalList([1, 4, 3]));
+    expect(emptyList.replaceAt(0, 1), emptyList);
   });
 
   test('should set elements starting at index', () {

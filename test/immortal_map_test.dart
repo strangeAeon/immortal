@@ -516,6 +516,18 @@ void main() {
     expectMap(multiMap.removeWhere((key, value) => false), multiMap);
   });
 
+  test('should remove entries with keys fulfilling a test', () {
+    expectMap(singleMap.removeWhereKey((key) => true), emptyMap);
+    expectMap(multiMap.removeWhereKey((key) => key != 'a'), singleMap);
+    expectMap(multiMap.removeWhereKey((key) => false), multiMap);
+  });
+
+  test('should remove entries with values fulfilling a test', () {
+    expectMap(singleMap.removeWhereValue((value) => true), emptyMap);
+    expectMap(multiMap.removeWhereValue((value) => value > 1), singleMap);
+    expectMap(multiMap.removeWhereValue((value) => false), multiMap);
+  });
+
   test('should replace value if present', () {
     expect(emptyMap.replace('a', 1), emptyMap);
     expect(multiMap.replace('d', 4), multiMap);

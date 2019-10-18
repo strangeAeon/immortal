@@ -2,6 +2,7 @@ import 'package:optional/optional.dart';
 import 'package:tuple/tuple.dart';
 
 import '../immortal.dart';
+import 'utils.dart';
 
 /// An immutable collection of objects in which each object can occur only once
 /// according to the `==` operator.
@@ -79,6 +80,12 @@ class ImmortalSet<T> {
 
   final Set<T> _set;
 
+  ImmortalSet<T> _mutateAsSet(Set<T> Function(Set<T>) f) =>
+      ImmortalSet._internal(f(toMutableSet()));
+
+  ImmortalSet<T> _mutateAsSetIf(bool condition, Set<T> Function(Set<T>) f) =>
+      condition ? _mutateAsSet(f) : this;
+
   /// Returns a new set which contains all the elements of this set and [other].
   ///
   /// See [union].
@@ -138,12 +145,8 @@ class ImmortalSet<T> {
   /// See [addAll].
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalSet<T> addIterable(Iterable<T> iterable) {
-    if (iterable.isEmpty) {
-      return this;
-    }
-    return ImmortalSet._internal(toMutableSet()..addAll(iterable));
-  }
+  ImmortalSet<T> addIterable(Iterable<T> iterable) =>
+      _mutateAsSetIf(iterable.isNotEmpty, (set) => set..addAll(iterable));
 
   /// Checks whether any element of this set satisfies the given [predicate].
   ///
@@ -201,12 +204,8 @@ class ImmortalSet<T> {
   /// See [difference].
   /// It iterates over [other], which must therefore not change during the
   /// iteration.
-  ImmortalSet<T> differenceWithSet(Set<Object> other) {
-    if (other.isEmpty) {
-      return this;
-    }
-    return ImmortalSet._internal(_set.difference(other));
-  }
+  ImmortalSet<T> differenceWithSet(Set<Object> other) =>
+      other.isEmpty ? this : ImmortalSet._internal(_set.difference(other));
 
   /// Checks whether this set is equal to [other].
   ///
@@ -285,8 +284,7 @@ class ImmortalSet<T> {
   ///
   /// If this set contains only instances of [ImmortalSet<R>] the new set will
   /// be created correctly, otherwise an exception is thrown.
-  ImmortalSet<R> flatten<R>() =>
-      cast<ImmortalSet<R>>().expand<R>((value) => value);
+  ImmortalSet<R> flatten<R>() => cast<ImmortalSet<R>>().expand<R>(identity);
 
   /// Flattens a set of iterables by combining their values to a single set.
   ///
@@ -295,7 +293,7 @@ class ImmortalSet<T> {
   /// The iterable values are iterated over and must therefore not change
   /// during the iteration.
   ImmortalSet<R> flattenIterables<R>() =>
-      cast<Iterable<R>>().expandIterable<R>((value) => value);
+      cast<Iterable<R>>().expandIterable<R>(identity);
 
   /// Flattens a set of immortal lists by combining their values to a single
   /// set.
@@ -411,17 +409,13 @@ class ImmortalSet<T> {
   /// See [removeAll].
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalSet<T> removeIterable(Iterable<Object> iterable) {
-    if (iterable.isEmpty) {
-      return this;
-    }
-    return ImmortalSet._internal(toMutableSet()..removeAll(iterable));
-  }
+  ImmortalSet<T> removeIterable(Iterable<Object> iterable) =>
+      _mutateAsSetIf(iterable.isNotEmpty, (set) => set..removeAll(iterable));
 
   /// Returns a copy of this set where all values that satisfy the given
   /// [predicate] are removed from.
   ImmortalSet<T> removeWhere(bool Function(T value) predicate) =>
-      ImmortalSet._internal(toMutableSet()..removeWhere(predicate));
+      _mutateAsSet((set) => set..removeWhere(predicate));
 
   /// Returns a copy of this set where are all elements that are not in [other]
   /// are removed from.
@@ -440,12 +434,12 @@ class ImmortalSet<T> {
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
   ImmortalSet<T> retainIterable(Iterable<Object> iterable) =>
-      ImmortalSet._internal(toMutableSet()..retainAll(iterable));
+      _mutateAsSet((set) => set..retainAll(iterable));
 
   /// Returns a copy of this set where all values that fail to satisfy the given
   /// [predicate] are removed from.
   ImmortalSet<T> retainWhere(bool Function(T value) predicate) =>
-      ImmortalSet._internal(toMutableSet()..retainWhere(predicate));
+      _mutateAsSet((set) => set..retainWhere(predicate));
 
   /// Returns an [Optional] containing the only element of the set if it has
   /// exactly one element, otherwise returns [Optional.empty].
@@ -453,12 +447,7 @@ class ImmortalSet<T> {
   /// This lookup can not distinguish between not having exactly one element and
   /// containing only the `null` value.
   /// Methods like [length] can be used if the distinction is important.
-  Optional<T> get single {
-    if (length != 1) {
-      return Optional.empty();
-    }
-    return Optional.ofNullable(_set.single);
-  }
+  Optional<T> get single => getValueIf(length == 1, () => _set.single);
 
   /// Returns an [Optional] containing the only element that satisfies the given
   /// [predicate] if there is exactly one, otherwise returns [Optional.empty].
@@ -474,10 +463,7 @@ class ImmortalSet<T> {
   /// predicate and only containing the `null` value satisfying the predicate.
   /// Methods like [contains] can be used if the distinction is important.
   Optional<T> singleWhere(bool Function(T value) predicate) =>
-      Optional.ofNullable(_set.singleWhere(
-        predicate,
-        orElse: () => null,
-      ));
+      Optional.ofNullable(_set.singleWhere(predicate, orElse: returnNull));
 
   /// Returns a copy of this set by toggling the presence of [value].
   ///
@@ -517,12 +503,8 @@ class ImmortalSet<T> {
   /// See [union].
   /// It iterates over [other], which must therefore not change during the
   /// iteration.
-  ImmortalSet<T> unionWithSet(Set<T> other) {
-    if (other.isEmpty) {
-      return this;
-    }
-    return ImmortalSet._internal(_set.union(other));
-  }
+  ImmortalSet<T> unionWithSet(Set<T> other) =>
+      other.isEmpty ? this : ImmortalSet._internal(_set.union(other));
 
   /// Returns a copy of this set by applying [update] to all elements that
   /// fulfill the given [predicate].
