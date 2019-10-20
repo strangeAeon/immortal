@@ -504,8 +504,11 @@ class ImmortalMap<K, V> {
 
   /// Returns a copy of this map where all entries with a value contained in
   /// [valuesToRemove] are removed from.
+  ///
+  /// Deprecated in favour of [removeValues].
+  @Deprecated('Renamed to "removeValues"')
   ImmortalMap<K, V> removeAllValues(ImmortalList<V> valuesToRemove) =>
-      removeWhereValue(valuesToRemove.contains);
+      removeValues(valuesToRemove);
 
   /// Returns a copy of this map where all keys and their associated values
   /// contained in the iterable [keysToRemove] are removed from.
@@ -521,8 +524,15 @@ class ImmortalMap<K, V> {
   ImmortalMap<K, V> removeValue(Object valueToRemove) =>
       removeWhereValue(equalTo(valueToRemove));
 
+  /// Returns a copy of this map where all entries with a value contained in
+  /// [valuesToRemove] are removed from.
+  ImmortalMap<K, V> removeValues(ImmortalList<V> valuesToRemove) =>
+      removeWhereValue(valuesToRemove.contains);
+
   /// Returns a copy of this map where all entries with a value contained in the
   /// iterable [valuesToRemove] are removed from.
+  ///
+  /// See [removeValues].
   /// It iterates over [valuesToRemove], which must therefore not change during
   /// the iteration.
   ImmortalMap<K, V> removeValuesIterable(Iterable<V> valuesToRemove) =>

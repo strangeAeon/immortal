@@ -199,10 +199,8 @@ class ImmortalList<T> {
   /// See [addAll].
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> addIterable(Iterable<T> iterable) => _mutateAsListIf(
-        iterable.isNotEmpty,
-        (list) => list..addAll(iterable),
-      );
+  ImmortalList<T> addIterable(Iterable<T> iterable) =>
+      _mutateAsListIf(iterable.isNotEmpty, (list) => list..addAll(iterable));
 
   /// Checks whether any element of this list satisfies the given [predicate].
   ///
@@ -241,9 +239,7 @@ class ImmortalList<T> {
   /// Returns an [ImmortalMap] generating keys by applying the given function
   /// [keyGenerator] to each value and its respective index.
   ///
-  /// Iterates over all elements in iteration order.
-  /// If a key is already present in the map, the corresponding value is
-  /// overwritten.
+  /// See [asMapWithKeys].
   ImmortalMap<K, T> asMapWithKeysIndexed<K>(
     K Function(int index, T value) keyGenerator,
   ) =>
@@ -264,9 +260,7 @@ class ImmortalList<T> {
 
   /// Returns a copy of this list concatenating [iterable].
   ///
-  /// See [followedBy].
-  /// It iterates over [iterable], which must therefore not change during the
-  /// iteration.
+  /// See [followedByIterable].
   ImmortalList<T> concatenateIterable(Iterable<T> iterable) =>
       followedByIterable(iterable);
 
@@ -362,9 +356,7 @@ class ImmortalList<T> {
   /// of zero or more elements by applying [f] to each element and its
   /// respective index and concatenating the resulting lists.
   ///
-  /// See [expand].
-  /// The iterables returnd by [f] are iterated over and must therefore not
-  /// change during the iteration.
+  /// See [expandIterable].
   ImmortalList<R> expandIterableIndexed<R>(
     Iterable<R> Function(int index, T value) f,
   ) =>
@@ -407,7 +399,7 @@ class ImmortalList<T> {
   /// Returns a new list containing all elements that satisfy the given
   /// [predicate] with their respective indices.
   ///
-  /// See [whereIndexed].
+  /// See [where].
   ImmortalList<T> filterIndexed(bool Function(int index, T value) predicate) =>
       whereIndexed(predicate);
 
@@ -456,7 +448,7 @@ class ImmortalList<T> {
   /// or more elements by applying [f] to each element and its respective index
   /// and concatenating the resulting lists.
   ///
-  /// See [expandIndexed].
+  /// See [expand].
   ImmortalList<R> flatMapIndexed<R>(
     ImmortalList<R> Function(int index, T value) f,
   ) =>
@@ -465,9 +457,7 @@ class ImmortalList<T> {
   /// Returns a new list expanding each element of this list into an iterable of
   /// zero or more elements.
   ///
-  /// See [expand].
-  /// The iterables returnd by [f] are iterated over and must therefore not
-  /// change during the iteration.
+  /// See [expandIterable].
   ImmortalList<R> flatMapIterable<R>(Iterable<R> Function(T value) f) =>
       expandIterable(f);
 
@@ -475,9 +465,7 @@ class ImmortalList<T> {
   /// of zero or more elements by applying [f] to each element and its
   /// respective index and concatenating the resulting lists.
   ///
-  /// See [expandIterableIndexed].
-  /// The iterables returnd by [f] are iterated over and must therefore not
-  /// change during the iteration.
+  /// See [expandIterable].
   ImmortalList<R> flatMapIterableIndexed<R>(
     Iterable<R> Function(int index, T value) f,
   ) =>
@@ -496,6 +484,7 @@ class ImmortalList<T> {
   /// If this list contains only instances of [Iterable<R>] the new list will be
   /// created correctly, otherwise an exception is thrown.
   ///
+  /// See [flatten].
   /// The iterables are iterated over and must therefore not change during the
   /// iteration.
   ImmortalList<R> flattenIterables<R>() =>
@@ -542,6 +531,8 @@ class ImmortalList<T> {
   void forEach(void Function(T value) f) => _list.forEach(f);
 
   /// Applies the function [f] to each element and its index of this list.
+  ///
+  /// See [forEach].
   void forEachIndexed(void Function(int index, T value) f) => mapIndexed(f);
 
   /// Returns a copy of this list that contains all elements in the range
@@ -728,7 +719,9 @@ class ImmortalList<T> {
   ImmortalList<R> map<R>(R Function(T value) f) => ImmortalList(_list.map(f));
 
   /// Returns a new list with elements that are created by calling [f] on each
-  /// element of this list and its respective index.
+  /// element of this list and its respective index in iteration order.
+  ///
+  /// See [map].
   ImmortalList<R> mapIndexed<R>(R Function(int index, T value) f) =>
       ImmortalList(_list
           .asMap()
@@ -762,7 +755,7 @@ class ImmortalList<T> {
   /// Returns a copy of this list replacing each element that fulfills the given
   /// [predicate] with its respective index by [value].
   ///
-  /// See [setWhereIndexed].
+  /// See [setWhere].
   ImmortalList<T> putWhereIndexed(
     bool Function(int index, T value) predicate,
     T value,
@@ -797,7 +790,6 @@ class ImmortalList<T> {
   /// from if present.
   ///
   /// See [removeAll].
-  ///
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
   ImmortalList<T> removeIterable(Iterable<T> iterable) => _mutateAsListIf(
@@ -897,7 +889,7 @@ class ImmortalList<T> {
   /// Returns a copy of this list replacing each element that fulfills the given
   /// [predicate] with its respective index by [value].
   ///
-  /// See [setWhereIndexed].
+  /// See [setWhere].
   ImmortalList<T> replaceWhereIndexed(
     bool Function(int index, T value) predicate,
     T value,
@@ -1034,6 +1026,8 @@ class ImmortalList<T> {
 
   /// Returns a copy of this list replacing each element that fulfills the given
   /// [predicate] with its respective index by [newValue].
+  ///
+  /// See [setWhere].
   ImmortalList<T> setWhereIndexed(
     bool Function(int index, T value) predicate,
     T newValue,
@@ -1204,6 +1198,8 @@ class ImmortalList<T> {
 
   /// Returns a copy of this list by applying [update] on each element and its
   /// respective index that fulfill the given [predicate].
+  ///
+  /// See [updateWhere].
   ImmortalList<T> updateWhereIndexed(
     bool Function(int index, T value) predicate,
     T Function(int index, T value) update,
@@ -1222,8 +1218,7 @@ class ImmortalList<T> {
   /// Returns a new list containing all elements that satisfy the given
   /// [predicate] with their respective indices.
   ///
-  /// The matching elements have the same order in the returned list as they
-  /// have in [iterator].
+  /// See [where].
   ImmortalList<T> whereIndexed(bool Function(int index, T value) predicate) =>
       asMap().where(predicate).values;
 
@@ -1251,6 +1246,8 @@ class ImmortalList<T> {
   /// the [iterable].
   ///
   /// See [zip].
+  /// It iterates over [iterable], which must therefore not change during the
+  /// iteration.
   ImmortalList<Tuple2<T, R>> zipIterable<R>(Iterable<R> iterable) =>
       zip(ImmortalList._internal(iterable));
 }

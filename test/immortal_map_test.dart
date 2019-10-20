@@ -486,14 +486,6 @@ void main() {
     );
   });
 
-  test('should remove entries by value', () {
-    expectMap(singleMap.removeAllValues(ImmortalList([1])), emptyMap);
-    expectMap(
-      multiMap.removeAllValues(ImmortalList([1, 3])),
-      ImmortalMap({'b': 2}),
-    );
-  });
-
   test('should remove entries by key iterable', () {
     expectMap(singleMap.removeIterable(['a']), emptyMap);
     expectMap(multiMap.removeIterable(['a', 'c']), ImmortalMap({'b': 2}));
@@ -503,6 +495,14 @@ void main() {
     expectMap(singleMap.removeValue(1), emptyMap);
     expectMap(ImmortalMap({'a': 1, 'b': 2, 'c': 2}).removeValue(2), singleMap);
     expectMap(multiMap.removeValue(4), multiMap);
+  });
+
+  test('should remove entries by value', () {
+    expectMap(singleMap.removeValues(ImmortalList([1])), emptyMap);
+    expectMap(
+      multiMap.removeValues(ImmortalList([1, 3])),
+      ImmortalMap({'b': 2}),
+    );
   });
 
   test('should remove entries by value iterable', () {

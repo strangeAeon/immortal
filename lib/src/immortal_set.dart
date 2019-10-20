@@ -39,8 +39,6 @@ class ImmortalSet<T> {
   /// Creates an [ImmortalSet] that contains all elements of [iterable].
   ///
   /// See [ImmortalSet.ofIterable].
-  /// It iterates over [iterable], which must therefore not change during the
-  /// iteration.
   factory ImmortalSet.fromIterable(Iterable<T> iterable) =>
       ImmortalSet(iterable);
 
@@ -274,9 +272,7 @@ class ImmortalSet<T> {
   /// Returns a new set expanding each element of this set into an iterable of
   /// zero or more elements.
   ///
-  /// See [expand].
-  /// The iterables returnd by [f] are iterated over and must therefore not
-  /// change during the iteration.
+  /// See [expandIterable].
   ImmortalSet<R> flatMapIterable<R>(Iterable<R> Function(T value) f) =>
       expandIterable(f);
 
@@ -290,6 +286,8 @@ class ImmortalSet<T> {
   ///
   /// If this set contains only instances of [Iterable<R>] the new set will be
   /// created correctly, otherwise an exception is thrown.
+  ///
+  /// See [flatten].
   /// The iterable values are iterated over and must therefore not change
   /// during the iteration.
   ImmortalSet<R> flattenIterables<R>() =>
