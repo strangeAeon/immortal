@@ -367,6 +367,31 @@ class ImmortalMap<K, V> {
   ImmortalMap<K, V> filterValues(bool Function(V value) predicate) =>
       whereValue(predicate);
 
+  /// Flattens a map of immortal maps by building a new map from the nested map
+  /// entries.
+  ///
+  /// If multiple entries have the same key after transformation, later
+  /// occurences overwrite the earlier ones.
+  ///
+  /// If this map contains only instances of [ImmortalMap<K2, V2>] the new map
+  /// will be created correctly, otherwise an exception is thrown.
+  ImmortalMap<K2, V2> flatten<K2, V2>() =>
+      ImmortalMap.fromEntries(cast<K, ImmortalMap<K2, V2>>()
+          .mapEntries((_, map) => map.entries)
+          .flatten());
+
+  /// Flattens a map of mutable maps by building a new map from the nested map
+  /// entries.
+  ///
+  /// If this map contains only instances of [Map<K2, V2>] the new map will be
+  /// created correctly, otherwise an exception is thrown.
+  ///
+  /// See [flatten].
+  ImmortalMap<K2, V2> flattenMutables<K2, V2>() =>
+      ImmortalMap.fromEntries(cast<K, Map<K2, V2>>()
+          .mapEntries((_, map) => map.entries)
+          .flattenIterables());
+
   /// Applies [f] to each key/value pair of the map.
   void forEach(void Function(K key, V value) f) => _map.forEach(f);
 

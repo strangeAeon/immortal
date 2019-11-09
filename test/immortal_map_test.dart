@@ -367,6 +367,26 @@ void main() {
     expectMap(multiMap.whereValue((value) => true), multiMap);
   });
 
+  test('should flatten map', () {
+    final initialMap = ImmortalMap({
+      'a': ImmortalMap({1: 'a', 2: 'b', 3: 'c'}),
+      'b': ImmortalMap({1: 'aa', 4: 'd'}),
+      'c': ImmortalMap({4: 'dd', 5: 'e'}),
+    });
+    final expectedMap = ImmortalMap({1: 'aa', 2: 'b', 3: 'c', 4: 'dd', 5: 'e'});
+    expectMap(initialMap.flatten(), expectedMap);
+  });
+
+  test('should flatten nested mutable maps', () {
+    final initialMap = ImmortalMap({
+      'a': {1: 'a', 2: 'b', 3: 'c'},
+      'b': {1: 'aa', 4: 'd'},
+      'c': {4: 'dd', 5: 'e'},
+    });
+    final expectedMap = ImmortalMap({1: 'aa', 2: 'b', 3: 'c', 4: 'dd', 5: 'e'});
+    expectMap(initialMap.flattenMutables(), expectedMap);
+  });
+
   test('should execute function for each entry', () {
     var joinedKeys = '';
     var sum = 0;
