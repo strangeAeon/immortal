@@ -305,6 +305,25 @@ class ImmortalMap<K, V> {
         (pair) => MapEntry(pair.item1, pair.item2),
       ));
 
+  /// Checks whether any entry in this map satisfies the given [predicate].
+  ///
+  /// Checks every entry and returns `true` if any of them make [predicate]
+  /// return `true`, otherwise returns `false`.
+  bool any(bool Function(K key, V value) predicate) =>
+      _map.entries.any((entry) => predicate(entry.key, entry.value));
+
+  /// Checks whether any key of this map satisfies the given [predicate].
+  ///
+  /// Checks every key and returns `true` if any of them make [predicate]
+  /// return `true`, otherwise returns `false`.
+  bool anyKey(bool Function(K key) predicate) => _map.keys.any(predicate);
+
+  /// Checks whether any value in this map satisfies the given [predicate].
+  ///
+  /// Checks every value and returns `true` if any of them make [predicate]
+  /// return `true`, otherwise returns `false`.
+  bool anyValue(bool Function(V value) predicate) => _map.values.any(predicate);
+
   /// Returns a copy of this map casting all keys to instances of [K2] and all
   /// values to instances of [V2].
   ///
@@ -345,6 +364,26 @@ class ImmortalMap<K, V> {
           mapEntries(
             (key, value) => other[key].map(equalTo(value)).orElse(false),
           ).every(isTrue);
+
+  /// Checks whether every entry in this map satisfies the given [predicate].
+  ///
+  /// Returns `false` if any entry makes [predicate] return `false`, otherwise
+  /// returns `true`.
+  bool every(bool Function(K key, V value) predicate) =>
+      _map.entries.every((entry) => predicate(entry.key, entry.value));
+
+  /// Checks whether every key of this map satisfies the given [predicate].
+  ///
+  /// Returns `false` if any key makes [predicate] return `false`, otherwise
+  /// returns `true`.
+  bool everyKey(bool Function(K key) predicate) => _map.keys.every(predicate);
+
+  /// Checks whether every value in this map satisfies the given [predicate].
+  ///
+  /// Returns `false` if any value makes [predicate] return `false`, otherwise
+  /// returns `true`.
+  bool everyValue(bool Function(V value) predicate) =>
+      _map.values.every(predicate);
 
   /// Returns a copy of this map containing all entries that satisfy the given
   /// [predicate].

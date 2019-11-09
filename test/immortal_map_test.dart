@@ -276,6 +276,21 @@ void main() {
     expect(multiMap.addPairsIterable([]), multiMap);
   });
 
+  test('should check if any entry satisfies a test', () {
+    expect(multiMap.any((key, value) => value < 3), true);
+    expect(multiMap.any((key, value) => key == ''), false);
+  });
+
+  test('should check if any key satisfies a test', () {
+    expect(multiMap.anyKey((key) => key == 'a'), true);
+    expect(multiMap.anyKey((key) => key == ''), false);
+  });
+
+  test('should check if any value satisfies a test', () {
+    expect(multiMap.anyValue((value) => value < 3), true);
+    expect(multiMap.anyValue((value) => value > 3), false);
+  });
+
   test('should cast the map', () {
     expectMap(
       ImmortalMap<Object, Object>({'a': 1, 'b': 2, 'c': 3}).cast<String, int>(),
@@ -338,6 +353,21 @@ void main() {
     expect(emptyMap.equals(ImmortalMap<String, int>()), true);
     expect(singleMap.equals(multiMap), false);
     expect(multiMap.equals(ImmortalMap({'a': 1, 'b': 2, 'c': 3})), true);
+  });
+
+  test('should check if every entry satisfies a test', () {
+    expect(multiMap.every((key, value) => value > 0), true);
+    expect(multiMap.every((key, value) => key == 'a'), false);
+  });
+
+  test('should check if every key satisfies a test', () {
+    expect(multiMap.everyKey((key) => key != ''), true);
+    expect(multiMap.everyKey((key) => key == 'a'), false);
+  });
+
+  test('should check if every value satisfies a test', () {
+    expect(multiMap.everyValue((value) => value > 0), true);
+    expect(multiMap.everyValue((value) => value > 3), false);
   });
 
   test('should filter for entries fulfilling a test', () {

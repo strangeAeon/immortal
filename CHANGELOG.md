@@ -5,7 +5,7 @@
 * Extend set functionality:
   * methods: `asMapWithKeys`, `flatten`, `flattenIterables`, `flattenLists`, `updateWhere`
 * Extend map functionality:
-  * methods: `addEntryIfAbsent`, `filter`, `filterKeys`, `filterValues`, `flatten`, `flattenMutables`, `get`, `getKeysForValue`, `keysForValue`, `lookupKeysForValue`, `put`, `putEntryIfAbsent`, `putWhere`, `removeWhereKey`, `removeWhereValue`, `replace`, `replaceEntry`, `replaceKey`, `replaceWhere`, `set`, `setEntry`, `setEntryIfAbsent`, `setIfAbsent`, `setWhere`, `single`, `singleKey`, `singleValue`, `updateEntry`, `updateKey`, `updateWhere`, `where`, `whereKey`, `whereValue`
+  * methods: `addEntryIfAbsent`, `any`, `anyKey`, `anyValue`, `every`, `everyKey`, `everyValue`, `filter`, `filterKeys`, `filterValues`, `flatten`, `flattenMutables`, `get`, `getKeysForValue`, `keysForValue`, `lookupKeysForValue`, `put`, `putEntryIfAbsent`, `putWhere`, `removeWhereKey`, `removeWhereValue`, `replace`, `replaceEntry`, `replaceKey`, `replaceWhere`, `set`, `setEntry`, `setEntryIfAbsent`, `setIfAbsent`, `setWhere`, `single`, `singleKey`, `singleValue`, `updateEntry`, `updateKey`, `updateWhere`, `where`, `whereKey`, `whereValue`
   * Renamed `removeAllValues` to `removeValues`
 
 ## 1.1.0
