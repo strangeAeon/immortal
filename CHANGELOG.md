@@ -7,6 +7,7 @@
   * methods: `addList`
 * Extend map functionality:
   * methods: `keysWhere`, `singleKeyWhere`, `singleValueWhere`, `singleWhere`, `valuesWhere`
+  * Change return types of `getKeysForValue`, `keys`, `keysForValue`, `lookupKeysForValue` from lists to sets
   * Remove deprecated method `removeAllValues`
 
 ## 1.2.0

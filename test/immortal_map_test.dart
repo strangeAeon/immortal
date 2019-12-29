@@ -30,6 +30,10 @@ void main() {
     expect(actual.equals(expected), true);
   }
 
+  void expectSet<T>(ImmortalSet<T> actual, ImmortalSet<T> expected) {
+    expect(actual.equals(expected), true);
+  }
+
   tearDown(() {
     // Make sure that original maps were not changed
     expectMap(emptyMap, ImmortalMap<String, int>());
@@ -446,37 +450,37 @@ void main() {
     expect(multiMap.isNotEmpty, true);
   });
 
-  test('should return immortal list of keys', () {
-    expectList(emptyMap.keys, ImmortalList<String>());
-    expectList(singleMap.keys, ImmortalList(['a']));
-    expectList(multiMap.keys, ImmortalList(['a', 'b', 'c']));
+  test('should return immortal set of keys', () {
+    expectSet(emptyMap.keys, ImmortalSet<String>());
+    expectSet(singleMap.keys, ImmortalSet(['a']));
+    expectSet(multiMap.keys, ImmortalSet(['a', 'b', 'c']));
   });
 
-  test('should return immortal list of keys with value', () {
+  test('should return immortal set of keys with value', () {
     final multiValueMap = ImmortalMap({'a': 1, 'b': 2, 'c': 1});
-    expectList(emptyMap.keysForValue(1), ImmortalList<String>());
-    expectList(singleMap.keysForValue(1), ImmortalList(['a']));
-    expectList(multiValueMap.keysForValue(1), ImmortalList(['a', 'c']));
-    expectList(emptyMap.lookupKeysForValue(1), ImmortalList<String>());
-    expectList(singleMap.lookupKeysForValue(1), ImmortalList(['a']));
-    expectList(multiValueMap.lookupKeysForValue(1), ImmortalList(['a', 'c']));
-    expectList(emptyMap.getKeysForValue(1), ImmortalList<String>());
-    expectList(singleMap.getKeysForValue(1), ImmortalList(['a']));
-    expectList(multiValueMap.getKeysForValue(1), ImmortalList(['a', 'c']));
+    expectSet(emptyMap.keysForValue(1), ImmortalSet<String>());
+    expectSet(singleMap.keysForValue(1), ImmortalSet(['a']));
+    expectSet(multiValueMap.keysForValue(1), ImmortalSet(['a', 'c']));
+    expectSet(emptyMap.lookupKeysForValue(1), ImmortalSet<String>());
+    expectSet(singleMap.lookupKeysForValue(1), ImmortalSet(['a']));
+    expectSet(multiValueMap.lookupKeysForValue(1), ImmortalSet(['a', 'c']));
+    expectSet(emptyMap.getKeysForValue(1), ImmortalSet<String>());
+    expectSet(singleMap.getKeysForValue(1), ImmortalSet(['a']));
+    expectSet(multiValueMap.getKeysForValue(1), ImmortalSet(['a', 'c']));
   });
 
   test('should return keys of entries fulfilling a test', () {
-    expectList(
+    expectSet(
       singleMap.keysWhere((key, value) => false),
-      ImmortalList<String>(),
+      ImmortalSet<String>(),
     );
-    expectList(
+    expectSet(
       multiMap.keysWhere((key, value) => value < 2),
-      ImmortalList(['a']),
+      ImmortalSet(['a']),
     );
-    expectList(
+    expectSet(
       multiMap.keysWhere((key, value) => true),
-      ImmortalList(['a', 'b', 'c']),
+      ImmortalSet(['a', 'b', 'c']),
     );
   });
 

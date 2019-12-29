@@ -440,11 +440,11 @@ class ImmortalMap<K, V> {
   /// See [lookup].
   Optional<V> get(K key) => lookup(key);
 
-  /// Returns an [ImmortalList] of all keys with a value equal to the given
+  /// Returns an [ImmortalSet] of all keys with a value equal to the given
   /// [value] according to the `==` operator.
   ///
   /// See [lookupKeysForValue].
-  ImmortalList<K> getKeysForValue(V value) => lookupKeysForValue(value);
+  ImmortalSet<K> getKeysForValue(V value) => lookupKeysForValue(value);
 
   /// Returns `true` if there is no key/value pair in the map.
   bool get isEmpty => _map.isEmpty;
@@ -452,18 +452,18 @@ class ImmortalMap<K, V> {
   /// Returns `true` if there is at least one key/value pair in the map.
   bool get isNotEmpty => _map.isNotEmpty;
 
-  /// Returns an [ImmortalList] containing the keys of this map.
-  ImmortalList<K> get keys => ImmortalList(_map.keys);
+  /// Returns an [ImmortalSet] containing the keys of this map.
+  ImmortalSet<K> get keys => ImmortalSet(_map.keys);
 
-  /// Returns an [ImmortalList] of all keys with a value equal to the given
+  /// Returns an [ImmortalSet] of all keys with a value equal to the given
   /// [value] according to the `==` operator.
   ///
   /// See [lookupKeysForValue].
-  ImmortalList<K> keysForValue(V value) => lookupKeysForValue(value);
+  ImmortalSet<K> keysForValue(V value) => lookupKeysForValue(value);
 
-  /// Returns an [ImmortalList] containing the keys of all entries in this map
+  /// Returns an [ImmortalSet] containing the keys of all entries in this map
   /// that fulfill the given [predicate].
-  ImmortalList<K> keysWhere(bool Function(K key, V value) predicate) =>
+  ImmortalSet<K> keysWhere(bool Function(K key, V value) predicate) =>
       where(predicate).keys;
 
   /// The number of key/value pairs in the map.
@@ -478,9 +478,9 @@ class ImmortalMap<K, V> {
   /// is important.
   Optional<V> lookup(K key) => Optional.ofNullable(_map[key]);
 
-  /// Returns an [ImmortalList] of all keys with a value equal to the given
+  /// Returns an [ImmortalSet] of all keys with a value equal to the given
   /// [lookupValue] according to the `==` operator.
-  ImmortalList<K> lookupKeysForValue(V lookupValue) =>
+  ImmortalSet<K> lookupKeysForValue(V lookupValue) =>
       where(_mapValue(equalTo(lookupValue))).keys;
 
   /// Returns a new map where all entries of this map are transformed by the
