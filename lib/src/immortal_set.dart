@@ -146,6 +146,12 @@ class ImmortalSet<T> {
   ImmortalSet<T> addIterable(Iterable<T> iterable) =>
       _mutateAsSetIf(iterable.isNotEmpty, (set) => set..addAll(iterable));
 
+  /// Returns a copy of this set where all elements of [list] are added.
+  ///
+  /// See [addAll].
+  ImmortalSet<T> addList(ImmortalList<T> list) =>
+      addIterable(list.toMutableList());
+
   /// Checks whether any element of this set satisfies the given [predicate].
   ///
   /// Returns `true` if any element makes [predicate] return `true`, otherwise

@@ -1,3 +1,8 @@
+## 2.0.0
+
+* Extend set functionality:
+  * methods: `addList`
+
 ## 1.2.0
 
 * Extend list functionality:

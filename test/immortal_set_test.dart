@@ -91,6 +91,15 @@ void main() {
     expect(singleSet.addIterable([]), singleSet);
   });
 
+  test('should add all elements of the given list', () {
+    expectSet(emptySet.addList(ImmortalList({1})), singleSet);
+    expectSet(
+      multiSet.addList(ImmortalList({3, 4, 5})),
+      ImmortalSet({1, 2, 3, 4, 5}),
+    );
+    expect(singleSet.addList(ImmortalList()), singleSet);
+  });
+
   test('should check if any element satisfies a test', () {
     expect(multiSet.any((value) => value < 3), true);
     expect(multiSet.any((value) => value > 3), false);
