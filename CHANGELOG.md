@@ -6,6 +6,7 @@
 * Extend set functionality:
   * methods: `addList`
 * Extend map functionality:
+  * methods: `singleKeyWhere`, `singleValueWhere`, `singleWhere`
   * Remove deprecated method `removeAllValues`
 
 ## 1.2.0

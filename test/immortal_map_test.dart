@@ -632,10 +632,49 @@ void main() {
     expect(multiMap.singleKey, Optional.empty());
   });
 
+  test('should return single key fulfilling a test', () {
+    expect(
+      emptyMap.singleKeyWhere((key, value) => value < 2),
+      Optional.empty(),
+    );
+    expect(
+      multiMap.singleKeyWhere((key, value) => value < 2),
+      Optional.of('a'),
+    );
+    expect(
+      multiMap.singleKeyWhere((key, value) => value < 3),
+      Optional.empty(),
+    );
+  });
+
   test('should return single value', () {
     expect(emptyMap.singleValue, Optional.empty());
     expect(singleMap.singleValue, Optional.of(1));
     expect(multiMap.singleValue, Optional.empty());
+  });
+
+  test('should return single value fulfilling a test', () {
+    expect(
+      emptyMap.singleValueWhere((key, value) => value < 2),
+      Optional.empty(),
+    );
+    expect(
+      multiMap.singleValueWhere((key, value) => value < 2),
+      Optional.of(1),
+    );
+    expect(
+      multiMap.singleValueWhere((key, value) => value < 3),
+      Optional.empty(),
+    );
+  });
+
+  test('should return single entry fulfilling a test', () {
+    expect(emptyMap.singleWhere((key, value) => value < 2), Optional.empty());
+    expectMapEntry(
+      multiMap.singleWhere((key, value) => value < 2).value,
+      MapEntry('a', 1),
+    );
+    expect(multiMap.singleWhere((key, value) => value < 3), Optional.empty());
   });
 
   test('should return map', () {

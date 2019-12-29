@@ -692,6 +692,12 @@ class ImmortalMap<K, V> {
   /// is important.
   Optional<K> get singleKey => single.map((entry) => entry.key);
 
+  /// Returns an [Optional] containing the key of only entry in this map that
+  /// fulfills the given [predicate] if there is exactly one entry fulfilling
+  /// this condition, otherwise returns [Optional.empty].
+  Optional<K> singleKeyWhere(bool Function(K key, V value) predicate) =>
+      where(predicate).singleKey;
+
   /// Returns an [Optional] containing the only value in this map if it has
   /// exactly one key/value pair, otherwise returns [Optional.empty].
   ///
@@ -700,6 +706,19 @@ class ImmortalMap<K, V> {
   /// Methods like [containsValue] or [length] can be used if the distinction
   /// is important.
   Optional<V> get singleValue => single.map((entry) => entry.value);
+
+  /// Returns an [Optional] containing the value of only entry in this map that
+  /// fulfills the given [predicate] if there is exactly one entry fulfilling
+  /// this condition, otherwise returns [Optional.empty].
+  Optional<V> singleValueWhere(bool Function(K key, V value) predicate) =>
+      where(predicate).singleValue;
+
+  /// Returns an [Optional] containing the only entry in this map that fulfills
+  /// the given [predicate] if there is exactly one entry fulfilling this
+  /// condition, otherwise returns [Optional.empty].
+  Optional<MapEntry<K, V>> singleWhere(
+          bool Function(K key, V value) predicate) =>
+      where(predicate).single;
 
   /// Returns a mutable [LinkedHashMap] containing all key/value pairs of this
   /// map.
