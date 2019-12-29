@@ -465,6 +465,21 @@ void main() {
     expectList(multiValueMap.getKeysForValue(1), ImmortalList(['a', 'c']));
   });
 
+  test('should return keys of entries fulfilling a test', () {
+    expectList(
+      singleMap.keysWhere((key, value) => false),
+      ImmortalList<String>(),
+    );
+    expectList(
+      multiMap.keysWhere((key, value) => value < 2),
+      ImmortalList(['a']),
+    );
+    expectList(
+      multiMap.keysWhere((key, value) => true),
+      ImmortalList(['a', 'b', 'c']),
+    );
+  });
+
   test("should return the map's size", () {
     expect(emptyMap.length, 0);
     expect(singleMap.length, 1);
@@ -739,5 +754,20 @@ void main() {
     expectList(emptyMap.values, ImmortalList<int>());
     expectList(singleMap.values, ImmortalList([1]));
     expectList(multiMap.values, ImmortalList([1, 2, 3]));
+  });
+
+  test('should return values of entries fulfilling a test', () {
+    expectList(
+      singleMap.valuesWhere((key, value) => false),
+      ImmortalList<int>(),
+    );
+    expectList(
+      multiMap.valuesWhere((key, value) => value < 2),
+      ImmortalList([1]),
+    );
+    expectList(
+      multiMap.valuesWhere((key, value) => true),
+      ImmortalList([1, 2, 3]),
+    );
   });
 }

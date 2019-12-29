@@ -406,7 +406,7 @@ class ImmortalMap<K, V> {
   ImmortalMap<K, V> filterValues(bool Function(V value) predicate) =>
       whereValue(predicate);
 
-  /// Flattens a map of immortal maps by building a new map from the nested map
+  /// Flattens a map of [ImmortalMap]s by building a new map from the nested map
   /// entries.
   ///
   /// If multiple entries have the same key after transformation, later
@@ -440,7 +440,7 @@ class ImmortalMap<K, V> {
   /// See [lookup].
   Optional<V> get(K key) => lookup(key);
 
-  /// Returns an immortal list of all keys with a value equal to the given
+  /// Returns an [ImmortalList] of all keys with a value equal to the given
   /// [value] according to the `==` operator.
   ///
   /// See [lookupKeysForValue].
@@ -455,11 +455,16 @@ class ImmortalMap<K, V> {
   /// Returns an [ImmortalList] containing the keys of this map.
   ImmortalList<K> get keys => ImmortalList(_map.keys);
 
-  /// Returns an immortal list of all keys with a value equal to the given
+  /// Returns an [ImmortalList] of all keys with a value equal to the given
   /// [value] according to the `==` operator.
   ///
   /// See [lookupKeysForValue].
   ImmortalList<K> keysForValue(V value) => lookupKeysForValue(value);
+
+  /// Returns an [ImmortalList] containing the keys of all entries in this map
+  /// that fulfill the given [predicate].
+  ImmortalList<K> keysWhere(bool Function(K key, V value) predicate) =>
+      where(predicate).keys;
 
   /// The number of key/value pairs in the map.
   int get length => _map.length;
@@ -473,7 +478,7 @@ class ImmortalMap<K, V> {
   /// is important.
   Optional<V> lookup(K key) => Optional.ofNullable(_map[key]);
 
-  /// Returns an immortal list of all keys with a value equal to the given
+  /// Returns an [ImmortalList] of all keys with a value equal to the given
   /// [lookupValue] according to the `==` operator.
   ImmortalList<K> lookupKeysForValue(V lookupValue) =>
       where(_mapValue(equalTo(lookupValue))).keys;
@@ -797,6 +802,11 @@ class ImmortalMap<K, V> {
 
   /// Returns an [ImmortalList] containing the values of this map.
   ImmortalList<V> get values => ImmortalList(_map.values);
+
+  /// Returns an [ImmortalList] containing the values of all entries in this
+  /// map that fulfill the given [predicate].
+  ImmortalList<V> valuesWhere(bool Function(K key, V value) predicate) =>
+      where(predicate).values;
 
   /// Returns a copy of this map containing all entries that satisfy the given
   /// [predicate].

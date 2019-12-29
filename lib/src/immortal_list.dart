@@ -471,8 +471,8 @@ class ImmortalList<T> {
   ) =>
       expandIterableIndexed(f);
 
-  /// Flattens a list of immortal lists by concatenating the values in iteration
-  /// order.
+  /// Flattens a list of [ImmortalList]s by concatenating the values in
+  /// iteration order.
   ///
   /// If this list contains only instances of [ImmortalList<R>] the new list
   /// will be created correctly, otherwise an exception is thrown.
