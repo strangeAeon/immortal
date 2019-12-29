@@ -591,10 +591,11 @@ void main() {
     );
   });
 
-  test('should remove element', () {
+  test('should remove all occurrences of an element', () {
     expectList(singleList.remove(1), emptyList);
     expectList(multiList.remove(2), ImmortalList([1, 3]));
     expectList(multiList.remove(4), multiList);
+    expectList(ImmortalList([1, 2, 1, 3]).remove(1), ImmortalList([2, 3]));
   });
 
   test('should remove all elements', () {
@@ -629,6 +630,16 @@ void main() {
       ImmortalList([2, 2]),
     );
     expect(singleList.removeIterable([]), singleList);
+  });
+
+  test('should remove first occurrence of element', () {
+    expectList(singleList.removeFirst(1), emptyList);
+    expectList(multiList.removeFirst(2), ImmortalList([1, 3]));
+    expectList(multiList.removeFirst(4), multiList);
+    expectList(
+      ImmortalList([1, 2, 1, 3]).removeFirst(1),
+      ImmortalList([2, 1, 3]),
+    );
   });
 
   test('should remove last element', () {

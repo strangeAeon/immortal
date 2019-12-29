@@ -1,5 +1,8 @@
 ## 2.0.0
 
+* Extend list functionality:
+  * methods: `remove`
+  * Rename `remove` to `removeFirst`
 * Extend set functionality:
   * methods: `addList`
 

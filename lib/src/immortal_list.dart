@@ -762,15 +762,21 @@ class ImmortalList<T> {
   ) =>
       setWhereIndexed(predicate, value);
 
+  /// Returns a copy of this list where all occurrences of [element] are
+  /// removed.
+  ImmortalList<T> remove(Object element) => removeIterable([element]);
+
   /// Returns a copy of this list where the first occurrence of [element] is
   /// removed from if present.
-  ImmortalList<T> remove(Object element) =>
+  ///
+  /// Unlike [remove] only the first occurrence of a value is removed.
+  ImmortalList<T> removeFirst(Object element) =>
       _mutateAsList((list) => list..remove(element));
 
   /// Returns a copy of this list where all values in [other] are removed from
   /// if present.
   ///
-  /// Unlike [remove] all occurrences of a value are removed.
+  /// Unlike [removeFirst] all occurrences of a value are removed.
   ImmortalList<T> removeAll(ImmortalList<T> other) =>
       removeIterable(other.toMutableList());
 
