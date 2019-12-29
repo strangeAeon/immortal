@@ -226,6 +226,24 @@ class ImmortalList<T> {
   ///     map.keys.toList();           // [0, 1, 2, 3]
   ImmortalMap<int, T> asMap() => ImmortalMap(_list.asMap());
 
+  /// Returns an [ImmortalMap] using the given [keyGenerator] and concatenating
+  /// values with the same key.
+  ///
+  /// Iterates over all elements in iteration order and calculates the key for
+  /// each element by applying [keyGenerator] to its value. The list of all
+  /// values with the same key in iteration order is used as the value of the
+  /// generated key in the resulting map.
+  ImmortalMap<K, ImmortalList<T>> asMapOfLists<K>(
+          K Function(T value) keyGenerator) =>
+      fold(
+        ImmortalMap<K, ImmortalList<T>>(),
+        (map, value) => map.update(
+          keyGenerator(value),
+          (list) => list.add(value),
+          ifAbsent: () => ImmortalList([value]),
+        ),
+      );
+
   /// Returns an [ImmortalMap] using the given [keyGenerator].
   ///
   /// Iterates over all elements in iteration order and creates the key for each

@@ -24,6 +24,15 @@ void main() {
     expect(actual.equals(expected), true);
   }
 
+  void expectMapOfLists<K, V>(ImmortalMap<K, ImmortalList<V>> actual,
+      ImmortalMap<K, ImmortalList<V>> expected) {
+    expect(actual.length, expected.length);
+    actual.entries.forEach((entry) {
+      final expectedEntry = expected[entry.key];
+      expectList(entry.value, expectedEntry.value);
+    });
+  }
+
   void expectListTuple<T1, T2>(
     Tuple2<ImmortalList<T1>, ImmortalList<T2>> actual,
     Tuple2<ImmortalList<T1>, ImmortalList<T2>> expected,
@@ -129,6 +138,22 @@ void main() {
     expectMap(emptyList.asMap(), ImmortalMap<int, int>());
     expectMap(singleList.asMap(), ImmortalMap({0: 1}));
     expectMap(multiList.asMap(), ImmortalMap({0: 1, 1: 2, 2: 3}));
+  });
+
+  test('should transform list to immortal map of lists', () {
+    expectMapOfLists(
+      singleList.asMapOfLists((v) => v),
+      ImmortalMap({
+        1: ImmortalList([1]),
+      }),
+    );
+    expectMapOfLists(
+      multiList.asMapOfLists((v) => v.isOdd),
+      ImmortalMap({
+        true: ImmortalList([1, 3]),
+        false: ImmortalList([2]),
+      }),
+    );
   });
 
   test('should transform list to immortal map with a key function', () {
