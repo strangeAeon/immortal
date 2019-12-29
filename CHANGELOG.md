@@ -5,6 +5,8 @@
   * Rename `remove` to `removeFirst`
 * Extend set functionality:
   * methods: `addList`
+* Extend map functionality:
+  * Remove deprecated method `removeAllValues`
 
 ## 1.2.0
 

@@ -566,14 +566,6 @@ class ImmortalMap<K, V> {
   ImmortalMap<K, V> removeAll(ImmortalList<K> keysToRemove) =>
       removeWhereKey(keysToRemove.contains);
 
-  /// Returns a copy of this map where all entries with a value contained in
-  /// [valuesToRemove] are removed from.
-  ///
-  /// Deprecated in favour of [removeValues].
-  @Deprecated('Renamed to "removeValues"')
-  ImmortalMap<K, V> removeAllValues(ImmortalList<V> valuesToRemove) =>
-      removeValues(valuesToRemove);
-
   /// Returns a copy of this map where all keys and their associated values
   /// contained in the iterable [keysToRemove] are removed from.
   ///
