@@ -1,274 +1,239 @@
 import 'dart:math';
 
+import 'package:immortal/src/utils.dart';
 import 'package:optional/optional.dart';
 import 'package:test/test.dart';
 
 import 'package:immortal/immortal.dart';
 import 'package:tuple/tuple.dart';
 
+import 'test_data.dart';
+import 'test_utils.dart';
+
 void main() {
-  final emptySet = ImmortalSet<int>();
-  final singleSet = ImmortalSet({1});
-  final multiSet = ImmortalSet({1, 2, 3});
-
-  void expectSet<T>(ImmortalSet<T> actual, ImmortalSet<T> expected) {
-    expect(actual.equals(expected), true);
-  }
-
-  void expectList<T>(ImmortalList<T> actual, ImmortalList<T> expected) {
-    expect(actual.equals(expected), true);
-  }
-
-  void expectMap<K, V>(ImmortalMap<K, V> actual, ImmortalMap<K, V> expected) {
-    expect(actual.equals(expected), true);
-  }
-
-  void expectSetTuple<T1, T2>(
-    Tuple2<ImmortalSet<T1>, ImmortalSet<T2>> actual,
-    Tuple2<ImmortalSet<T1>, ImmortalSet<T2>> expected,
-  ) {
-    expectSet(actual.item1, expected.item1);
-    expectSet(actual.item2, expected.item2);
-  }
+  final set13 = ImmortalSet({1, 3});
+  final set23 = ImmortalSet({2, 3});
 
   tearDown(() {
     // Make sure that original sets were not changed
-    expectSet(emptySet, ImmortalSet<int>());
-    expectSet(singleSet, ImmortalSet({1}));
-    expectSet(multiSet, ImmortalSet({1, 2, 3}));
+    expectCollection(emptySet, ImmortalSet<int>());
+    expectCollection(set1, ImmortalSet({1}));
+    expectCollection(set123, ImmortalSet({1, 2, 3}));
   });
 
   test('should create copy of set passed in constructor', () {
     final mutableSet = {1, 2, 3};
     final immortalSet = ImmortalSet(mutableSet);
     mutableSet.add(4);
-    expectSet(immortalSet, multiSet);
+    expectCollection(immortalSet, set123);
   });
 
   test('should create empty set', () {
-    expectSet(ImmortalSet<int>.empty(), emptySet);
+    expectCollection(ImmortalSet<int>.empty(), emptySet);
   });
 
   test('should create set from existing', () {
-    expectSet(ImmortalSet.from(emptySet), emptySet);
-    expectSet(ImmortalSet.from(singleSet), singleSet);
-    expectSet(ImmortalSet.from(multiSet), multiSet);
-    expectSet(ImmortalSet.of(emptySet), emptySet);
-    expectSet(ImmortalSet.of(singleSet), singleSet);
-    expectSet(ImmortalSet.of(multiSet), multiSet);
+    expectCollection(ImmortalSet.from(emptySet), emptySet);
+    expectCollection(ImmortalSet.from(set1), set1);
+    expectCollection(ImmortalSet.from(set123), set123);
+    expectCollection(ImmortalSet.of(emptySet), emptySet);
+    expectCollection(ImmortalSet.of(set1), set1);
+    expectCollection(ImmortalSet.of(set123), set123);
   });
 
   test('should create set from iterable', () {
-    expectSet(ImmortalSet.fromIterable([]), emptySet);
-    expectSet(ImmortalSet.fromIterable([1]), singleSet);
-    expectSet(ImmortalSet.fromIterable([1, 2, 3]), multiSet);
-    expectSet(ImmortalSet.ofIterable([]), emptySet);
-    expectSet(ImmortalSet.ofIterable([1]), singleSet);
-    expectSet(ImmortalSet.ofIterable([1, 2, 3]), multiSet);
+    expectCollection(ImmortalSet.fromIterable([]), emptySet);
+    expectCollection(ImmortalSet.fromIterable([1]), set1);
+    expectCollection(ImmortalSet.fromIterable([1, 2, 3]), set123);
+    expectCollection(ImmortalSet.ofIterable([]), emptySet);
+    expectCollection(ImmortalSet.ofIterable([1]), set1);
+    expectCollection(ImmortalSet.ofIterable([1, 2, 3]), set123);
   });
 
   test('should add single value', () {
-    expectSet(emptySet.add(1), singleSet);
-    expect(singleSet.add(1), singleSet);
-    expectSet(multiSet.add(4), ImmortalSet({1, 2, 3, 4}));
+    expectCollection(emptySet.add(1), set1);
+    expect(set1.add(1), set1);
+    expectCollection(set23.add(1), set123);
   });
 
   test('should add all elements', () {
-    expectSet(emptySet.addAll(singleSet), singleSet);
-    expectSet(
-      multiSet.addAll(ImmortalSet({3, 4, 5})),
-      ImmortalSet({1, 2, 3, 4, 5}),
-    );
-    expect(singleSet.addAll(emptySet), singleSet);
+    expectCollection(emptySet.addAll(set1), set1);
+    expectCollection(set23.addAll(ImmortalSet({1, 2})), set123);
+    expect(set1.addAll(emptySet), set1);
   });
 
   test('should add all elements of the given iterable', () {
-    expectSet(emptySet.addIterable({1}), singleSet);
-    expectSet(
-      multiSet.addIterable({3, 4, 5}),
-      ImmortalSet({1, 2, 3, 4, 5}),
-    );
-    expect(singleSet.addIterable([]), singleSet);
+    expectCollection(emptySet.addIterable([1]), set1);
+    expectCollection(set23.addIterable([1, 2]), set123);
+    expect(set1.addIterable([]), set1);
   });
 
   test('should add all elements of the given list', () {
-    expectSet(emptySet.addList(ImmortalList({1})), singleSet);
-    expectSet(
-      multiSet.addList(ImmortalList({3, 4, 5})),
-      ImmortalSet({1, 2, 3, 4, 5}),
-    );
-    expect(singleSet.addList(ImmortalList()), singleSet);
+    expectCollection(emptySet.addList(list1), set1);
+    expectCollection(set23.addList(ImmortalList([1, 2])), set123);
+    expect(set1.addList(emptyList), set1);
   });
 
   test('should check if any element satisfies a test', () {
-    expect(multiSet.any((value) => value < 3), true);
-    expect(multiSet.any((value) => value > 3), false);
+    expect(set123.any(matchingAll), true);
+    expect(set123.any(matching(1)), true);
+    expect(set123.any(matchingNone), false);
+    expect(emptyList.any(matchingAll), false);
   });
 
   test('should transform set to immortal map with a key function', () {
-    expectMap(singleSet.asMapWithKeys((v) => v), ImmortalMap({1: 1}));
-    expectMap(
-      multiSet.asMapWithKeys((v) => v.toString()),
+    expectCollection(
+      set123.asMapWithKeys(identity),
+      ImmortalMap({1: 1, 2: 2, 3: 3}),
+    );
+    expectCollection(
+      set123.asMapWithKeys(toString),
       ImmortalMap({'1': 1, '2': 2, '3': 3}),
     );
-    expectMap(
-      multiSet.asMapWithKeys((v) => v.isOdd),
+    expectCollection(
+      set123.asMapWithKeys(isOdd),
       ImmortalMap({true: 3, false: 2}),
     );
   });
 
   test('should cast the set', () {
-    expectSet(ImmortalSet<Object>({1, 2, 3}).cast<int>(), multiSet);
+    expectCollection(ImmortalSet<Object>({1, 2, 3}).cast<int>(), set123);
   });
 
   test('should create set by casting existing', () {
-    expectSet(ImmortalSet.castFrom(ImmortalSet<Object>({1, 2, 3})), multiSet);
+    expectCollection(
+      ImmortalSet.castFrom(ImmortalSet<Object>({1, 2, 3})),
+      set123,
+    );
   });
 
   test('should create set by casting iterable', () {
-    expectSet(ImmortalSet.castFromIterable(<Object>[1, 2, 3]), multiSet);
+    expectCollection(ImmortalSet.castFromIterable(<Object>[1, 2, 3]), set123);
   });
 
   test('should check if an element is contained', () {
-    expect(multiSet.contains(3), true);
-    expect(multiSet.contains(4), false);
+    expect(set123.contains(3), true);
+    expect(set123.contains(4), false);
   });
 
   test('should check if all elements are contained', () {
-    expect(multiSet.containsAll(ImmortalSet({1, 3})), true);
-    expect(multiSet.containsAll(ImmortalSet({3, 4})), false);
+    expect(set123.containsAll(set13), true);
+    expect(set23.containsAll(set123), false);
   });
 
   test('should check if all elements of the given iterable are contained', () {
-    expect(multiSet.containsIterable({1, 3}), true);
-    expect(multiSet.containsIterable({3, 4}), false);
+    expect(set123.containsIterable([1, 3]), true);
+    expect(set123.containsIterable([3, 4]), false);
   });
 
   test('should copy set', () {
-    final copy = singleSet.copy();
-    expectSet(copy, singleSet);
-    expect(copy == singleSet, false);
+    final copy = set1.copy();
+    expectCollection(copy, set1);
+    expect(copy == set1, false);
   });
 
   test('should calculate difference', () {
-    expectSet(emptySet.difference(singleSet), emptySet);
-    expect(singleSet.difference(emptySet), singleSet);
-    expectSet(multiSet.difference(ImmortalSet({1, 3, 4})), ImmortalSet({2}));
-    expectSet(emptySet - singleSet, emptySet);
-    expect(singleSet - emptySet, singleSet);
-    expectSet(multiSet - ImmortalSet({1, 3, 4}), ImmortalSet({2}));
+    expectCollection(emptySet.difference(set1), emptySet);
+    expect(set1.difference(emptySet), set1);
+    expectCollection(set13.difference(set23), set1);
+    expectCollection(emptySet - set1, emptySet);
+    expect(set1 - emptySet, set1);
+    expectCollection(set13 - set23, set1);
   });
 
   test('should calculate difference with the given mortal set', () {
-    expectSet(emptySet.differenceWithSet(singleSet.toMutableSet()), emptySet);
-    expect(singleSet.differenceWithSet({}), singleSet);
-    expectSet(multiSet.differenceWithSet({1, 3, 4}), ImmortalSet({2}));
+    expectCollection(emptySet.differenceWithSet(set1.toMutableSet()), emptySet);
+    expect(set1.differenceWithSet({}), set1);
+    expectCollection(set13.differenceWithSet({2, 3}), set1);
   });
 
   test('should compare sets', () {
     expect(emptySet.equals(ImmortalSet<int>()), true);
-    expect(singleSet.equals(multiSet), false);
-    expect(multiSet.equals(ImmortalSet([1, 2, 3])), true);
+    expect(set1.equals(set123), false);
+    expect(set123.equals(ImmortalSet({1, 2, 3})), true);
   });
 
   test('should check if every element satisfies a test', () {
-    expect(emptySet.every((value) => value < 4), true);
-    expect(multiSet.every((value) => value < 4), true);
-    expect(multiSet.every((value) => value > 2), false);
+    expect(emptySet.every(matchingAll), true);
+    expect(set123.every(matchingAll), true);
+    expect(set123.every(matching(1)), false);
+    expect(set123.every(matchingNone), false);
   });
 
   test('should expand each element to an immortal set and flatten the result',
       () {
-    expectSet(
-      singleSet.expand((i) => ImmortalSet({i, i * 1.0})),
-      ImmortalSet({1.0}),
-    );
-    expectSet(
-      multiSet.expand((i) => ImmortalSet({i, i * 2})),
-      ImmortalSet({1, 2, 4, 3, 6}),
-    );
-    expectSet(
-      singleSet.flatMap((i) => ImmortalSet({i, i * 1.0})),
-      ImmortalSet({1.0}),
-    );
-    expectSet(
-      multiSet.flatMap((i) => ImmortalSet({i, i * 2})),
-      ImmortalSet({1, 2, 4, 3, 6}),
-    );
+    ImmortalSet<double> expansion(int i) => ImmortalSet({i * 1.0, i * 2.0});
+    final expandedSet1 = ImmortalSet<double>({1, 2});
+    final expandedSet123 = ImmortalSet<double>({1, 2, 3, 4, 6});
+    expectCollection(set1.expand(expansion), expandedSet1);
+    expectCollection(set123.expand(expansion), expandedSet123);
+    expectCollection(set1.flatMap(expansion), expandedSet1);
+    expectCollection(set123.flatMap(expansion), expandedSet123);
   });
 
   test('should expand each element to an iterable and flatten the result', () {
-    expectSet(
-      singleSet.expandIterable((i) => {i, i * 1.0}),
-      ImmortalSet({1.0}),
-    );
-    expectSet(
-      multiSet.expandIterable((i) => {i, i * 2}),
-      ImmortalSet({1, 2, 4, 3, 6}),
-    );
-    expectSet(
-      singleSet.flatMapIterable((i) => {i, i * 1.0}),
-      ImmortalSet({1.0}),
-    );
-    expectSet(
-      multiSet.flatMapIterable((i) => {i, i * 2}),
-      ImmortalSet({1, 2, 4, 3, 6}),
-    );
+    Set<double> expansion(int i) => {i * 1.0, i * 2.0};
+    final expandedSet1 = ImmortalSet<double>({1, 2});
+    final expandedSet123 = ImmortalSet<double>({1, 2, 3, 4, 6});
+    expectCollection(set1.expandIterable(expansion), expandedSet1);
+    expectCollection(set123.expandIterable(expansion), expandedSet123);
+    expectCollection(set1.flatMapIterable(expansion), expandedSet1);
+    expectCollection(set123.flatMapIterable(expansion), expandedSet123);
   });
 
   test('should return elements fulfilling a test', () {
-    expectSet(multiSet.filter((value) => value > 1), ImmortalSet({2, 3}));
-    expectSet(multiSet.filter((value) => value > 4), emptySet);
-    expectSet(multiSet.filter((value) => value > 0), multiSet);
-    expectSet(multiSet.where((value) => value > 1), ImmortalSet({2, 3}));
-    expectSet(multiSet.where((value) => value > 4), emptySet);
-    expectSet(multiSet.where((value) => value > 0), multiSet);
+    expectCollection(set123.filter(not(matching(1))), set23);
+    expectCollection(set123.filter(matchingNone), emptySet);
+    expectCollection(set123.filter(matchingAll), set123);
+    expectCollection(set123.where(not(matching(1))), set23);
+    expectCollection(set123.where(matchingNone), emptySet);
+    expectCollection(set123.where(matchingAll), set123);
   });
 
   test('should return elements of a type', () {
-    expectSet(ImmortalSet({1, '1', '2'}).filterType<int>(), singleSet);
-    expectSet(multiSet.filterType<String>(), ImmortalSet<String>({}));
-    expectSet(ImmortalSet({1, '1', '2'}).whereType<int>(), singleSet);
-    expectSet(multiSet.whereType<String>(), ImmortalSet<String>({}));
+    expectCollection(ImmortalSet({1, '1', '2'}).filterType<int>(), set1);
+    expectCollection(set123.filterType<String>(), ImmortalSet<String>({}));
+    expectCollection(ImmortalSet({1, '1', '2'}).whereType<int>(), set1);
+    expectCollection(set123.whereType<String>(), ImmortalSet<String>({}));
   });
 
   test('should flatten set of sets', () {
-    expectSet(
-      ImmortalSet([
-        ImmortalSet([1, 2]),
-        ImmortalSet([1, 2, 3]),
-        ImmortalSet([4]),
-      ]).flatten(),
-      ImmortalSet([1, 2, 3, 4]),
+    expectCollection(
+      ImmortalSet({
+        ImmortalSet({1, 3}),
+        ImmortalSet({1, 2, 3}),
+        ImmortalSet({2}),
+      }).flatten(),
+      set123,
     );
   });
 
   test('should flatten set of iterables', () {
-    expectSet(
-      ImmortalSet([
-        [1, 2],
+    expectCollection(
+      ImmortalSet({
+        [1, 3],
         [1, 2, 3],
-        [4],
-      ]).flattenIterables(),
-      ImmortalSet([1, 2, 3, 4]),
+        [2],
+      }).flattenIterables(),
+      set123,
     );
   });
 
   test('should flatten set of lists', () {
-    expectSet(
-      ImmortalSet([
+    expectCollection(
+      ImmortalSet({
         ImmortalList([1, 1, 2]),
         ImmortalList([1, 2, 2, 3]),
-        ImmortalList([4]),
-      ]).flattenLists(),
-      ImmortalSet([1, 2, 3, 4]),
+        ImmortalList([2]),
+      }).flattenLists(),
+      set123,
     );
   });
 
   test('should fold elements', () {
     expect(emptySet.fold(0, max), 0);
-    expect(multiSet.fold(0, (v1, v2) => v1 + v2), 6);
-    expect(multiSet.fold(0, max), 3);
+    expect(set123.fold(0, add), 6);
+    expect(set123.fold(0, max), 3);
   });
 
   test('should execute function for each element', () {
@@ -279,7 +244,7 @@ void main() {
       sum += value;
     }
 
-    multiSet.forEach(handleValue);
+    set123.forEach(handleValue);
     expect(callCount, 3);
     expect(sum, 6);
 
@@ -291,35 +256,33 @@ void main() {
   });
 
   test('should calculate intersection', () {
-    expectSet(emptySet.intersection(singleSet), emptySet);
-    expectSet(
-      multiSet.intersection(ImmortalSet({1, 3, 4})),
-      ImmortalSet({1, 3}),
-    );
-    expectSet(emptySet & singleSet, emptySet);
-    expectSet(
-      multiSet & ImmortalSet({1, 3, 4}),
-      ImmortalSet({1, 3}),
-    );
+    final set134 = ImmortalSet({1, 3, 4});
+    expectCollection(emptySet.intersection(set1), emptySet);
+    expectCollection(set123.intersection(set134), set13);
+    expectCollection(emptySet & set1, emptySet);
+    expectCollection(set123 & set134, set13);
   });
 
   test('should calculate intersection with the given mortal set', () {
-    expectSet(emptySet.intersectionWithSet(singleSet.toMutableSet()), emptySet);
-    expectSet(multiSet.intersectionWithSet({1, 3, 4}), ImmortalSet({1, 3}));
+    expectCollection(
+      emptySet.intersectionWithSet(set1.toMutableSet()),
+      emptySet,
+    );
+    expectCollection(set123.intersectionWithSet({1, 3, 4}), set13);
   });
 
   test('should return if list is empty', () {
     expect(emptySet.isEmpty, true);
-    expect(multiSet.isEmpty, false);
+    expect(set123.isEmpty, false);
   });
 
   test('should return if list is not empty', () {
     expect(emptySet.isNotEmpty, false);
-    expect(multiSet.isNotEmpty, true);
+    expect(set123.isNotEmpty, true);
   });
 
   test('should return iterator', () {
-    final iterator = multiSet.iterator;
+    final iterator = set123.iterator;
     expect(iterator.current, null);
     expect(iterator.moveNext(), true);
     expect(iterator.current, 1);
@@ -332,160 +295,148 @@ void main() {
 
   test('should join elements to a string', () {
     expect(emptySet.join(), '');
-    expect(multiSet.join(), '123');
-    expect(multiSet.join(','), '1,2,3');
+    expect(set123.join(), '123');
+    expect(set123.join(','), '1,2,3');
   });
 
   test('should return length', () {
     expect(emptySet.length, 0);
-    expect(singleSet.length, 1);
-    expect(multiSet.length, 3);
+    expect(set1.length, 1);
+    expect(set123.length, 3);
   });
 
   test('should lookup elements', () {
-    expect(multiSet.lookup(3), Optional.of(3));
-    expect(multiSet.lookup(4), Optional.empty());
+    expect(set123.lookup(3), Optional.of(3));
+    expect(set123.lookup(4), Optional.empty());
   });
 
   test('should apply function to each element of the list', () {
-    expectSet(
-      multiSet.map((value) => value.toString()),
+    expectCollection(
+      set123.map(toString),
       ImmortalSet({'1', '2', '3'}),
     );
   });
 
   test('should partition set', () {
-    expectSetTuple(
-      singleSet.partition((value) => value > 0),
-      Tuple2(singleSet, emptySet),
+    expectCollectionTuple(
+      set1.partition(matchingAll),
+      Tuple2(set1, emptySet),
     );
-    expectSetTuple(
-      multiSet.partition((value) => value > 1),
-      Tuple2(ImmortalSet({2, 3}), singleSet),
+    expectCollectionTuple(
+      set123.partition(not(matching(1))),
+      Tuple2(set23, set1),
     );
   });
 
   test('should remove element', () {
     expect(emptySet.remove(1), emptySet);
-    expectSet(singleSet.remove(1), emptySet);
-    expectSet(multiSet.remove(2), ImmortalSet({1, 3}));
-    expect(multiSet.remove(4), multiSet);
+    expectCollection(set1.remove(1), emptySet);
+    expectCollection(set123.remove(2), set13);
+    expect(set123.remove(4), set123);
   });
 
   test('should remove all given elements', () {
-    expectSet(emptySet.removeAll(singleSet), emptySet);
-    expectSet(singleSet.removeAll(singleSet), emptySet);
-    expectSet(multiSet.removeAll(ImmortalSet({2, 3})), singleSet);
-    expect(multiSet.removeAll(emptySet), multiSet);
+    expectCollection(emptySet.removeAll(set1), emptySet);
+    expectCollection(set1.removeAll(set1), emptySet);
+    expectCollection(set123.removeAll(set23), set1);
+    expect(set123.removeAll(emptySet), set123);
   });
 
   test('should remove all elements of the given iterable', () {
-    expectSet(emptySet.removeIterable({1}), emptySet);
-    expectSet(singleSet.removeIterable({1}), emptySet);
-    expectSet(multiSet.removeIterable({2, 3}), singleSet);
-    expect(multiSet.removeIterable({}), multiSet);
+    expectCollection(emptySet.removeIterable({1}), emptySet);
+    expectCollection(set1.removeIterable({1}), emptySet);
+    expectCollection(set123.removeIterable({2, 3}), set1);
+    expect(set123.removeIterable({}), set123);
   });
 
   test('should remove elements fulfilling a test', () {
-    expectSet(multiSet.removeWhere((value) => value > 1), singleSet);
-    expectSet(multiSet.removeWhere((value) => value > 4), multiSet);
+    expectCollection(set123.removeWhere(not(matching(1))), set1);
+    expectCollection(set123.removeWhere(matchingNone), set123);
+    expectCollection(set123.removeWhere(matchingAll), emptySet);
   });
 
   test('should retain all given elements', () {
-    expectSet(emptySet.retainAll(singleSet), emptySet);
-    expectSet(multiSet.retainAll(ImmortalSet({4})), emptySet);
-    expectSet(multiSet.retainAll(singleSet), singleSet);
-    expectSet(multiSet.retainAll(multiSet), multiSet);
+    expectCollection(emptySet.retainAll(set1), emptySet);
+    expectCollection(set123.retainAll(ImmortalSet({4})), emptySet);
+    expectCollection(set123.retainAll(set1), set1);
+    expectCollection(set123.retainAll(set123), set123);
   });
 
   test('should retain all elements of the given iterable', () {
-    expectSet(emptySet.retainIterable({1}), emptySet);
-    expectSet(multiSet.retainIterable({4}), emptySet);
-    expectSet(multiSet.retainIterable({1}), singleSet);
-    expectSet(multiSet.retainIterable(multiSet.toMutableSet()), multiSet);
+    expectCollection(emptySet.retainIterable([1]), emptySet);
+    expectCollection(set123.retainIterable([4]), emptySet);
+    expectCollection(set123.retainIterable([1]), set1);
+    expectCollection(set123.retainIterable([1, 2, 3]), set123);
   });
 
   test('should retain elements fulfilling a test', () {
-    expectSet(multiSet.retainWhere((value) => value > 4), emptySet);
-    expectSet(multiSet.retainWhere((value) => value < 2), singleSet);
-    expectSet(multiSet.retainWhere((value) => value > 0), multiSet);
+    expectCollection(set123.retainWhere(matchingNone), emptySet);
+    expectCollection(set123.retainWhere(matching(1)), set1);
+    expectCollection(set123.retainWhere(matchingAll), set123);
   });
 
   test('should return single element', () {
     expect(emptySet.single, Optional.empty());
-    expect(singleSet.single, Optional.of(1));
-    expect(multiSet.single, Optional.empty());
+    expect(set1.single, Optional.of(1));
+    expect(set123.single, Optional.empty());
   });
 
   test('should return single element fulfilling a test', () {
-    expect(multiSet.singleWhere((value) => value > 2), Optional.of(3));
-    expect(multiSet.singleWhere((value) => value < 0), Optional.empty());
-    expect(multiSet.singleWhere((value) => value > 4), Optional.empty());
+    expect(set123.singleWhere(matching(1)), Optional.of(1));
+    expect(set123.singleWhere(matchingNone), Optional.empty());
+    expect(set123.singleWhere(matchingAll), Optional.empty());
   });
 
   test('should toggle element', () {
-    expectSet(emptySet.toggle(1), singleSet);
-    expectSet(singleSet.toggle(1), emptySet);
-    expectSet(multiSet.toggle(1), ImmortalSet({2, 3}));
+    expectCollection(emptySet.toggle(1), set1);
+    expectCollection(set1.toggle(1), emptySet);
+    expectCollection(set123.toggle(1), set23);
   });
 
   test('should return immortal list', () {
-    expectList(emptySet.toList(), ImmortalList<int>());
-    expectList(singleSet.toList(), ImmortalList([1]));
-    expectList(multiSet.toList(), ImmortalList([1, 2, 3]));
+    expectCollection(emptySet.toList(), emptyList);
+    expectCollection(set1.toList(), list1);
+    expectCollection(set123.toList(), list123);
   });
 
   test('should return list', () {
     expect(emptySet.toMutableList(), []);
-    expect(singleSet.toMutableList(), [1]);
-    expect(multiSet.toMutableList(), [1, 2, 3]);
+    expect(set1.toMutableList(), [1]);
+    expect(set123.toMutableList(), [1, 2, 3]);
   });
 
   test('should return immortal set', () {
     expect(emptySet.toMutableSet(), <int>{});
-    expect(singleSet.toMutableSet(), {1});
-    expect(multiSet.toMutableSet(), {1, 2, 3});
+    expect(set1.toMutableSet(), {1});
+    expect(set123.toMutableSet(), {1, 2, 3});
   });
 
   test('should convert set to string', () {
     expect(emptySet.toString(), 'Immortal{}');
-    expect(singleSet.toString(), 'Immortal{1}');
-    expect(multiSet.toString(), 'Immortal{1, 2, 3}');
+    expect(set1.toString(), 'Immortal{1}');
+    expect(set123.toString(), 'Immortal{1, 2, 3}');
   });
 
   test('should calculate union', () {
-    expectSet(emptySet.union(singleSet), singleSet);
-    expectSet(
-      multiSet.union(ImmortalSet({1, 3, 4})),
-      ImmortalSet({1, 2, 3, 4}),
-    );
-    expect(multiSet.union(emptySet), multiSet);
-    expectSet(emptySet + singleSet, singleSet);
-    expectSet(
-      multiSet + ImmortalSet({1, 3, 4}),
-      ImmortalSet({1, 2, 3, 4}),
-    );
-    expect(multiSet + emptySet, multiSet);
-    expectSet(emptySet | singleSet, singleSet);
-    expectSet(
-      multiSet | ImmortalSet({1, 3, 4}),
-      ImmortalSet({1, 2, 3, 4}),
-    );
-    expect(multiSet | emptySet, multiSet);
+    expectCollection(emptySet.union(set1), set1);
+    expectCollection(set23.union(set13), set123);
+    expect(set123.union(emptySet), set123);
+    expectCollection(emptySet + set1, set1);
+    expectCollection(set23 + set13, set123);
+    expect(set123 + emptySet, set123);
+    expectCollection(emptySet | set1, set1);
+    expectCollection(set23 | set13, set123);
+    expect(set123 | emptySet, set123);
   });
 
   test('should calculate union with the given mortal set', () {
-    expectSet(emptySet.unionWithSet(singleSet.toMutableSet()), singleSet);
-    expectSet(multiSet.unionWithSet({1, 3, 4}), ImmortalSet({1, 2, 3, 4}));
-    expect(multiSet.unionWithSet({}), multiSet);
+    expectCollection(emptySet.unionWithSet(set1.toMutableSet()), set1);
+    expectCollection(set23.unionWithSet({1, 3}), set123);
+    expect(set123.unionWithSet({}), set123);
   });
 
   test('should update elements fulfilling a test', () {
-    int inc(v) => v + 1;
-    expectSet(
-      multiSet.updateWhere((value) => value > 1, inc),
-      ImmortalSet({1, 3, 4}),
-    );
-    expectSet(multiSet.updateWhere((value) => value < 1, inc), multiSet);
+    expectCollection(set13.updateWhere(matching(1), inc), set23);
+    expectCollection(set123.updateWhere(matchingNone, inc), set123);
   });
 }

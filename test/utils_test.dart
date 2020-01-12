@@ -3,6 +3,8 @@ import 'package:test/test.dart';
 
 import 'package:immortal/src/utils.dart' as utils;
 
+import 'test_data.dart';
+
 class EvenOdd {
   const EvenOdd(this.value);
 
@@ -51,8 +53,8 @@ void main() {
   });
 
   test('should conditionally wrap value in optional', () {
-    expect(utils.getValueIf<int>(false, () => 10), Optional.empty());
-    expect(utils.getValueIf<int>(true, () => 10), Optional.of(10));
-    expect(utils.getValueIf<int>(true, () => null), Optional.empty());
+    expect(utils.getValueIf<int>(false, yields(10)), Optional.empty());
+    expect(utils.getValueIf<int>(true, yields(10)), Optional.of(10));
+    expect(utils.getValueIf<int>(true, yields(null)), Optional.empty());
   });
 }
