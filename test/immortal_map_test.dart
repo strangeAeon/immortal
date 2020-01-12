@@ -504,7 +504,7 @@ void main() {
   });
 
   test('should remove entries by key', () {
-    final toRemove = ImmortalList(['a', 'c']);
+    final toRemove = ImmortalSet({'a', 'c'});
     expectCollection(mapA1.removeAll(toRemove), emptyMap);
     expectCollection(mapA1B2C3.removeAll(toRemove), mapB2);
   });

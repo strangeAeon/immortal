@@ -8,6 +8,7 @@
 * Extend map functionality:
   * methods: `keysWhere`, `singleKeyWhere`, `singleValueWhere`, `singleWhere`, `valuesWhere`
   * Change return types of `getKeysForValue`, `keys`, `keysForValue`, `lookupKeysForValue` from lists to sets
+  * Change parameter type of `removeAll` from list to set
   * Remove deprecated method `removeAllValues`
 * All collections:
   * Perform deep comparison in `equals` by adding `DeeplyComparable` interface

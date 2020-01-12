@@ -569,7 +569,7 @@ class ImmortalMap<K, V> implements DeeplyComparable {
 
   /// Returns a copy of this map where all keys and their associated values
   /// contained in [keysToRemove] are removed from.
-  ImmortalMap<K, V> removeAll(ImmortalList<K> keysToRemove) =>
+  ImmortalMap<K, V> removeAll(ImmortalSet<K> keysToRemove) =>
       removeWhereKey(keysToRemove.contains);
 
   /// Returns a copy of this map where all keys and their associated values
