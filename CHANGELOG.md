@@ -1,12 +1,12 @@
 ## 2.0.0
 
 * Extend list functionality:
-  * methods: `asMapOfLists`, `remove`, `removeFirst`, `removeLastOccurrence`
+  * methods: `asMapOfLists`, `merge`, `remove`, `removeFirst`, `removeLastOccurrence`
   * Rename previous `remove` to `removeFirstOccurrence`
 * Extend set functionality:
-  * methods: `addList`
+  * methods: `addList`, `merge`
 * Extend map functionality:
-  * methods: `keysWhere`, `singleKeyWhere`, `singleValueWhere`, `singleWhere`, `valuesWhere`
+  * methods: `keysWhere`, `merge`, `singleKeyWhere`, `singleValueWhere`, `singleWhere`, `valuesWhere`
   * Change return types of `getKeysForValue`, `keys`, `keysForValue`, `lookupKeysForValue` from lists to sets
   * Change parameter type of `removeAll` from list to set
   * Remove deprecated method `removeAllValues`

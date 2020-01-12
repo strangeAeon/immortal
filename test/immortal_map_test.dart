@@ -485,6 +485,33 @@ void main() {
     expectCollection(mapA1B2C3.mapValues(yields(1)), mapA1B1C1);
   });
 
+  test('should merge values with other map if possible', () {
+    final list23 = ImmortalList([2, 3]);
+    final set23 = ImmortalSet({2, 3});
+    expectCollection(emptyMap.merge(mapA1B2C3), mapA1B2C3);
+    expectCollection(emptyMap.merge(mapA1B2C3), mapA1B2C3);
+    expectCollection(mapA1B1C1.merge(mapA1B2C3), mapA1B2C3);
+    expect(mapA1B2C3.merge(emptyMap), mapA1B2C3);
+    expectCollection(
+      ImmortalMap({'a': list1, 'b': list1}).merge(
+        ImmortalMap({'b': list23, 'c': list23}),
+      ),
+      ImmortalMap({'a': list1, 'b': list123, 'c': list23}),
+    );
+    expectCollection(
+      ImmortalMap({'a': set1, 'b': set1}).merge(
+        ImmortalMap({'b': set23, 'c': set23}),
+      ),
+      ImmortalMap({'a': set1, 'b': set123, 'c': set23}),
+    );
+    expectCollection(
+      ImmortalMap({'a': mapA1B1C1, 'b': mapA1C3}).merge(
+        ImmortalMap({'b': mapB2, 'c': mapA1B2C1}),
+      ),
+      ImmortalMap({'a': mapA1B1C1, 'b': mapA1B2C3, 'c': mapA1B2C1}),
+    );
+  });
+
   test('should return immortal list of pairs', () {
     expectCollection(emptyMap.pairs(), ImmortalList<Tuple2<String, int>>());
     expectCollection(mapA1.pairs(), ImmortalList([Tuple2('a', 1)]));

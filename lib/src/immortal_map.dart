@@ -14,7 +14,8 @@ R Function(K, V) _mapValue<K, V, R>(R Function(V value) f) => (_, v) => f(v);
 ///
 /// Internally a [LinkedHashMap] is used, regardless of what type of map is
 /// passed to the constructor.
-class ImmortalMap<K, V> implements DeeplyComparable {
+class ImmortalMap<K, V>
+    implements DeeplyComparable, Mergeable<ImmortalMap<K, V>> {
   /// Creates an [ImmortalMap] instance that contains all key/value pairs of
   /// [map].
   ///
@@ -516,6 +517,25 @@ class ImmortalMap<K, V> implements DeeplyComparable {
   /// the given [f] function in respect of their keys.
   ImmortalMap<K, V2> mapValues<V2>(V2 Function(K key, V value) f) =>
       map((key, value) => MapEntry(key, f(key, value)));
+
+  /// Returns a copy of this map where all key/value pairs of [other] are added
+  /// and merged with existing values if possible.
+  ///
+  /// If the value type [V] is [Mergeable] and a key is present in both maps,
+  /// the resulting map will contain the merged result of the two respective
+  /// values for this key.
+  ///
+  /// Otherwise the function behaves like [addAll], i.e. if a key of [other] is
+  /// already present in this map, its value is overwritten in the copy.
+  ///
+  /// If [other] is empty, the map is returned unchanged.
+  @override
+  ImmortalMap<K, V> merge(ImmortalMap<K, V> other) => other.isEmpty
+      ? this
+      : updateAll((k, v) => other[k]
+          .map(
+              (otherValue) => v is Mergeable ? v.merge(otherValue) : otherValue)
+          .orElse(v)).addAll(other.removeAll(keys));
 
   /// Returns an [ImmortalList] containing the entries of this map as tuples of
   /// key and value.

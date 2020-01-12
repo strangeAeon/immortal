@@ -12,7 +12,7 @@ import 'utils.dart';
 ///
 /// Internally a [LinkedHashSet] is used, regardless of what type of set is
 /// passed to the constructor.
-class ImmortalSet<T> implements DeeplyComparable {
+class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// Creates an [ImmortalSet] that contains all elements of [iterable].
   ///
   /// All the elements of [iterable] should be instances of [T].
@@ -382,6 +382,12 @@ class ImmortalSet<T> implements DeeplyComparable {
   /// Returns a new set with elements that are created by calling [f] on each
   /// element of this set.
   ImmortalSet<R> map<R>(R Function(T value) f) => ImmortalSet(_set.map(f));
+
+  /// Returns a new set which contains all the elements of this set and [other].
+  ///
+  /// See [union].
+  @override
+  ImmortalSet<T> merge(ImmortalSet<T> other) => union(other);
 
   /// Returns a tuple of two new sets by splitting the set into two depending on
   /// the result of the given [predicate].

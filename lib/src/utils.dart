@@ -5,6 +5,10 @@ abstract class DeeplyComparable {
   bool equals(dynamic other);
 }
 
+abstract class Mergeable<T> {
+  T merge(T other);
+}
+
 T identity<T>(T value) => value;
 
 // ignore: avoid_positional_boolean_parameters

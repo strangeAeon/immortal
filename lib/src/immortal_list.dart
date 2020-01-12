@@ -27,7 +27,7 @@ class _Range {
 ///
 /// Internally a fixed-length [List] is used, regardless of what type of list is
 /// passed to the constructor.
-class ImmortalList<T> implements DeeplyComparable {
+class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// Creates an [ImmortalList] that contains all elements of [iterable].
   ///
   /// The [Iterator] of [iterable] provides the order of the elements.
@@ -746,6 +746,12 @@ class ImmortalList<T> implements DeeplyComparable {
           .asMap()
           .map((index, value) => MapEntry(index, f(index, value)))
           .values);
+
+  /// Returns a copy of this list concatenating [other].
+  ///
+  /// See [followedBy].
+  @override
+  ImmortalList<T> merge(ImmortalList<T> other) => followedBy(other);
 
   /// Returns a tuple of two new lists by splitting the list into two depending
   /// on the result of the given [predicate].
