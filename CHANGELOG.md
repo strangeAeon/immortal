@@ -1,8 +1,8 @@
 ## 2.0.0
 
 * Extend list functionality:
-  * methods: `asMapOfLists`, `remove`
-  * Rename `remove` to `removeFirst`
+  * methods: `asMapOfLists`, `remove`, `removeFirst`, `removeLastOccurrence`
+  * Rename previous `remove` to `removeFirstOccurrence`
 * Extend set functionality:
   * methods: `addList`
 * Extend map functionality:

@@ -785,17 +785,25 @@ class ImmortalList<T> implements DeeplyComparable {
   /// removed.
   ImmortalList<T> remove(Object element) => removeIterable([element]);
 
+  /// Returns a copy of this list where the first element is removed if the
+  /// list is not empty.
+  ///
+  /// Empty lists are returned unchanged.
+  ImmortalList<T> removeFirst() => isNotEmpty ? skip(1) : this;
+
   /// Returns a copy of this list where the first occurrence of [element] is
   /// removed from if present.
   ///
-  /// Unlike [remove] only the first occurrence of a value is removed.
-  ImmortalList<T> removeFirst(Object element) =>
-      _mutateAsList((list) => list..remove(element));
+  /// If [element] is not present in the list, the list is returned unchanged.
+  ///
+  /// Use [remove] to remove all occurrences of a value.
+  ImmortalList<T> removeFirstOccurrence(Object element) =>
+      _mutateAsListIf(contains(element), (list) => list..remove(element));
 
   /// Returns a copy of this list where all values in [other] are removed from
   /// if present.
   ///
-  /// Unlike [removeFirst] all occurrences of a value are removed.
+  /// All occurrences of the values in [other] are removed.
   ImmortalList<T> removeAll(ImmortalList<T> other) =>
       removeIterable(other.toMutableList());
 
@@ -824,6 +832,20 @@ class ImmortalList<T> implements DeeplyComparable {
   /// otherwise the list is returned unchanged.
   ImmortalList<T> removeLast() =>
       _mutateAsListIf(isNotEmpty, (list) => list..removeLast());
+
+  /// Returns a copy of this list where the last occurrence of [element] is
+  /// removed from if present.
+  ///
+  /// If [element] is not present in the list, the list is returned unchanged.
+  ///
+  /// Use [remove] to remove all occurrences of a value.
+  ImmortalList<T> removeLastOccurrence(Object element) {
+    final lastIndex = lastIndexOf(element);
+    if (lastIndex >= 0) {
+      return removeAt(lastIndex);
+    }
+    return this;
+  }
 
   /// Returns a copy of this list where the objects in the range [start]
   /// inclusive to [end] exclusive are removed from.

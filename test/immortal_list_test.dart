@@ -552,17 +552,31 @@ void main() {
     expect(list1.removeIterable([]), list1);
   });
 
+  test('should remove first element in list', () {
+    expect(emptyList.removeFirst(), emptyList);
+    expectCollection(list1.removeFirst(), emptyList);
+    expectCollection(list123.removeFirst(), list23);
+    expectCollection(list111.removeFirst(), list11);
+  });
+
   test('should remove first occurrence of element', () {
-    expectCollection(list1.removeFirst(1), emptyList);
-    expectCollection(list123.removeFirst(2), list13);
-    expectCollection(list123.removeFirst(4), list123);
-    expectCollection(list111.removeFirst(1), list11);
+    expectCollection(list1.removeFirstOccurrence(1), emptyList);
+    expectCollection(list123.removeFirstOccurrence(2), list13);
+    expect(list123.removeFirstOccurrence(4), list123);
+    expectCollection(list111.removeFirstOccurrence(1), list11);
   });
 
   test('should remove last element', () {
-    expectCollection(emptyList.removeLast(), emptyList);
+    expect(emptyList.removeLast(), emptyList);
     expectCollection(list1.removeLast(), emptyList);
     expectCollection(list112.removeLast(), list11);
+  });
+
+  test('should remove last occurrence of element', () {
+    expectCollection(list1.removeLastOccurrence(1), emptyList);
+    expectCollection(list123.removeLastOccurrence(2), list13);
+    expect(list123.removeLastOccurrence(4), list123);
+    expectCollection(list111.removeLastOccurrence(1), list11);
   });
 
   test('should remove range', () {
