@@ -27,7 +27,7 @@ class _Range {
 ///
 /// Internally a fixed-length [List] is used, regardless of what type of list is
 /// passed to the constructor.
-class ImmortalList<T> {
+class ImmortalList<T> implements DeeplyComparable {
   /// Creates an [ImmortalList] that contains all elements of [iterable].
   ///
   /// The [Iterator] of [iterable] provides the order of the elements.
@@ -313,6 +313,7 @@ class ImmortalList<T> {
   /// respective `==` operators.
   ///
   /// To solely test if two lists are identical, the operator `==` can be used.
+  @override
   bool equals(dynamic other) =>
       this == other ||
       other is ImmortalList<T> &&

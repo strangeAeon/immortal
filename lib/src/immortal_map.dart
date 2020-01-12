@@ -14,7 +14,7 @@ R Function(K, V) _mapValue<K, V, R>(R Function(V value) f) => (_, v) => f(v);
 ///
 /// Internally a [LinkedHashMap] is used, regardless of what type of map is
 /// passed to the constructor.
-class ImmortalMap<K, V> {
+class ImmortalMap<K, V> implements DeeplyComparable {
   /// Creates an [ImmortalMap] instance that contains all key/value pairs of
   /// [map].
   ///
@@ -357,6 +357,7 @@ class ImmortalMap<K, V> {
   /// and values.
   ///
   /// To solely test if two maps are identical, the operator `==` can be used.
+  @override
   bool equals(dynamic other) =>
       this == other ||
       other is ImmortalMap<K, V> &&

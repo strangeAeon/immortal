@@ -9,6 +9,8 @@
   * methods: `keysWhere`, `singleKeyWhere`, `singleValueWhere`, `singleWhere`, `valuesWhere`
   * Change return types of `getKeysForValue`, `keys`, `keysForValue`, `lookupKeysForValue` from lists to sets
   * Remove deprecated method `removeAllValues`
+* All collections:
+  * Perform deep comparison in `equals` by adding `DeeplyComparable` interface
 
 ## 1.2.0
 

@@ -12,7 +12,7 @@ import 'utils.dart';
 ///
 /// Internally a [LinkedHashSet] is used, regardless of what type of set is
 /// passed to the constructor.
-class ImmortalSet<T> {
+class ImmortalSet<T> implements DeeplyComparable {
   /// Creates an [ImmortalSet] that contains all elements of [iterable].
   ///
   /// All the elements of [iterable] should be instances of [T].
@@ -219,6 +219,7 @@ class ImmortalSet<T> {
   /// operators.
   ///
   /// To solely test if two sets are identical, the operator `==` can be used.
+  @override
   bool equals(dynamic other) =>
       this == other ||
       other is ImmortalSet<T> &&
