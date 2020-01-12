@@ -1087,10 +1087,15 @@ class ImmortalList<T> implements DeeplyComparable {
   /// distinguish between not having exactly one element satisfying the
   /// predicate and containing only the `null` value satisfying the predicate.
   /// Methods like [contains] can be used if the distinction is important.
-  Optional<T> singleWhere(bool Function(T value) predicate) =>
-      Optional.ofNullable(
+  Optional<T> singleWhere(bool Function(T value) predicate) {
+    try {
+      return Optional.ofNullable(
         _list.singleWhere(predicate, orElse: returnNull),
       );
+    } on Error {
+      return Optional.empty();
+    }
+  }
 
   /// Returns a copy of this list that contains all but the fist [count]
   /// elements.

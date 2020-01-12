@@ -468,8 +468,15 @@ class ImmortalSet<T> implements DeeplyComparable {
   /// distinguish between not having exactly one element satisfying the
   /// predicate and only containing the `null` value satisfying the predicate.
   /// Methods like [contains] can be used if the distinction is important.
-  Optional<T> singleWhere(bool Function(T value) predicate) =>
-      Optional.ofNullable(_set.singleWhere(predicate, orElse: returnNull));
+  Optional<T> singleWhere(bool Function(T value) predicate) {
+    try {
+      return Optional.ofNullable(
+        _set.singleWhere(predicate, orElse: returnNull),
+      );
+    } on Error {
+      return Optional.empty();
+    }
+  }
 
   /// Returns a copy of this set by toggling the presence of [value].
   ///
