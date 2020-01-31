@@ -1120,8 +1120,9 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
       return Optional.ofNullable(
         _list.singleWhere(predicate, orElse: returnNull),
       );
+      // ignore: avoid_catching_errors
     } on Error {
-      return Optional.empty();
+      return const Optional.empty();
     }
   }
 

@@ -479,8 +479,9 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
       return Optional.ofNullable(
         _set.singleWhere(predicate, orElse: returnNull),
       );
+      // ignore: avoid_catching_errors
     } on Error {
-      return Optional.empty();
+      return const Optional.empty();
     }
   }
 

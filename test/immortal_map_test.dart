@@ -15,9 +15,9 @@ void main() {
   final mapA1B2C1 = ImmortalMap({'a': 1, 'b': 2, 'c': 1});
   final mapB2 = ImmortalMap({'b': 2});
 
-  final entryA1 = MapEntry('a', 1);
-  final entryB2 = MapEntry('b', 2);
-  final entryC1 = MapEntry('c', 1);
+  const entryA1 = MapEntry('a', 1);
+  const entryB2 = MapEntry('b', 2);
+  const entryC1 = MapEntry('c', 1);
 
   final listABC = ImmortalList(['a', 'b', 'c']);
   final emptyKeySet = ImmortalSet<String>();
@@ -164,27 +164,27 @@ void main() {
     expect(mapA1B2C3['a'], Optional.of(1));
     expect(mapA1B2C3['b'], Optional.of(2));
     expect(mapA1B2C3['c'], Optional.of(3));
-    expect(mapA1B2C3['d'], Optional.empty());
+    expect(mapA1B2C3['d'], const Optional.empty());
     expect(mapA1B2C3.lookup('a'), Optional.of(1));
     expect(mapA1B2C3.lookup('b'), Optional.of(2));
     expect(mapA1B2C3.lookup('c'), Optional.of(3));
-    expect(mapA1B2C3.lookup('d'), Optional.empty());
+    expect(mapA1B2C3.lookup('d'), const Optional.empty());
     expect(mapA1B2C3.get('a'), Optional.of(1));
     expect(mapA1B2C3.get('b'), Optional.of(2));
     expect(mapA1B2C3.get('c'), Optional.of(3));
-    expect(mapA1B2C3.get('d'), Optional.empty());
+    expect(mapA1B2C3.get('d'), const Optional.empty());
   });
 
   test('should add entry', () {
     expectCollection(emptyMap.add('a', 1), mapA1);
     expectCollection(emptyMap.addEntry(entryA1), mapA1);
-    expectCollection(emptyMap.addPair(Tuple2('a', 1)), mapA1);
+    expectCollection(emptyMap.addPair(const Tuple2('a', 1)), mapA1);
     expectCollection(emptyMap.put('a', 1), mapA1);
     expectCollection(emptyMap.set('a', 1), mapA1);
     expectCollection(emptyMap.setEntry(entryA1), mapA1);
     expectCollection(mapA1C3.add('b', 2), mapA1B2C3);
     expectCollection(mapA1C3.addEntry(entryB2), mapA1B2C3);
-    expectCollection(mapA1C3.addPair(Tuple2('b', 2)), mapA1B2C3);
+    expectCollection(mapA1C3.addPair(const Tuple2('b', 2)), mapA1B2C3);
     expectCollection(mapA1C3.put('b', 2), mapA1B2C3);
     expectCollection(mapA1C3.set('b', 2), mapA1B2C3);
     expectCollection(mapA1C3.setEntry(entryB2), mapA1B2C3);
@@ -193,7 +193,7 @@ void main() {
   test('should replace entry', () {
     expectCollection(mapA1B2C3.add('c', 1), mapA1B2C1);
     expectCollection(mapA1B2C3.addEntry(entryC1), mapA1B2C1);
-    expectCollection(mapA1B2C3.addPair(Tuple2('c', 1)), mapA1B2C1);
+    expectCollection(mapA1B2C3.addPair(const Tuple2('c', 1)), mapA1B2C1);
   });
 
   test('should combine two immortal maps', () {
@@ -224,7 +224,7 @@ void main() {
   });
 
   test('should add entry if absent', () {
-    final entryA4 = MapEntry('a', 4);
+    const entryA4 = MapEntry('a', 4);
     expectCollection(emptyMap.addIfAbsent('a', yields(1)), mapA1);
     expectCollection(mapA1B2C3.addIfAbsent('a', yields(4)), mapA1B2C3);
     expectCollection(emptyMap.putIfAbsent('a', yields(1)), mapA1);
@@ -326,9 +326,9 @@ void main() {
     expectMapEntries(
       mapA1B2C3.entries,
       ImmortalList([
-        MapEntry('a', 1),
-        MapEntry('b', 2),
-        MapEntry('c', 3),
+        const MapEntry('a', 1),
+        const MapEntry('b', 2),
+        const MapEntry('c', 3),
       ]),
     );
   });
@@ -514,13 +514,13 @@ void main() {
 
   test('should return immortal list of pairs', () {
     expectCollection(emptyMap.pairs(), ImmortalList<Tuple2<String, int>>());
-    expectCollection(mapA1.pairs(), ImmortalList([Tuple2('a', 1)]));
+    expectCollection(mapA1.pairs(), ImmortalList([const Tuple2('a', 1)]));
     expectCollection(
       mapA1B2C3.pairs(),
       ImmortalList([
-        Tuple2('a', 1),
-        Tuple2('b', 2),
-        Tuple2('c', 3),
+        const Tuple2('a', 1),
+        const Tuple2('b', 2),
+        const Tuple2('c', 3),
       ]),
     );
   });
@@ -610,39 +610,39 @@ void main() {
   });
 
   test('should return single entry', () {
-    expect(emptyMap.single, Optional.empty());
+    expect(emptyMap.single, const Optional.empty());
     expectMapEntry(mapA1.single.value, entryA1);
-    expect(mapA1B2C3.single, Optional.empty());
+    expect(mapA1B2C3.single, const Optional.empty());
   });
 
   test('should return single key', () {
-    expect(emptyMap.singleKey, Optional.empty());
+    expect(emptyMap.singleKey, const Optional.empty());
     expect(mapA1.singleKey, Optional.of('a'));
-    expect(mapA1B2C3.singleKey, Optional.empty());
+    expect(mapA1B2C3.singleKey, const Optional.empty());
   });
 
   test('should return single key fulfilling a test', () {
-    expect(emptyMap.singleKeyWhere(matchingNone), Optional.empty());
+    expect(emptyMap.singleKeyWhere(matchingNone), const Optional.empty());
     expect(mapA1B2C3.singleKeyWhere(matchingValue(1)), Optional.of('a'));
-    expect(mapA1B2C3.singleKeyWhere(matchingAll), Optional.empty());
+    expect(mapA1B2C3.singleKeyWhere(matchingAll), const Optional.empty());
   });
 
   test('should return single value', () {
-    expect(emptyMap.singleValue, Optional.empty());
+    expect(emptyMap.singleValue, const Optional.empty());
     expect(mapA1.singleValue, Optional.of(1));
-    expect(mapA1B2C3.singleValue, Optional.empty());
+    expect(mapA1B2C3.singleValue, const Optional.empty());
   });
 
   test('should return single value fulfilling a test', () {
-    expect(emptyMap.singleValueWhere(matchingNone), Optional.empty());
+    expect(emptyMap.singleValueWhere(matchingNone), const Optional.empty());
     expect(mapA1B2C3.singleValueWhere(matchingValue(1)), Optional.of(1));
-    expect(mapA1B2C3.singleValueWhere(matchingAll), Optional.empty());
+    expect(mapA1B2C3.singleValueWhere(matchingAll), const Optional.empty());
   });
 
   test('should return single entry fulfilling a test', () {
-    expect(emptyMap.singleWhere(matchingNone), Optional.empty());
+    expect(emptyMap.singleWhere(matchingNone), const Optional.empty());
     expectMapEntry(mapA1B2C3.singleWhere(matchingValue(1)).value, entryA1);
-    expect(mapA1B2C3.singleWhere(matchingAll), Optional.empty());
+    expect(mapA1B2C3.singleWhere(matchingAll), const Optional.empty());
   });
 
   test('should return map', () {

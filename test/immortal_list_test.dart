@@ -68,18 +68,18 @@ void main() {
   });
 
   test('should return elements by index', () {
-    expect(list123[-1], Optional.empty());
-    expect(list123.elementAt(-1), Optional.empty());
+    expect(list123[-1], const Optional.empty());
+    expect(list123.elementAt(-1), const Optional.empty());
     expect(list123[0], Optional.of(1));
     expect(list123.elementAt(0), Optional.of(1));
     expect(list123[1], Optional.of(2));
     expect(list123.elementAt(1), Optional.of(2));
     expect(list123[2], Optional.of(3));
     expect(list123.elementAt(2), Optional.of(3));
-    expect(list123[3], Optional.empty());
-    expect(list123.elementAt(3), Optional.empty());
-    expect(emptyList[0], Optional.empty());
-    expect(emptyList.elementAt(0), Optional.empty());
+    expect(list123[3], const Optional.empty());
+    expect(list123.elementAt(3), const Optional.empty());
+    expect(emptyList[0], const Optional.empty());
+    expect(emptyList.elementAt(0), const Optional.empty());
   });
 
   test('should add single value', () {
@@ -235,7 +235,7 @@ void main() {
   });
 
   test(
-      'should expand each element and its index to a list and flatten the'
+      'should expand each element and its index to a list and flatten the '
       'result', () {
     ImmortalList expansion(int index, int i) => ImmortalList([i, i * index]);
     final expandedList1 = ImmortalList([1, 0]);
@@ -257,7 +257,7 @@ void main() {
   });
 
   test(
-      'should expand each element and its index to an iterable and flatten the'
+      'should expand each element and its index to an iterable and flatten the '
       'result', () {
     List expansion(int index, int i) => [i, i * index];
     final expandedList1 = ImmortalList([1, 0]);
@@ -305,15 +305,15 @@ void main() {
   });
 
   test('should return first element', () {
-    expect(emptyList.first, Optional.empty());
+    expect(emptyList.first, const Optional.empty());
     expect(list1.first, Optional.of(1));
     expect(list123.first, Optional.of(1));
   });
 
   test('should return first element fulfilling a given test', () {
-    expect(list123.firstWhere(matchingNone), Optional.empty());
+    expect(list123.firstWhere(matchingNone), const Optional.empty());
     expect(list123.firstWhere(not(matching(1))), Optional.of(2));
-    expect(emptyList.firstWhere(matchingAll), Optional.empty());
+    expect(emptyList.firstWhere(matchingAll), const Optional.empty());
     expect(list111.firstWhere(matching(1)), Optional.of(1));
   });
 
@@ -467,7 +467,7 @@ void main() {
   });
 
   test('should return last element', () {
-    expect(emptyList.last, Optional.empty());
+    expect(emptyList.last, const Optional.empty());
     expect(list1.last, Optional.of(1));
     expect(list123.last, Optional.of(3));
   });
@@ -488,8 +488,8 @@ void main() {
   });
 
   test('should return last element fulfilling a test', () {
-    expect(emptyList.lastWhere(matchingAll), Optional.empty());
-    expect(list123.lastWhere(matchingNone), Optional.empty());
+    expect(emptyList.lastWhere(matchingAll), const Optional.empty());
+    expect(list123.lastWhere(matchingNone), const Optional.empty());
     expect(list123.lastWhere(matchingAll), Optional.of(3));
     expect(list123.lastWhere(matching(1)), Optional.of(1));
     expect(list111.lastWhere(matching(1)), Optional.of(1));
@@ -701,15 +701,15 @@ void main() {
   });
 
   test('should return single element', () {
-    expect(emptyList.single, Optional.empty());
+    expect(emptyList.single, const Optional.empty());
     expect(list1.single, Optional.of(1));
-    expect(list123.single, Optional.empty());
+    expect(list123.single, const Optional.empty());
   });
 
   test('should return single element fulfilling a test', () {
     expect(list123.singleWhere(matching(1)), Optional.of(1));
-    expect(list123.singleWhere(matchingNone), Optional.empty());
-    expect(list123.singleWhere(matchingAll), Optional.empty());
+    expect(list123.singleWhere(matchingNone), const Optional.empty());
+    expect(list123.singleWhere(matchingAll), const Optional.empty());
   });
 
   test('should skip elements', () {
@@ -807,11 +807,15 @@ void main() {
     );
     expectCollection(
       list1.zip(list123.reversed),
-      ImmortalList([Tuple2(1, 3)]),
+      ImmortalList([const Tuple2(1, 3)]),
     );
     expectCollection(
       list123.zip(list123.reversed),
-      ImmortalList([Tuple2(1, 3), Tuple2(2, 2), Tuple2(3, 1)]),
+      ImmortalList([
+        const Tuple2(1, 3),
+        const Tuple2(2, 2),
+        const Tuple2(3, 1),
+      ]),
     );
   });
 
@@ -822,11 +826,15 @@ void main() {
     );
     expectCollection(
       list1.zipIterable([3, 2, 1]),
-      ImmortalList([Tuple2(1, 3)]),
+      ImmortalList([const Tuple2(1, 3)]),
     );
     expectCollection(
       list123.zipIterable([3, 2, 1]),
-      ImmortalList([Tuple2(1, 3), Tuple2(2, 2), Tuple2(3, 1)]),
+      ImmortalList([
+        const Tuple2(1, 3),
+        const Tuple2(2, 2),
+        const Tuple2(3, 1),
+      ]),
     );
   });
 }

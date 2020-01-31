@@ -307,7 +307,7 @@ void main() {
 
   test('should lookup elements', () {
     expect(set123.lookup(3), Optional.of(3));
-    expect(set123.lookup(4), Optional.empty());
+    expect(set123.lookup(4), const Optional.empty());
   });
 
   test('should apply function to each element of the list', () {
@@ -376,15 +376,15 @@ void main() {
   });
 
   test('should return single element', () {
-    expect(emptySet.single, Optional.empty());
+    expect(emptySet.single, const Optional.empty());
     expect(set1.single, Optional.of(1));
-    expect(set123.single, Optional.empty());
+    expect(set123.single, const Optional.empty());
   });
 
   test('should return single element fulfilling a test', () {
     expect(set123.singleWhere(matching(1)), Optional.of(1));
-    expect(set123.singleWhere(matchingNone), Optional.empty());
-    expect(set123.singleWhere(matchingAll), Optional.empty());
+    expect(set123.singleWhere(matchingNone), const Optional.empty());
+    expect(set123.singleWhere(matchingAll), const Optional.empty());
   });
 
   test('should toggle element', () {

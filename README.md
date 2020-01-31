@@ -1,5 +1,9 @@
 # immortal
 
+[![pub package](https://img.shields.io/pub/v/immortal.svg)](https://pub.dartlang.org/packages/immortal)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![style: effective dart](https://img.shields.io/badge/style-effective_dart-40c4ff.svg)](https://github.com/tenhobi/effective_dart)
+
 Trve immutable wrapper classes for Dart collections.
 
 ## Introduction

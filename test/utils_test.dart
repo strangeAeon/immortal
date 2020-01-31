@@ -5,6 +5,7 @@ import 'package:immortal/src/utils.dart' as utils;
 
 import 'test_data.dart';
 
+// ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
 class EvenOdd {
   const EvenOdd(this.value);
 
@@ -24,8 +25,8 @@ void main() {
     expect(utils.identity(1), 1.0);
     expect(utils.identity('foobar'), 'foobar');
     expect(utils.identity(null), null);
-    expect(utils.identity(EvenOdd(2)), EvenOdd(4));
-    expect(utils.identity(EvenOdd(3)), isNot(EvenOdd(4)));
+    expect(utils.identity(const EvenOdd(2)), const EvenOdd(4));
+    expect(utils.identity(const EvenOdd(3)), isNot(const EvenOdd(4)));
   });
 
   test('should return if true', () {
@@ -43,8 +44,8 @@ void main() {
     expect(utils.equalTo(1)(2), false);
     expect(utils.equalTo('foo')('foo'), true);
     expect(utils.equalTo('foo')('bar'), false);
-    expect(utils.equalTo(EvenOdd(2))(EvenOdd(4)), true);
-    expect(utils.equalTo(EvenOdd(2))(EvenOdd(3)), false);
+    expect(utils.equalTo(const EvenOdd(2))(const EvenOdd(4)), true);
+    expect(utils.equalTo(const EvenOdd(2))(const EvenOdd(3)), false);
   });
 
   test('should negate', () {
@@ -53,8 +54,8 @@ void main() {
   });
 
   test('should conditionally wrap value in optional', () {
-    expect(utils.getValueIf<int>(false, yields(10)), Optional.empty());
+    expect(utils.getValueIf<int>(false, yields(10)), const Optional.empty());
     expect(utils.getValueIf<int>(true, yields(10)), Optional.of(10));
-    expect(utils.getValueIf<int>(true, yields(null)), Optional.empty());
+    expect(utils.getValueIf<int>(true, yields(null)), const Optional.empty());
   });
 }
