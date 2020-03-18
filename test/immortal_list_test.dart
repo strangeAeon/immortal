@@ -93,10 +93,42 @@ void main() {
     expectCollection(list1.addAll(list11), list111);
   });
 
+  test('should add value if absent', () {
+    expectCollection(emptyList.addIfAbsent(1), list1);
+    expect(list123.addIfAbsent(1), list123);
+  });
+
   test('should add all elements of the given iterable', () {
     expect(emptyList.addIterable([]), emptyList);
     expectCollection(emptyList.addIterable([1]), list1);
     expectCollection(list1.addIterable([1, 1]), list111);
+  });
+
+  test('should add or replace elements fulfilling a test', () {
+    expectCollection(list1.addOrPutWhere(matchingNone, 3), list13);
+    expectCollection(list13.addOrPutWhere(matching(1), 2), list23);
+    expectCollection(list123.addOrPutWhere(matchingAll, 1), list111);
+    expectCollection(list1.addOrReplaceWhere(matchingNone, 3), list13);
+    expectCollection(list13.addOrReplaceWhere(matching(1), 2), list23);
+    expectCollection(list123.addOrReplaceWhere(matchingAll, 1), list111);
+    expectCollection(list1.addOrSetWhere(matchingNone, 3), list13);
+    expectCollection(list13.addOrSetWhere(matching(1), 2), list23);
+    expectCollection(list123.addOrSetWhere(matchingAll, 1), list111);
+  });
+
+  test('should add or update element fulfilling a test', () {
+    expectCollection(
+      list1.addOrUpdateWhere(matchingNone, inc, yields(3)),
+      list13,
+    );
+    expectCollection(
+      list13.addOrUpdateWhere(matching(1), inc, yields(4)),
+      list23,
+    );
+    expectCollection(
+      list123.addOrUpdateWhere(matchingAll, yields(1), yields(4)),
+      list111,
+    );
   });
 
   test('should check if any element satisfies a test', () {

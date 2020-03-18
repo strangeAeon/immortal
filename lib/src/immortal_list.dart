@@ -193,6 +193,12 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   ImmortalList<T> addAll(ImmortalList<T> other) =>
       addIterable(other.toMutableList());
 
+  /// Returns a copy of this list where [value] is added to the end if it is
+  /// not present yet.
+  ///
+  /// Otherwise the list is returned unchanged.
+  ImmortalList<T> addIfAbsent(T value) => contains(value) ? this : add(value);
+
   /// Returns a copy of this list where all elements of [iterable] are added to
   /// the end.
   ///
@@ -201,6 +207,47 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// iteration.
   ImmortalList<T> addIterable(Iterable<T> iterable) =>
       _mutateAsListIf(iterable.isNotEmpty, (list) => list..addAll(iterable));
+
+  /// Returns a copy of this list replacing each element that fulfills the given
+  /// [predicate] by [value], or adds [value] to the end of the list if no
+  /// element satisfying [predicate] was found.
+  ///
+  /// See [addOrSetWhere].
+  ImmortalList<T> addOrPutWhere(
+    bool Function(T value) predicate,
+    T value,
+  ) =>
+      addOrSetWhere(predicate, value);
+
+  /// Returns a copy of this list replacing each element that fulfills the given
+  /// [predicate] by [value], or adds [value] to the end of the list if no
+  /// element satisfying [predicate] was found.
+  ///
+  /// See [addOrSetWhere].
+  ImmortalList<T> addOrReplaceWhere(
+    bool Function(T value) predicate,
+    T value,
+  ) =>
+      addOrSetWhere(predicate, value);
+
+  /// Returns a copy of this list replacing each element that fulfills the given
+  /// [predicate] by [value], or adds [value] to the end of the list if no
+  /// element satisfying [predicate] was found.
+  ImmortalList<T> addOrSetWhere(
+    bool Function(T value) predicate,
+    T value,
+  ) =>
+      any(predicate) ? setWhere(predicate, value) : add(value);
+
+  /// Returns a copy of this list by applying [update] on each element that
+  /// fulfills the given [predicate], or adds the result of [ifAbsent] to the
+  /// list if no element satisfying [predicate] was found.
+  ImmortalList<T> addOrUpdateWhere(
+    bool Function(T value) predicate,
+    T Function(T value) update,
+    T Function() ifAbsent,
+  ) =>
+      any(predicate) ? updateWhere(predicate, update) : add(ifAbsent());
 
   /// Checks whether any element of this list satisfies the given [predicate].
   ///

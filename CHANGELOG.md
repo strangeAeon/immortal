@@ -1,5 +1,7 @@
-## 2.0.1
+## 2.1.0
 
+* Extend list functionality:
+  * methods: `addIfAbsent`, `addOrPutWhere`, `addOrReplaceWhere`, `addOrSetWhere`, `addOrUpdateWhere`
 * Update dependencies:
   * optional v4.1.0
   * tuple v1.0.3
