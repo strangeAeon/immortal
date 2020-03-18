@@ -1,3 +1,9 @@
+## 2.0.1
+
+* Update dependencies:
+  * optional v4.1.0
+  * tuple v1.0.3
+
 ## 2.0.0
 
 * Extend list functionality:

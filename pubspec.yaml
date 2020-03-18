@@ -1,15 +1,15 @@
 name: immortal
 description: Trve immutable wrapper classes for the Dart collections List, Set and Map.
-version: 2.0.0
+version: 2.0.1
 homepage: https://github.com/strangeAeon/immortal
 
 environment:
   sdk: ">=2.2.0 <3.0.0"
 
 dependencies:
-  optional: ^3.0.2+1
-  tuple: ^1.0.2
+  optional: ^4.1.0
+  tuple: ^1.0.3
 
 dev_dependencies:
-  test: ^1.0.0
+  test: ^1.14.2
   effective_dart: ^1.2.1
