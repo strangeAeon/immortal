@@ -152,6 +152,29 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   ImmortalSet<T> addList(ImmortalList<T> list) =>
       addIterable(list.toMutableList());
 
+  /// Returns a copy of this set replacing each element that fulfills the given
+  /// [predicate] by [value], or adds [value] to the set if no element
+  /// satisfying [predicate] was found.
+  ///
+  /// As each element can only be present once in the set, this is equivalent
+  /// to removing all elements fulfilling [predicate] and adding [value] to the
+  /// set.
+  ImmortalSet<T> addOrReplaceWhere(
+    bool Function(T value) predicate,
+    T value,
+  ) =>
+      any(predicate) ? replaceWhere(predicate, value) : add(value);
+
+  /// Returns a copy of this set by applying [update] on each element that
+  /// fulfills the given [predicate], or adds the result of [ifAbsent] to the
+  /// set if no element satisfying [predicate] was found.
+  ImmortalSet<T> addOrUpdateWhere(
+    bool Function(T value) predicate,
+    T Function(T value) update,
+    T Function() ifAbsent,
+  ) =>
+      any(predicate) ? updateWhere(predicate, update) : add(ifAbsent());
+
   /// Checks whether any element of this set satisfies the given [predicate].
   ///
   /// Returns `true` if any element makes [predicate] return `true`, otherwise
@@ -428,6 +451,18 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// [predicate] are removed from.
   ImmortalSet<T> removeWhere(bool Function(T value) predicate) =>
       _mutateAsSet((set) => set..removeWhere(predicate));
+
+  /// Returns a copy of this list replacing each element that fulfills the given
+  /// [predicate] by [newValue].
+  ///
+  /// As each element can only be present once in the set, this is equivalent to
+  /// removing all elements satisfying [predicate] and adding [newValue] if at
+  /// least one element was removed.
+  ImmortalSet<T> replaceWhere(
+    bool Function(T value) predicate,
+    T newValue,
+  ) =>
+      map((value) => predicate(value) ? newValue : value);
 
   /// Returns a copy of this set where are all elements that are not in [other]
   /// are removed from.

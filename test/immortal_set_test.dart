@@ -74,6 +74,27 @@ void main() {
     expect(set1.addList(emptyList), set1);
   });
 
+  test('should add or replace elements fulfilling a test', () {
+    expectCollection(set1.addOrReplaceWhere(matchingNone, 3), set13);
+    expectCollection(set13.addOrReplaceWhere(matching(1), 2), set23);
+    expectCollection(set123.addOrReplaceWhere(matchingAll, 1), set1);
+  });
+
+  test('should add or update element fulfilling a test', () {
+    expectCollection(
+      set1.addOrUpdateWhere(matchingNone, inc, yields(3)),
+      set13,
+    );
+    expectCollection(
+      set13.addOrUpdateWhere(matching(1), inc, yields(4)),
+      set23,
+    );
+    expectCollection(
+      set123.addOrUpdateWhere(matchingAll, yields(1), yields(4)),
+      set1,
+    );
+  });
+
   test('should check if any element satisfies a test', () {
     expect(set123.any(matchingAll), true);
     expect(set123.any(matching(1)), true);
@@ -353,6 +374,12 @@ void main() {
     expectCollection(set123.removeWhere(not(matching(1))), set1);
     expectCollection(set123.removeWhere(matchingNone), set123);
     expectCollection(set123.removeWhere(matchingAll), emptySet);
+  });
+
+  test('should replace elements fulfilling a test', () {
+    expectCollection(set13.replaceWhere(matching(1), 2), set23);
+    expectCollection(set123.replaceWhere(matching(1), 2), set23);
+    expectCollection(set123.replaceWhere(matchingNone, 4), set123);
   });
 
   test('should retain all given elements', () {
