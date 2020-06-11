@@ -1,3 +1,11 @@
+## 2.1.1
+
+* Update dependencies:
+  * optional v5.0.0
+* Update dev dependencies:
+  * effective_dart: v1.2.2
+  * test v1.14.7
+
 ## 2.1.0
 
 * Extend list functionality:
