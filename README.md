@@ -6,6 +6,66 @@
 
 Trve immutable wrapper classes for Dart collections.
 
+## Usage
+
+### Getting started
+
+Add `immortal` as dependency in your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  ...
+  immortal: ^2.1.1
+```
+
+Import `immortal`:
+
+```dart
+import 'package:immortal/immortal.dart';
+```
+
+### Examples
+
+- Lists
+
+  ```dart
+  final immortalList = ImmortalList([1, 2, 3]);
+  final modifiedList = immortalList
+      .add(4)
+      .where((value) => value.isEven)
+      .map((value) => value * 2);
+  print(immortalList); // prints "Immortal[1, 2, 3]"
+  print(modifiedList); // prints "Immortal[4, 8]"
+  ```
+
+- Sets
+
+  ```dart
+  final immortalSet = ImmortalSet({1, 2, 3});
+  final modifiedSet = immortalSet
+      .union(ImmortalSet({1, 2}))
+      .remove(1);
+  print(immortalSet); // prints "Immortal{1, 2, 3}"
+  print(modifiedSet); // prints "Immortal{2, 3}"
+  ```
+
+- Maps
+
+  ```dart
+  final immortalMap = ImmortalMap({1: 'a', 2: 'b', 3: 'c'});
+  final modifiedMap = immortalMap
+      .putIfAbsent(2, () => 'e')
+      .update(1, (value) => value.toUpperCase());
+  print(immortalMap); // prints "Immortal{1: 'a', 2: 'b', 3: 'c'}"
+  print(modifiedMap); // prints "Immortal{1: 'A', 2: 'b', 3: 'c'}"
+  ```
+
+- [A more elaborate example](https://pub.dev/packages/immortal/example)
+
+### API reference
+
+For a complete list of all functions defined on the `immortal` collections see the [API reference](https://pub.dev/documentation/immortal/latest/immortal/immortal-library.html).
+
 ## Introduction
 
 This library provides a more functional wrapper around the `dart:core` collections `List`, `Set` and `Map` called `ImmortalList`, `ImmortalSet` and `ImmortalMap`.
@@ -15,7 +75,7 @@ This should make switching from mutable to `Immortal` collections in existing ap
 
 In order to reach complete immutability, the elements have to be immutable as well.
 
-If you want to go fully functional, however, you should consider using `dartz` instead.
+If you want to go fully functional, however, you should consider using e.g. `dartz` instead.
 
 The key objectives for this library are the following:
 
