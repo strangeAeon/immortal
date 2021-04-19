@@ -23,10 +23,9 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// The set considers elements that are equal (using the `==` operator) to be
   /// indistinguishable and requires them to have a compatible `hashCode`
   /// implementation.
-  /// It is allowed although not advised to use `null` as value.
-  ImmortalSet([Iterable<T> iterable]) : _set = Set<T>.from(iterable ?? []);
+  ImmortalSet([Iterable<T> iterable = const []]) : _set = Set<T>.from(iterable);
 
-  ImmortalSet._internal(this._set);
+  ImmortalSet._internal(Iterable<T> iterable) : _set = iterable as Set<T>;
 
   /// Creates an empty [ImmortalSet].
   factory ImmortalSet.empty() => ImmortalSet<T>();
@@ -57,12 +56,11 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// The set considers elements that are equal (using the `==` operator) to be
   /// indistinguishable and requires them to have a compatible `hashCode`
   /// implementation.
-  /// It is allowed although not advised to use `null` as value.
   factory ImmortalSet.ofIterable(Iterable<T> iterable) => ImmortalSet(iterable);
 
   /// Returns a copy of [other] casting all elements to instances of [R].
   ///
-  /// See [cast].
+  /// See [castFromIterable].
   static ImmortalSet<R> castFrom<T, R>(ImmortalSet<T> other) => other.cast<R>();
 
   /// Creates an [ImmortalSet] by casting all elements of [iterable] to
@@ -97,12 +95,12 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// Returns a new set with the elements of this set that are not in [other].
   ///
   /// See [difference].
-  ImmortalSet<T> operator -(ImmortalSet<Object> other) => difference(other);
+  ImmortalSet<T> operator -(ImmortalSet<Object?> other) => difference(other);
 
   /// Returns a new set which is the intersection between this set and [other].
   ///
   /// See [intersection].
-  ImmortalSet<T> operator &(ImmortalSet<Object> other) => intersection(other);
+  ImmortalSet<T> operator &(ImmortalSet<Object?> other) => intersection(other);
 
   /// Returns a copy of this set where [value] is added to.
   ///
@@ -199,10 +197,10 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   ImmortalSet<R> cast<R>() => ImmortalSet(_set.cast<R>());
 
   /// Returns `true` if [element] is in the set according to the `==` operator.
-  bool contains(Object element) => _set.contains(element);
+  bool contains(Object? element) => _set.contains(element);
 
   /// Returns whether this set contains all the elements of [other].
-  bool containsAll(ImmortalSet<Object> other) =>
+  bool containsAll(ImmortalSet<Object?> other) =>
       containsIterable(other.toMutableSet());
 
   /// Returns whether this set contains all the elements of [iterable].
@@ -210,7 +208,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// See [containsAll].
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  bool containsIterable(Iterable<Object> iterable) =>
+  bool containsIterable(Iterable<Object?> iterable) =>
       _set.containsAll(iterable);
 
   /// Returns a copy of this set.
@@ -222,7 +220,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// not elements of [other] according to `other.contains`.
   ///
   /// If [other] is empty, the set is returned unchanged.
-  ImmortalSet<T> difference(ImmortalSet<Object> other) =>
+  ImmortalSet<T> difference(ImmortalSet<Object?> other) =>
       differenceWithSet(other.toMutableSet());
 
   /// Returns a new set with the elements of this set that are not in the set
@@ -231,7 +229,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// See [difference].
   /// It iterates over [other], which must therefore not change during the
   /// iteration.
-  ImmortalSet<T> differenceWithSet(Set<Object> other) =>
+  ImmortalSet<T> differenceWithSet(Set<Object?> other) =>
       other.isEmpty ? this : ImmortalSet._internal(_set.difference(other));
 
   /// Checks whether this set is equal to [other].
@@ -358,7 +356,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   ///
   /// That is, the returned set contains all the elements of this set that are
   /// also elements of [other] according to `other.contains`.
-  ImmortalSet<T> intersection(ImmortalSet<Object> other) =>
+  ImmortalSet<T> intersection(ImmortalSet<Object?> other) =>
       intersectionWithSet(other.toMutableSet());
 
   /// Returns a new set which is the intersection between this set and the set
@@ -367,7 +365,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// See [intersection].
   /// It iterates over [other], which must therefore not change during the
   /// iteration.
-  ImmortalSet<T> intersectionWithSet(Set<Object> other) =>
+  ImmortalSet<T> intersectionWithSet(Set<Object?> other) =>
       ImmortalSet._internal(_set.intersection(other));
 
   /// Returns `true` if there are no elements in this collection.
@@ -399,7 +397,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// This lookup can not distinguish between an object not being in the set or
   /// being the `null` value.
   /// The method [contains] can be used if the distinction is important.
-  Optional<T> lookup(Object element) =>
+  Optional<T> lookup(Object? element) =>
       Optional.ofNullable(_set.lookup(element));
 
   /// Returns a new set with elements that are created by calling [f] on each
@@ -424,7 +422,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
 
   /// Returns a copy of this set where [element] is removed from if present,
   /// otherwise the set is returned unchanged.
-  ImmortalSet<T> remove(Object element) {
+  ImmortalSet<T> remove(Object? element) {
     final newSet = toMutableSet();
     if (newSet.remove(element)) {
       return ImmortalSet._internal(newSet);
@@ -435,7 +433,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// Returns a copy of this set where each element in [other] is removed from.
   ///
   /// If [other] is empty, the set is returned unchanged.
-  ImmortalSet<T> removeAll(ImmortalSet<Object> other) =>
+  ImmortalSet<T> removeAll(ImmortalSet<Object?> other) =>
       removeIterable(other.toMutableSet());
 
   /// Returns a copy of this set where each element in the [iterable] is
@@ -444,7 +442,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// See [removeAll].
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalSet<T> removeIterable(Iterable<Object> iterable) =>
+  ImmortalSet<T> removeIterable(Iterable<Object?> iterable) =>
       _mutateAsSetIf(iterable.isNotEmpty, (set) => set..removeAll(iterable));
 
   /// Returns a copy of this set where all values that satisfy the given
@@ -471,7 +469,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// that is equal to it (according to [contains]), and if so, the equal
   /// element in this set is retained in the copy, and elements that are not
   /// equal to any element in [other] are removed from the copy.
-  ImmortalSet<T> retainAll(ImmortalSet<Object> other) =>
+  ImmortalSet<T> retainAll(ImmortalSet<Object?> other) =>
       retainIterable(other.toMutableSet());
 
   /// Returns a copy of this set where are all elements that are not in
@@ -480,7 +478,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// See [retainAll].
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalSet<T> retainIterable(Iterable<Object> iterable) =>
+  ImmortalSet<T> retainIterable(Iterable<Object?> iterable) =>
       _mutateAsSet((set) => set..retainAll(iterable));
 
   /// Returns a copy of this set where all values that fail to satisfy the given
@@ -511,9 +509,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// Methods like [contains] can be used if the distinction is important.
   Optional<T> singleWhere(bool Function(T value) predicate) {
     try {
-      return Optional.ofNullable(
-        _set.singleWhere(predicate, orElse: returnNull),
-      );
+      return Optional.ofNullable(_set.singleWhere(predicate));
       // ignore: avoid_catching_errors
     } on Error {
       return const Optional.empty();

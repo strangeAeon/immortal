@@ -26,8 +26,7 @@ class ImmortalMap<K, V>
   /// during the iteration.
   ///
   /// All keys are required to implement compatible `operator==` and `hashCode`.
-  /// It is allowed although not advised to use `null` as a key and/or value.
-  ImmortalMap([Map<K, V> map]) : _map = Map.from(map ?? <K, V>{});
+  ImmortalMap([Map<K, V> map = const {}]) : _map = Map<K, V>.from(map);
 
   ImmortalMap._internal(this._map);
 
@@ -44,7 +43,6 @@ class ImmortalMap<K, V>
   /// The keys must all be instances of [K] and the values of [V].
   ///
   /// All keys are required to implement compatible `operator==` and `hashCode`.
-  /// It is allowed although not advised to use `null` as a key and/or value.
   ///
   /// If multiple [entries] have the same key, later occurrences overwrite the
   /// earlier ones.
@@ -73,7 +71,6 @@ class ImmortalMap<K, V>
   ///
   /// All [keys] are required to implement compatible `operator==` and
   /// `hashCode`.
-  /// It is allowed although not advised to use `null` as a key and/or value.
   factory ImmortalMap.fromLists(ImmortalList<K> keys, ImmortalList<V> values) =>
       ImmortalMap.fromIterables(
         keys.toMutableList(),
@@ -96,7 +93,6 @@ class ImmortalMap<K, V>
   /// The keys must all be instances of [K] and the values of [V].
   ///
   /// All keys are required to implement compatible `operator==` and `hashCode`.
-  /// It is allowed although not advised to use `null` as a key and/or value.
   ///
   /// If multiple [pairs] have the same key, later occurrences overwrite the
   /// earlier ones.
@@ -131,7 +127,6 @@ class ImmortalMap<K, V>
   /// during the iteration.
   ///
   /// All keys are required to implement compatible `operator==` and `hashCode`.
-  /// It is allowed although not advised to use `null` as a key and/or value.
   factory ImmortalMap.ofMutable(Map<K, V> other) => ImmortalMap(other);
 
   /// Returns a copy of [other] casting all keys to instances of [K2] and all
@@ -163,11 +158,10 @@ class ImmortalMap<K, V>
   /// occurrence of a key will simply overwrite any previous value.
   ///
   /// All keys are required to implement compatible `operator==` and `hashCode`.
-  /// It is allowed although not advised to use `null` as a key and/or value.
-  static ImmortalMap<K, V> fromList<T, K, V>(
-    ImmortalList<T> list, {
-    K Function(T value) keyGenerator,
-    V Function(T value) valueGenerator,
+  static ImmortalMap<K, V> fromList<K, V>(
+    ImmortalList<dynamic> list, {
+    K Function(dynamic value)? keyGenerator,
+    V Function(dynamic value)? valueGenerator,
   }) =>
       ImmortalMap.fromIterable(
         list.toMutableList(),
@@ -180,10 +174,10 @@ class ImmortalMap<K, V>
   /// See [ImmortalMap.fromList].
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  static ImmortalMap<K, V> fromIterable<T, K, V>(
-    Iterable<T> iterable, {
-    K Function(T value) keyGenerator,
-    V Function(T value) valueGenerator,
+  static ImmortalMap<K, V> fromIterable<K, V>(
+    Iterable<dynamic> iterable, {
+    K Function(dynamic value)? keyGenerator,
+    V Function(dynamic value)? valueGenerator,
   }) =>
       ImmortalMap._internal(Map.fromIterable(
         iterable,
@@ -211,7 +205,7 @@ class ImmortalMap<K, V>
   /// [Optional.empty] if [key] is not in the map.
   ///
   /// See [lookup].
-  Optional<V> operator [](Object key) => lookup(key);
+  Optional<V> operator [](Object? key) => lookup(key);
 
   /// Returns a copy of this map where the value of [key] is set to [value].
   ///
@@ -336,13 +330,13 @@ class ImmortalMap<K, V>
   ///
   /// Returns `true` if any of the keys in the map are equal to [key] according
   /// to the `==` operator.
-  bool containsKey(Object key) => _map.containsKey(key);
+  bool containsKey(Object? key) => _map.containsKey(key);
 
   /// Returns `true` if this map contains the given [value].
   ///
   /// Returns `true` if any of the values in the map are equal to [value]
   /// according to the `==` operator.
-  bool containsValue(Object value) => _map.containsValue(value);
+  bool containsValue(Object? value) => _map.containsValue(value);
 
   /// Returns a copy of this map.
   ImmortalMap<K, V> copy() => ImmortalMap(_map);
@@ -440,13 +434,13 @@ class ImmortalMap<K, V>
   /// [Optional.empty] if [key] is not in the map.
   ///
   /// See [lookup].
-  Optional<V> get(K key) => lookup(key);
+  Optional<V> get(Object? key) => lookup(key);
 
   /// Returns an [ImmortalSet] of all keys with a value equal to the given
   /// [value] according to the `==` operator.
   ///
   /// See [lookupKeysForValue].
-  ImmortalSet<K> getKeysForValue(V value) => lookupKeysForValue(value);
+  ImmortalSet<K> getKeysForValue(Object? value) => lookupKeysForValue(value);
 
   /// Returns `true` if there is no key/value pair in the map.
   bool get isEmpty => _map.isEmpty;
@@ -461,7 +455,7 @@ class ImmortalMap<K, V>
   /// [value] according to the `==` operator.
   ///
   /// See [lookupKeysForValue].
-  ImmortalSet<K> keysForValue(V value) => lookupKeysForValue(value);
+  ImmortalSet<K> keysForValue(Object? value) => lookupKeysForValue(value);
 
   /// Returns an [ImmortalSet] containing the keys of all entries in this map
   /// that fulfill the given [predicate].
@@ -478,11 +472,11 @@ class ImmortalMap<K, V>
   /// key having a `null` value.
   /// Methods like [containsKey] or [addIfAbsent] can be used if the distinction
   /// is important.
-  Optional<V> lookup(K key) => Optional.ofNullable(_map[key]);
+  Optional<V> lookup(Object? key) => Optional.ofNullable(_map[key]);
 
   /// Returns an [ImmortalSet] of all keys with a value equal to the given
   /// [lookupValue] according to the `==` operator.
-  ImmortalSet<K> lookupKeysForValue(V lookupValue) =>
+  ImmortalSet<K> lookupKeysForValue(Object? lookupValue) =>
       where(_mapValue(equalTo(lookupValue))).keys;
 
   /// Returns a new map where all entries of this map are transformed by the
@@ -584,12 +578,12 @@ class ImmortalMap<K, V>
 
   /// Returns a copy of this map where [key] and its associated value are
   /// removed if present.
-  ImmortalMap<K, V> remove(Object key) =>
+  ImmortalMap<K, V> remove(Object? key) =>
       _mutateAsMap((map) => map..remove(key));
 
   /// Returns a copy of this map where all keys and their associated values
   /// contained in [keysToRemove] are removed from.
-  ImmortalMap<K, V> removeAll(ImmortalSet<K> keysToRemove) =>
+  ImmortalMap<K, V> removeAll(ImmortalSet<Object?> keysToRemove) =>
       removeWhereKey(keysToRemove.contains);
 
   /// Returns a copy of this map where all keys and their associated values
@@ -598,17 +592,17 @@ class ImmortalMap<K, V>
   /// See [removeAll].
   /// It iterates over [keysToRemove], which must therefore not change during
   /// the iteration.
-  ImmortalMap<K, V> removeIterable(Iterable<K> keysToRemove) =>
+  ImmortalMap<K, V> removeIterable(Iterable<Object?> keysToRemove) =>
       removeWhereKey(keysToRemove.contains);
 
   /// Returns a copy of this map where all entries are removed that contain a
   /// value equal to [valueToRemove] according to the `==` operator.
-  ImmortalMap<K, V> removeValue(Object valueToRemove) =>
+  ImmortalMap<K, V> removeValue(Object? valueToRemove) =>
       removeWhereValue(equalTo(valueToRemove));
 
   /// Returns a copy of this map where all entries with a value contained in
   /// [valuesToRemove] are removed from.
-  ImmortalMap<K, V> removeValues(ImmortalList<V> valuesToRemove) =>
+  ImmortalMap<K, V> removeValues(ImmortalList<Object?> valuesToRemove) =>
       removeWhereValue(valuesToRemove.contains);
 
   /// Returns a copy of this map where all entries with a value contained in the
@@ -617,7 +611,7 @@ class ImmortalMap<K, V>
   /// See [removeValues].
   /// It iterates over [valuesToRemove], which must therefore not change during
   /// the iteration.
-  ImmortalMap<K, V> removeValuesIterable(Iterable<V> valuesToRemove) =>
+  ImmortalMap<K, V> removeValuesIterable(Iterable<Object?> valuesToRemove) =>
       removeWhereValue(valuesToRemove.contains);
 
   /// Returns a copy of this map where all entries that satisfy the given
@@ -766,7 +760,7 @@ class ImmortalMap<K, V>
   ImmortalMap<K, V> update(
     K key,
     V Function(V value) update, {
-    V Function() ifAbsent,
+    V Function()? ifAbsent,
   }) =>
       _mutateAsMapIf(ifAbsent != null || containsKey(key),
           (map) => map..update(key, update, ifAbsent: ifAbsent));
@@ -794,7 +788,7 @@ class ImmortalMap<K, V>
   ImmortalMap<K, V> updateEntry(
     K key,
     MapEntry<K, V> Function(V value) update, {
-    MapEntry<K, V> Function() ifAbsent,
+    MapEntry<K, V> Function()? ifAbsent,
   }) =>
       lookup(key)
           .map((value) => remove(key).addEntry(update(value)))

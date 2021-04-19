@@ -29,4 +29,6 @@ bool matchingNone<T>(T _, [__]) => false;
 bool Function(T) matching<T>(T value) => (otherValue) => otherValue == value;
 bool Function(A, B) matchingValue<A, B>(B value) =>
     (_, otherValue) => otherValue == value;
-T Function([X, Y]) yields<T, X, Y>(T value) => ([_, __]) => value;
+T Function() yields<T>(T value) => () => value;
+T Function(X) yields1<T, X>(T value) => (_) => value;
+T Function(X, Y) yields2<T, X, Y>(T value) => (_, __) => value;

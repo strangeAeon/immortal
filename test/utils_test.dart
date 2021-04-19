@@ -32,11 +32,6 @@ void main() {
   test('should return if true', () {
     expect(utils.isTrue(true), true);
     expect(utils.isTrue(false), false);
-    expect(utils.isTrue(null), false);
-  });
-
-  test('should return null', () {
-    expect(utils.returnNull(), null);
   });
 
   test('should compare to value', () {
@@ -56,6 +51,6 @@ void main() {
   test('should conditionally wrap value in optional', () {
     expect(utils.getValueIf<int>(false, yields(10)), const Optional.empty());
     expect(utils.getValueIf<int>(true, yields(10)), Optional.of(10));
-    expect(utils.getValueIf<int>(true, yields(null)), const Optional.empty());
+    expect(utils.getValueIf<int?>(true, yields(null)), const Optional.empty());
   });
 }

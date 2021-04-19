@@ -17,14 +17,11 @@ T identity<T>(T value) => value;
 
 /// Helper function to check if the given [value] is true.
 // ignore: avoid_positional_boolean_parameters
-bool isTrue(bool value) => value ?? false;
-
-/// Helper function that always returns null.
-T returnNull<T>() => null;
+bool isTrue(bool value) => value;
 
 /// Compares two values by applying deep comparison if possible - otherwise an
 /// equality check using the `==` operator is performed.
-bool Function(T) equalTo<T>(T value) => (otherValue) =>
+bool Function(dynamic) equalTo(dynamic value) => (otherValue) =>
     value is DeeplyComparable ? value.equals(otherValue) : otherValue == value;
 
 /// Helper function that negates the results of the given [predicate].

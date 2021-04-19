@@ -90,7 +90,7 @@ void main() {
       set23,
     );
     expectCollection(
-      set123.addOrUpdateWhere(matchingAll, yields(1), yields(4)),
+      set123.addOrUpdateWhere(matchingAll, yields1(1), yields(4)),
       set1,
     );
   });
@@ -260,7 +260,7 @@ void main() {
   test('should execute function for each element', () {
     var callCount = 0;
     var sum = 0;
-    void handleValue(value) {
+    void handleValue(int value) {
       callCount++;
       sum += value;
     }
@@ -304,7 +304,7 @@ void main() {
 
   test('should return iterator', () {
     final iterator = set123.iterator;
-    expect(iterator.current, null);
+    expect(() => iterator.current, throwsA(TypeMatcher<TypeError>()));
     expect(iterator.moveNext(), true);
     expect(iterator.current, 1);
     expect(iterator.moveNext(), true);

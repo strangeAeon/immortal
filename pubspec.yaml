@@ -4,7 +4,7 @@ version: 2.1.2-nullsafety
 homepage: https://github.com/strangeAeon/immortal
 
 environment:
-  sdk: ">=2.2.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   optional: ^6.0.0-nullsafety.0

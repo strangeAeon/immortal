@@ -405,7 +405,7 @@ void main() {
   test('should execute function for each entry', () {
     var joinedKeys = '';
     var sum = 0;
-    void handleEntry(key, value) {
+    void handleEntry(String key, int value) {
       joinedKeys += key;
       sum += value;
     }
@@ -478,11 +478,11 @@ void main() {
 
   test('should apply function to each key', () {
     expectCollection(mapA1B2C3.mapKeys((key, value) => value), map123);
-    expectCollection(mapA1B2C3.mapKeys(yields(1)), ImmortalMap({1: 3}));
+    expectCollection(mapA1B2C3.mapKeys(yields2(1)), ImmortalMap({1: 3}));
   });
 
   test('should apply function to each value', () {
-    expectCollection(mapA1B2C3.mapValues(yields(1)), mapA1B1C1);
+    expectCollection(mapA1B2C3.mapValues(yields2(1)), mapA1B1C1);
   });
 
   test('should merge values with other map if possible', () {
@@ -658,23 +658,23 @@ void main() {
   });
 
   test('should update entry', () {
-    expect(emptyMap.update('a', yields(2)), emptyMap);
+    expect(emptyMap.update('a', yields1(2)), emptyMap);
     expectCollection(
-      emptyMap.update('a', yields(2), ifAbsent: yields(1)),
+      emptyMap.update('a', yields1(2), ifAbsent: yields(1)),
       mapA1,
     );
     expectCollection(mapA1.update('a', inc), ImmortalMap({'a': 2}));
-    expect(emptyMap.updateEntry('a', yields(entryB2)), emptyMap);
+    expect(emptyMap.updateEntry('a', yields1(entryB2)), emptyMap);
     expectCollection(
-      emptyMap.updateEntry('a', yields(entryB2), ifAbsent: yields(entryA1)),
+      emptyMap.updateEntry('a', yields1(entryB2), ifAbsent: yields(entryA1)),
       mapA1,
     );
-    expectCollection(mapA1.updateEntry('a', yields(entryB2)), mapB2);
+    expectCollection(mapA1.updateEntry('a', yields1(entryB2)), mapB2);
   });
 
   test('should update all entries', () {
-    expectCollection(emptyMap.updateAll(yields(1)), emptyMap);
-    expectCollection(mapA1B2C3.updateAll(yields(1)), mapA1B1C1);
+    expectCollection(emptyMap.updateAll(yields2(1)), emptyMap);
+    expectCollection(mapA1B2C3.updateAll(yields2(1)), mapA1B1C1);
   });
 
   test('should update key', () {
@@ -687,11 +687,11 @@ void main() {
 
   test('should update values fulfilling a test', () {
     expectCollection(
-      mapA1B2C3.updateWhere(matchingValue(3), yields(1)),
+      mapA1B2C3.updateWhere(matchingValue(3), yields2(1)),
       mapA1B2C1,
     );
     expectCollection(
-      mapA1B2C3.updateWhere(matchingNone, yields(1)),
+      mapA1B2C3.updateWhere(matchingNone, yields2(1)),
       mapA1B2C3,
     );
   });

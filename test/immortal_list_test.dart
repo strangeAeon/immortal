@@ -126,7 +126,7 @@ void main() {
       list23,
     );
     expectCollection(
-      list123.addOrUpdateWhere(matchingAll, yields(1), yields(4)),
+      list123.addOrUpdateWhere(matchingAll, yields1(1), yields(4)),
       list111,
     );
   });
@@ -380,7 +380,7 @@ void main() {
   test('should execute function for each element', () {
     var callCount = 0;
     var sum = 0;
-    void handleValue(value) {
+    void handleValue(int value) {
       callCount++;
       sum += value;
     }
@@ -399,7 +399,7 @@ void main() {
   test('should execute function for each element and its index', () {
     var callCount = 0;
     var sum = 0;
-    void handleValue(index, value) {
+    void handleValue(int index, int value) {
       callCount++;
       sum += (index + 1) * value;
     }
@@ -482,7 +482,7 @@ void main() {
 
   test('should return iterator', () {
     final iterator = list123.iterator;
-    expect(iterator.current, null);
+    expect(() => iterator.current, throwsA(TypeMatcher<TypeError>()));
     expect(iterator.moveNext(), true);
     expect(iterator.current, 1);
     expect(iterator.moveNext(), true);
