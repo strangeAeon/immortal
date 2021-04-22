@@ -1,3 +1,70 @@
+## 3.0.0-nullsafety
+
+* Extend `ImmortalList` to implement `Iterable`
+  * **(Breaking change)** Adjust transformation methods of `ImmortalList`:
+    * Rename previous `toSet` to `toImmortalSet`
+    * Add new `toSet` to return mutable `Set`
+    * Rename `toMutableList` to `toList`
+  * **(Breaking change)** Change return type from `Optional<T>` to `T` for `ImmortalList` methods as required to implement the `Iterable` interface and provide alternative versions using `Optional<T>`:
+    * `elementAt` > `elementAtAsOptional`
+    * `first` > `firstAsOptional`
+    * `firstWhere` > `firstWhereAsOptional`
+    * `last` > `lastAsOptional`
+    * `lastWhere` > `lastWhereAsOptional`
+    * `single` > `singleAsOptional`
+    * `singleWhere` > `singleWhereAsOptional`
+  * **(Breaking change)** Combine equivalent methods handling `ImmortalList` and `Iterable` to all allow `Iterable` and remove obsolete versions:
+    * `ImmortalList`:
+      * ~~`ImmortalList.fromIterable`~~ > `ImmortalList.from`
+      * ~~`ImmortalList.ofIterable`~~ > `ImmortalList.of`
+      * ~~`ImmortalList.castFromIterable`~~ > `ImmortalList.castFrom`
+      * ~~`addIterable`~~ > `addAll`
+      * ~~`concatenateIterable`~~ > `concatenate`
+      * ~~`expandIterable`~~ > `expand`
+      * ~~`flatMapIterable`~~ > `flatMap`
+      * ~~`flatMapIterableIndexed`~~ > `flatMapIndexed`
+      * ~~`flattenIterables`~~ > `flatten`
+      * ~~`followedByIterable`~~ > `followedBy`
+      * ~~`insertIterable`~~ > `insertAll`
+      * ~~`removeIterable`~~ > `removeAll`
+      * ~~`replaceRangeIterable`~~ > `replaceRange`
+      * ~~`setIterable`~~ > `setAll`
+      * ~~`setRangeIterable`~~ > `setRange`
+      * ~~`zipIterable`~~ > `zip`
+    * `ImmortalSet`:
+      * ~~`addList`~~ > `addIterable`
+      * ~~`flattenLists`~~ > `flattenIterables`
+    * `ImmortalMap`:
+      * ~~`ImmortalMap.fromEntriesIterable`~~ > `ImmortalMap.fromEntries`
+      * ~~`ImmortalMap.fromList`~~ > `ImmortalMap.fromIterable`
+      * ~~`ImmortalMap.fromLists`~~ > `ImmortalMap.fromIterables`
+      * ~~`ImmortalMap.fromPairsIterable`~~ > `ImmortalMap.fromPairs`
+      * ~~`addEntriesIterable`~~ > `addEntries`
+      * ~~`addPairsIterable`~~ > `addPairs`
+      * ~~`removeValuesIterable`~~ > `removeValues`
+  * **(Breaking change)** Rename further functions to keep naming consistent:
+    * `ImmortalSet`:
+      * ~~`toList`~~ > `toImmortalList`
+      * ~~`toMutableList`~~ > `toList`
+      * ~~`toMutableSet`~~ > `toSet`
+    * `ImmortalMap`:
+      * ~~`ImmortalMap.fromMutable`~~ > `ImmortalMap.fromMap`
+      * ~~`ImmortalMap.ofMutable`~~ > `ImmortalMap.ofMap`
+      * ~~`ImmortalMap.castFromMutable`~~ > `ImmortalMap.castFromMap`
+      * ~~`flattenMutables`~~ > `flattenMaps`
+      * ~~`toMutableMap`~~ > `toMap`
+  * Relax parameter types from `ImmortalList` to `Iterable`:
+    * `ImmortalList`:
+      * operators `+`, `-`
+      * method `merge`
+  * Extend `ImmortalList` functionality:
+    * Add method `reduce`
+* Migrate to dart null-safety
+  * Change parameter type annotations from generic types or `Object` to `Object?`:
+    * `ImmortalList`: operator `-`, `contains`, `remove`, `removeFirstOccurrence`, `removeAll`, `removeLastOccurrence`
+    * `ImmortalSet`: operators `-` and `&`, `contains`, `containsAll`, `containsIterable`, `difference`, `differenceWithSet`, `intersection`, `intersectionWithSet`, `lookup`, `remove`, `removeAll`, `removeIterable`, `retainAll`, `retainIterable`
+    * `ImmortalMap`: operator `[]`, `containsKey`, `containsValue`, `get`, `getKeysForValue`, `keysForValue`, `lookup`, `lookupKeysForValue`, `remove`, `removeAll`, `removeIterable`, `removeValue`, `removeValues`
+
 ## 2.1.2-nullsafety
 
 * Update dependencies:
