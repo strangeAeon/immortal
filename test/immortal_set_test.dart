@@ -66,12 +66,9 @@ void main() {
     expectCollection(emptySet.addIterable([1]), set1);
     expectCollection(set23.addIterable([1, 2]), set123);
     expect(set1.addIterable([]), set1);
-  });
-
-  test('should add all elements of the given list', () {
-    expectCollection(emptySet.addList(list1), set1);
-    expectCollection(set23.addList(ImmortalList([1, 2])), set123);
-    expect(set1.addList(emptyList), set1);
+    expectCollection(emptySet.addIterable(list1), set1);
+    expectCollection(set23.addIterable(ImmortalList([1, 2])), set123);
+    expect(set1.addIterable(emptyList), set1);
   });
 
   test('should add or replace elements fulfilling a test', () {
@@ -163,7 +160,7 @@ void main() {
   });
 
   test('should calculate difference with the given mortal set', () {
-    expectCollection(emptySet.differenceWithSet(set1.toMutableSet()), emptySet);
+    expectCollection(emptySet.differenceWithSet(set1.toSet()), emptySet);
     expect(set1.differenceWithSet({}), set1);
     expectCollection(set13.differenceWithSet({2, 3}), set1);
   });
@@ -238,15 +235,12 @@ void main() {
       }).flattenIterables(),
       set123,
     );
-  });
-
-  test('should flatten set of lists', () {
     expectCollection(
       ImmortalSet({
         ImmortalList([1, 1, 2]),
         ImmortalList([1, 2, 2, 3]),
         ImmortalList([2]),
-      }).flattenLists(),
+      }).flattenIterables(),
       set123,
     );
   });
@@ -286,7 +280,7 @@ void main() {
 
   test('should calculate intersection with the given mortal set', () {
     expectCollection(
-      emptySet.intersectionWithSet(set1.toMutableSet()),
+      emptySet.intersectionWithSet(set1.toSet()),
       emptySet,
     );
     expectCollection(set123.intersectionWithSet({1, 3, 4}), set13);
@@ -421,21 +415,21 @@ void main() {
   });
 
   test('should return immortal list', () {
-    expectCollection(emptySet.toList(), emptyList);
-    expectCollection(set1.toList(), list1);
-    expectCollection(set123.toList(), list123);
+    expectCollection(emptySet.toImmortalList(), emptyList);
+    expectCollection(set1.toImmortalList(), list1);
+    expectCollection(set123.toImmortalList(), list123);
   });
 
-  test('should return list', () {
-    expect(emptySet.toMutableList(), []);
-    expect(set1.toMutableList(), [1]);
-    expect(set123.toMutableList(), [1, 2, 3]);
+  test('should return mutable list', () {
+    expect(emptySet.toList(), []);
+    expect(set1.toList(), [1]);
+    expect(set123.toList(), [1, 2, 3]);
   });
 
-  test('should return immortal set', () {
-    expect(emptySet.toMutableSet(), <int>{});
-    expect(set1.toMutableSet(), {1});
-    expect(set123.toMutableSet(), {1, 2, 3});
+  test('should return mutable set', () {
+    expect(emptySet.toSet(), <int>{});
+    expect(set1.toSet(), {1});
+    expect(set123.toSet(), {1, 2, 3});
   });
 
   test('should convert set to string', () {
@@ -457,7 +451,7 @@ void main() {
   });
 
   test('should calculate union with the given mortal set', () {
-    expectCollection(emptySet.unionWithSet(set1.toMutableSet()), set1);
+    expectCollection(emptySet.unionWithSet(set1.toSet()), set1);
     expectCollection(set23.unionWithSet({1, 3}), set123);
     expect(set123.unionWithSet({}), set123);
   });

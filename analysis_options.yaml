@@ -7,3 +7,4 @@ linter:
     prefer_typing_uninitialized_variables: true
     use_function_type_syntax_for_parameters: true
     unnecessary_getters: true
+    comment_references: false # Activate temporarily to check documentation references

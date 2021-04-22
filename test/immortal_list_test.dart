@@ -50,15 +50,12 @@ void main() {
     expectCollection(ImmortalList.of(emptyList), emptyList);
     expectCollection(ImmortalList.of(list1), list1);
     expectCollection(ImmortalList.of(list123), list123);
-  });
-
-  test('should create list from iterable', () {
-    expectCollection(ImmortalList.fromIterable([]), emptyList);
-    expectCollection(ImmortalList.fromIterable([1]), list1);
-    expectCollection(ImmortalList.fromIterable([1, 2, 3]), list123);
-    expectCollection(ImmortalList.ofIterable([]), emptyList);
-    expectCollection(ImmortalList.ofIterable([1]), list1);
-    expectCollection(ImmortalList.ofIterable([1, 2, 3]), list123);
+    expectCollection(ImmortalList.from([]), emptyList);
+    expectCollection(ImmortalList.from([1]), list1);
+    expectCollection(ImmortalList.from([1, 2, 3]), list123);
+    expectCollection(ImmortalList.of([]), emptyList);
+    expectCollection(ImmortalList.of([1]), list1);
+    expectCollection(ImmortalList.of([1, 2, 3]), list123);
   });
 
   test('should generate list', () {
@@ -67,19 +64,19 @@ void main() {
     expectCollection(ImmortalList.generate(3, inc), list123);
   });
 
-  test('should return elements by index', () {
+  test('should return elements by index as optional', () {
     expect(list123[-1], const Optional.empty());
-    expect(list123.elementAt(-1), const Optional.empty());
+    expect(list123.elementAtAsOptional(-1), const Optional.empty());
     expect(list123[0], Optional.of(1));
-    expect(list123.elementAt(0), Optional.of(1));
+    expect(list123.elementAtAsOptional(0), Optional.of(1));
     expect(list123[1], Optional.of(2));
-    expect(list123.elementAt(1), Optional.of(2));
+    expect(list123.elementAtAsOptional(1), Optional.of(2));
     expect(list123[2], Optional.of(3));
-    expect(list123.elementAt(2), Optional.of(3));
+    expect(list123.elementAtAsOptional(2), Optional.of(3));
     expect(list123[3], const Optional.empty());
-    expect(list123.elementAt(3), const Optional.empty());
+    expect(list123.elementAtAsOptional(3), const Optional.empty());
     expect(emptyList[0], const Optional.empty());
-    expect(emptyList.elementAt(0), const Optional.empty());
+    expect(emptyList.elementAtAsOptional(0), const Optional.empty());
   });
 
   test('should add single value', () {
@@ -91,17 +88,38 @@ void main() {
     expect(emptyList.addAll(emptyList), emptyList);
     expectCollection(emptyList.addAll(list1), list1);
     expectCollection(list1.addAll(list11), list111);
+    expect(list1 + emptyList, list1);
+    expectCollection(emptyList + list1, list1);
+    expectCollection(list1 + list23, list123);
+    expect(list1.concatenate(emptyList), list1);
+    expectCollection(emptyList.concatenate(list1), list1);
+    expectCollection(list1.concatenate(list23), list123);
+    expect(list1.followedBy(emptyList), list1);
+    expectCollection(emptyList.followedBy(list1), list1);
+    expectCollection(list1.followedBy(list23), list123);
+    expect(emptyList.merge(emptyList), emptyList);
+    expectCollection(emptyList.merge(list1), list1);
+    expectCollection(list1.merge(list11), list111);
+    expect(emptyList.addAll([]), emptyList);
+    expectCollection(emptyList.addAll([1]), list1);
+    expectCollection(list1.addAll([1, 1]), list111);
+    expect(list1 + [], list1);
+    expectCollection(emptyList + [1], list1);
+    expectCollection(list1 + [2, 3], list123);
+    expect(list1.concatenate([]), list1);
+    expectCollection(emptyList.concatenate([1]), list1);
+    expectCollection(list1.concatenate([2, 3]), list123);
+    expect(list1.followedBy([]), list1);
+    expectCollection(emptyList.followedBy([1]), list1);
+    expectCollection(list1.followedBy([2, 3]), list123);
+    expect(emptyList.merge([]), emptyList);
+    expectCollection(emptyList.merge([1]), list1);
+    expectCollection(list1.merge([1, 1]), list111);
   });
 
   test('should add value if absent', () {
     expectCollection(emptyList.addIfAbsent(1), list1);
     expect(list123.addIfAbsent(1), list123);
-  });
-
-  test('should add all elements of the given iterable', () {
-    expect(emptyList.addIterable([]), emptyList);
-    expectCollection(emptyList.addIterable([1]), list1);
-    expectCollection(list1.addIterable([1, 1]), list111);
   });
 
   test('should add or replace elements fulfilling a test', () {
@@ -195,34 +213,10 @@ void main() {
       ImmortalList.castFrom(ImmortalList<Object>([1, 2, 3])),
       list123,
     );
-  });
-
-  test('should create list by casting iterable', () {
     expectCollection(
-      ImmortalList.castFromIterable(<Object>[1, 2, 3]),
+      ImmortalList.castFrom(<Object>[1, 2, 3]),
       list123,
     );
-  });
-
-  test('should concatenate', () {
-    expect(list1 + emptyList, list1);
-    expectCollection(emptyList + list1, list1);
-    expectCollection(list1 + list23, list123);
-    expect(list1.concatenate(emptyList), list1);
-    expectCollection(emptyList.concatenate(list1), list1);
-    expectCollection(list1.concatenate(list23), list123);
-    expect(list1.followedBy(emptyList), list1);
-    expectCollection(emptyList.followedBy(list1), list1);
-    expectCollection(list1.followedBy(list23), list123);
-  });
-
-  test('should concatenate the given iterable', () {
-    expect(list1.concatenateIterable([]), list1);
-    expectCollection(emptyList.concatenateIterable([1]), list1);
-    expectCollection(list1.concatenateIterable([2, 3]), list123);
-    expect(list1.followedByIterable([]), list1);
-    expectCollection(emptyList.followedByIterable([1]), list1);
-    expectCollection(list1.followedByIterable([2, 3]), list123);
   });
 
   test('should check if an element is contained', () {
@@ -258,47 +252,35 @@ void main() {
 
   test('should expand each element to a list and flatten the result', () {
     ImmortalList<double> expansion(int i) => ImmortalList([i * 1.0, i * 2.0]);
+    List<double> iterableExpansion(int i) => [i * 1.0, i * 2.0];
     final expandedList1 = ImmortalList<double>([1, 2]);
     final expandedList123 = ImmortalList<double>([1, 2, 2, 4, 3, 6]);
     expectCollection(list1.expand(expansion), expandedList1);
     expectCollection(list123.expand(expansion), expandedList123);
     expectCollection(list1.flatMap(expansion), expandedList1);
     expectCollection(list123.flatMap(expansion), expandedList123);
+    expectCollection(list1.expand(iterableExpansion), expandedList1);
+    expectCollection(list123.expand(iterableExpansion), expandedList123);
+    expectCollection(list1.flatMap(iterableExpansion), expandedList1);
+    expectCollection(list123.flatMap(iterableExpansion), expandedList123);
   });
 
   test(
       'should expand each element and its index to a list and flatten the '
       'result', () {
     ImmortalList expansion(int index, int i) => ImmortalList([i, i * index]);
+    List iterableExpansion(int index, int i) => [i, i * index];
     final expandedList1 = ImmortalList([1, 0]);
     final expandedList123 = ImmortalList([1, 0, 2, 2, 3, 6]);
     expectCollection(list1.expandIndexed(expansion), expandedList1);
     expectCollection(list123.expandIndexed(expansion), expandedList123);
     expectCollection(list1.flatMapIndexed(expansion), expandedList1);
     expectCollection(list123.flatMapIndexed(expansion), expandedList123);
-  });
-
-  test('should expand each element to an iterable and flatten the result', () {
-    List<double> expansion(int i) => [i * 1.0, i * 2.0];
-    final expandedList1 = ImmortalList<double>([1, 2]);
-    final expandedList123 = ImmortalList<double>([1, 2, 2, 4, 3, 6]);
-    expectCollection(list1.expandIterable(expansion), expandedList1);
-    expectCollection(list123.expandIterable(expansion), expandedList123);
-    expectCollection(list1.flatMapIterable(expansion), expandedList1);
-    expectCollection(list123.flatMapIterable(expansion), expandedList123);
-  });
-
-  test(
-      'should expand each element and its index to an iterable and flatten the '
-      'result', () {
-    List expansion(int index, int i) => [i, i * index];
-    final expandedList1 = ImmortalList([1, 0]);
-    final expandedList123 = ImmortalList([1, 0, 2, 2, 3, 6]);
-    expectCollection(list1.expandIterableIndexed(expansion), expandedList1);
-    expectCollection(list123.expandIterableIndexed(expansion), expandedList123);
-    expectCollection(list1.flatMapIterableIndexed(expansion), expandedList1);
+    expectCollection(list1.expandIndexed(iterableExpansion), expandedList1);
+    expectCollection(list123.expandIndexed(iterableExpansion), expandedList123);
+    expectCollection(list1.flatMapIndexed(iterableExpansion), expandedList1);
     expectCollection(
-      list123.flatMapIterableIndexed(expansion),
+      list123.flatMapIndexed(iterableExpansion),
       expandedList123,
     );
   });
@@ -337,16 +319,33 @@ void main() {
   });
 
   test('should return first element', () {
-    expect(emptyList.first, const Optional.empty());
-    expect(list1.first, Optional.of(1));
-    expect(list123.first, Optional.of(1));
+    expect(() => emptyList.first, throwsStateError);
+    expect(list1.first, 1);
+    expect(list123.first, 1);
+  });
+
+  test('should return first element as optional', () {
+    expect(emptyList.firstAsOptional, const Optional.empty());
+    expect(list1.firstAsOptional, Optional.of(1));
+    expect(list123.firstAsOptional, Optional.of(1));
   });
 
   test('should return first element fulfilling a given test', () {
-    expect(list123.firstWhere(matchingNone), const Optional.empty());
-    expect(list123.firstWhere(not(matching(1))), Optional.of(2));
-    expect(emptyList.firstWhere(matchingAll), const Optional.empty());
-    expect(list111.firstWhere(matching(1)), Optional.of(1));
+    expect(() => list123.firstWhere(matchingNone), throwsStateError);
+    expect(list123.firstWhere(not(matching(1))), 2);
+    expect(() => emptyList.firstWhere(matchingAll), throwsStateError);
+    expect(list111.firstWhere(matching(1)), 1);
+    expect(list123.firstWhere(matchingNone, orElse: yields(0)), 0);
+    expect(list123.firstWhere(not(matching(1)), orElse: yields(0)), 2);
+    expect(emptyList.firstWhere(matchingAll, orElse: yields(0)), 0);
+    expect(list111.firstWhere(matching(1), orElse: yields(0)), 1);
+  });
+
+  test('should return first element fulfilling a given test as optional', () {
+    expect(list123.firstWhereAsOptional(matchingNone), const Optional.empty());
+    expect(list123.firstWhereAsOptional(not(matching(1))), Optional.of(2));
+    expect(emptyList.firstWhereAsOptional(matchingAll), const Optional.empty());
+    expect(list111.firstWhereAsOptional(matching(1)), Optional.of(1));
   });
 
   test('should flatten list of lists', () {
@@ -358,15 +357,12 @@ void main() {
       ]).flatten(),
       ImmortalList([1, 2, 3, 1, 2, 3]),
     );
-  });
-
-  test('should flatten list of iterables', () {
     expectCollection(
       ImmortalList([
         [1, 2],
         [3, 1, 2],
         [3],
-      ]).flattenIterables(),
+      ]).flatten(),
       ImmortalList([1, 2, 3, 1, 2, 3]),
     );
   });
@@ -460,14 +456,11 @@ void main() {
     expectCollection(emptyList.insertAll(-1, list123), list123);
     expectCollection(list1.insertAll(5, list23), list123);
     expect(list1.insertAll(0, emptyList), list1);
-  });
-
-  test('should insert iterable at index', () {
-    expectCollection(emptyList.insertIterable(0, [1, 2, 3]), list123);
-    expectCollection(list13.insertIterable(1, [2]), list123);
-    expectCollection(emptyList.insertIterable(-1, [1, 2, 3]), list123);
-    expectCollection(list11.insertIterable(5, [2]), list112);
-    expect(list1.insertIterable(0, []), list1);
+    expectCollection(emptyList.insertAll(0, [1, 2, 3]), list123);
+    expectCollection(list13.insertAll(1, [2]), list123);
+    expectCollection(emptyList.insertAll(-1, [1, 2, 3]), list123);
+    expectCollection(list11.insertAll(5, [2]), list112);
+    expect(list1.insertAll(0, []), list1);
   });
 
   test('should return if list is empty', () {
@@ -499,9 +492,15 @@ void main() {
   });
 
   test('should return last element', () {
-    expect(emptyList.last, const Optional.empty());
-    expect(list1.last, Optional.of(1));
-    expect(list123.last, Optional.of(3));
+    expect(() => emptyList.last, throwsStateError);
+    expect(list1.last, 1);
+    expect(list123.last, 3);
+  });
+
+  test('should return last element as optional', () {
+    expect(emptyList.lastAsOptional, const Optional.empty());
+    expect(list1.lastAsOptional, Optional.of(1));
+    expect(list123.lastAsOptional, Optional.of(3));
   });
 
   test('should return last index of element', () {
@@ -520,11 +519,23 @@ void main() {
   });
 
   test('should return last element fulfilling a test', () {
-    expect(emptyList.lastWhere(matchingAll), const Optional.empty());
-    expect(list123.lastWhere(matchingNone), const Optional.empty());
-    expect(list123.lastWhere(matchingAll), Optional.of(3));
-    expect(list123.lastWhere(matching(1)), Optional.of(1));
-    expect(list111.lastWhere(matching(1)), Optional.of(1));
+    expect(() => emptyList.lastWhere(matchingAll), throwsStateError);
+    expect(() => list123.lastWhere(matchingNone), throwsStateError);
+    expect(list123.lastWhere(matchingAll), 3);
+    expect(list123.lastWhere(matching(1)), 1);
+    expect(list111.lastWhere(matching(1)), 1);
+    expect(emptyList.lastWhere(matchingAll, orElse: yields(0)), 0);
+    expect(list123.lastWhere(matchingNone, orElse: yields(0)), 0);
+    expect(list123.lastWhere(matchingAll, orElse: yields(0)), 3);
+    expect(list123.lastWhere(matching(1), orElse: yields(0)), 1);
+  });
+
+  test('should return last element fulfilling a test as optional', () {
+    expect(emptyList.lastWhereAsOptional(matchingAll), const Optional.empty());
+    expect(list123.lastWhereAsOptional(matchingNone), const Optional.empty());
+    expect(list123.lastWhereAsOptional(matchingAll), Optional.of(3));
+    expect(list123.lastWhereAsOptional(matching(1)), Optional.of(1));
+    expect(list111.lastWhereAsOptional(matching(1)), Optional.of(1));
   });
 
   test('should return length', () {
@@ -552,6 +563,12 @@ void main() {
     );
   });
 
+  test('should reduce elements', () {
+    expect(() => emptyList.reduce(max), throwsStateError);
+    expect(list123.reduce(add), 6);
+    expect(list123.reduce(max), 3);
+  });
+
   test('should remove all occurrences of an element', () {
     expectCollection(list1.remove(1), emptyList);
     expectCollection(list123.remove(2), list13);
@@ -567,6 +584,15 @@ void main() {
     expectCollection(list123 - list1, list23);
     expectCollection(list111 - list1, emptyList);
     expect(list1.removeAll(emptyList), list1);
+    expect(list1 - emptyList, list1);
+    expectCollection(list1.removeAll([1]), emptyList);
+    expectCollection(list123.removeAll([1]), list23);
+    expectCollection(list111.removeAll([1]), emptyList);
+    expectCollection(list1 - [1], emptyList);
+    expectCollection(list123 - [1], list23);
+    expectCollection(list111 - [1], emptyList);
+    expect(list1.removeAll([]), list1);
+    expect(list1 - [], list1);
   });
 
   test('should remove element at index', () {
@@ -575,13 +601,6 @@ void main() {
     expectCollection(list1.removeAt(0), emptyList);
     expectCollection(list123.removeAt(1), list13);
     expect(emptyList.removeAt(0), emptyList);
-  });
-
-  test('should remove all elements from iterable', () {
-    expectCollection(list1.removeIterable([1]), emptyList);
-    expectCollection(list123.removeIterable([1]), list23);
-    expectCollection(list111.removeIterable([1]), emptyList);
-    expect(list1.removeIterable([]), list1);
   });
 
   test('should remove first element in list', () {
@@ -631,14 +650,11 @@ void main() {
     expectCollection(list23.replaceRange(0, 0, list1), list123);
     expectCollection(list123.replaceRange(0, 3, emptyList), emptyList);
     expectCollection(list1.replaceRange(1, 1, list23), list123);
-  });
-
-  test('should replace range with the given iterable', () {
-    expectCollection(list123.replaceRangeIterable(-1, 3, [1, 2, 3]), list123);
-    expectCollection(list1.replaceRangeIterable(5, 3, [2, 3]), list123);
-    expectCollection(list23.replaceRangeIterable(0, 0, [1]), list123);
-    expectCollection(list123.replaceRangeIterable(0, 3, []), emptyList);
-    expectCollection(list1.replaceRangeIterable(1, 1, [2, 3]), list123);
+    expectCollection(list123.replaceRange(-1, 3, [1, 2, 3]), list123);
+    expectCollection(list1.replaceRange(5, 3, [2, 3]), list123);
+    expectCollection(list23.replaceRange(0, 0, [1]), list123);
+    expectCollection(list123.replaceRange(0, 3, []), emptyList);
+    expectCollection(list1.replaceRange(1, 1, [2, 3]), list123);
   });
 
   test('should retain elements fulfilling a test', () {
@@ -677,14 +693,11 @@ void main() {
     expectCollection(list123.setAll(5, list23), list123);
     expectCollection(list1.setAll(0, list23), list2);
     expectCollection(list423.setAll(0, list1), list123);
-  });
-
-  test('should set elements to iterable starting at index', () {
-    expect(list123.setIterable(1, []), list123);
-    expectCollection(list123.setIterable(-1, [1, 2]), list123);
-    expectCollection(list123.setIterable(5, [2]), list123);
-    expectCollection(list1.setIterable(0, [2, 3]), list2);
-    expectCollection(list423.setIterable(0, [1]), list123);
+    expect(list123.setAll(1, []), list123);
+    expectCollection(list123.setAll(-1, [1, 2]), list123);
+    expectCollection(list123.setAll(5, [2]), list123);
+    expectCollection(list1.setAll(0, [2, 3]), list2);
+    expectCollection(list423.setAll(0, [1]), list123);
   });
 
   test('should set range to list', () {
@@ -695,16 +708,13 @@ void main() {
     expectCollection(list1.setRange(0, 1, list123), list1);
     expectCollection(list123.setRange(1, 3, list123), list112);
     expectCollection(list423.setRange(0, 3, list1), list123);
-  });
-
-  test('should set range to iterable', () {
-    expect(list123.setRangeIterable(1, 1, [1]), list123);
-    expect(list123.setRangeIterable(1, 2, []), list123);
-    expectCollection(list123.setRangeIterable(-1, 1, [1, 2, 3]), list123);
-    expectCollection(list123.setRangeIterable(5, 6, [1, 2, 3]), list123);
-    expectCollection(list1.setRangeIterable(0, 1, [1, 2, 3]), list1);
-    expectCollection(list123.setRangeIterable(1, 3, [1, 2, 3]), list112);
-    expectCollection(list423.setRangeIterable(0, 3, [1]), list123);
+    expect(list123.setRange(1, 1, [1]), list123);
+    expect(list123.setRange(1, 2, []), list123);
+    expectCollection(list123.setRange(-1, 1, [1, 2, 3]), list123);
+    expectCollection(list123.setRange(5, 6, [1, 2, 3]), list123);
+    expectCollection(list1.setRange(0, 1, [1, 2, 3]), list1);
+    expectCollection(list123.setRange(1, 3, [1, 2, 3]), list112);
+    expectCollection(list423.setRange(0, 3, [1]), list123);
   });
 
   test('should replace elements fulfilling a test', () {
@@ -733,15 +743,33 @@ void main() {
   });
 
   test('should return single element', () {
-    expect(emptyList.single, const Optional.empty());
-    expect(list1.single, Optional.of(1));
-    expect(list123.single, const Optional.empty());
+    expect(() => emptyList.single, throwsStateError);
+    expect(list1.single, 1);
+    expect(() => list123.single, throwsStateError);
+  });
+
+  test('should return single element as optional', () {
+    expect(emptyList.singleAsOptional, const Optional.empty());
+    expect(list1.singleAsOptional, Optional.of(1));
+    expect(list123.singleAsOptional, const Optional.empty());
   });
 
   test('should return single element fulfilling a test', () {
-    expect(list123.singleWhere(matching(1)), Optional.of(1));
-    expect(list123.singleWhere(matchingNone), const Optional.empty());
-    expect(list123.singleWhere(matchingAll), const Optional.empty());
+    expect(list123.singleWhere(matching(1)), 1);
+    expect(() => list123.singleWhere(matchingNone), throwsStateError);
+    expect(() => list123.singleWhere(matchingAll), throwsStateError);
+    expect(list123.singleWhere(matching(1), orElse: yields(0)), 1);
+    expect(list123.singleWhere(matchingNone, orElse: yields(0)), 0);
+    expect(
+      () => list123.singleWhere(matchingAll, orElse: yields(0)),
+      throwsStateError,
+    );
+  });
+
+  test('should return single element fulfilling a test as optional', () {
+    expect(list123.singleWhereAsOptional(matching(1)), Optional.of(1));
+    expect(list123.singleWhereAsOptional(matchingNone), const Optional.empty());
+    expect(list123.singleWhereAsOptional(matchingAll), const Optional.empty());
   });
 
   test('should skip elements', () {
@@ -792,16 +820,23 @@ void main() {
   });
 
   test('should return list', () {
-    expect(emptyList.toMutableList(), []);
-    expect(list1.toMutableList(), [1]);
-    expect(list123.toMutableList(), [1, 2, 3]);
+    expect(emptyList.toList(), []);
+    expect(list1.toList(), [1]);
+    expect(list123.toList(), [1, 2, 3]);
   });
 
   test('should return immortal set', () {
-    expectCollection(emptyList.toSet(), emptySet);
-    expectCollection(list1.toSet(), set1);
-    expectCollection(list123.toSet(), set123);
-    expectCollection(list111.toSet(), set1);
+    expectCollection(emptyList.toImmortalSet(), emptySet);
+    expectCollection(list1.toImmortalSet(), set1);
+    expectCollection(list123.toImmortalSet(), set123);
+    expectCollection(list111.toImmortalSet(), set1);
+  });
+
+  test('should return set', () {
+    expect(emptyList.toSet(), <int>{});
+    expect(list1.toSet(), {1});
+    expect(list123.toSet(), {1, 2, 3});
+    expect(list111.toSet(), {1});
   });
 
   test('should convert list to string', () {
@@ -849,19 +884,16 @@ void main() {
         const Tuple2(3, 1),
       ]),
     );
-  });
-
-  test('should zip list iterable', () {
     expectCollection(
-      list1.zipIterable([]),
+      list1.zip([]),
       ImmortalList<Tuple2<int, int>>(),
     );
     expectCollection(
-      list1.zipIterable([3, 2, 1]),
+      list1.zip([3, 2, 1]),
       ImmortalList([const Tuple2(1, 3)]),
     );
     expectCollection(
-      list123.zipIterable([3, 2, 1]),
+      list123.zip([3, 2, 1]),
       ImmortalList([
         const Tuple2(1, 3),
         const Tuple2(2, 2),

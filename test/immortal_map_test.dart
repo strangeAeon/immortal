@@ -64,17 +64,17 @@ void main() {
     expectCollection(ImmortalMap.of(mapA1B2C3), mapA1B2C3);
   });
 
-  test('should create map from mutable', () {
-    expectCollection(ImmortalMap.fromMutable({}), emptyMap);
-    expectCollection(ImmortalMap.fromMutable({'a': 1}), mapA1);
+  test('should create map from mutable map', () {
+    expectCollection(ImmortalMap.fromMap({}), emptyMap);
+    expectCollection(ImmortalMap.fromMap({'a': 1}), mapA1);
     expectCollection(
-      ImmortalMap.fromMutable({'a': 1, 'b': 2, 'c': 3}),
+      ImmortalMap.fromMap({'a': 1, 'b': 2, 'c': 3}),
       mapA1B2C3,
     );
-    expectCollection(ImmortalMap.ofMutable({}), emptyMap);
-    expectCollection(ImmortalMap.ofMutable({'a': 1}), mapA1);
+    expectCollection(ImmortalMap.ofMap({}), emptyMap);
+    expectCollection(ImmortalMap.ofMap({'a': 1}), mapA1);
     expectCollection(
-      ImmortalMap.ofMutable({'a': 1, 'b': 2, 'c': 3}),
+      ImmortalMap.ofMap({'a': 1, 'b': 2, 'c': 3}),
       mapA1B2C3,
     );
   });
@@ -83,19 +83,13 @@ void main() {
     expectCollection(ImmortalMap.fromEntries(emptyMap.entries), emptyMap);
     expectCollection(ImmortalMap.fromEntries(mapA1.entries), mapA1);
     expectCollection(ImmortalMap.fromEntries(mapA1B2C3.entries), mapA1B2C3);
-  });
-
-  test('should create map from entries iterable', () {
     expectCollection(
-      ImmortalMap.fromEntriesIterable(emptyMap.entries.toMutableList()),
+      ImmortalMap.fromEntries(emptyMap.entries.toList()),
       emptyMap,
     );
+    expectCollection(ImmortalMap.fromEntries(mapA1.entries.toList()), mapA1);
     expectCollection(
-      ImmortalMap.fromEntriesIterable(mapA1.entries.toMutableList()),
-      mapA1,
-    );
-    expectCollection(
-      ImmortalMap.fromEntriesIterable(mapA1B2C3.entries.toMutableList()),
+      ImmortalMap.fromEntries(mapA1B2C3.entries.toList()),
       mapA1B2C3,
     );
   });
@@ -104,30 +98,24 @@ void main() {
     expectCollection(ImmortalMap.fromPairs(emptyMap.pairs()), emptyMap);
     expectCollection(ImmortalMap.fromPairs(mapA1.pairs()), mapA1);
     expectCollection(ImmortalMap.fromPairs(mapA1B2C3.pairs()), mapA1B2C3);
-  });
-
-  test('should create map from pairs iterable', () {
     expectCollection(
-      ImmortalMap.fromPairsIterable(emptyMap.pairs().toMutableList()),
+      ImmortalMap.fromPairs(emptyMap.pairs().toList()),
       emptyMap,
     );
+    expectCollection(ImmortalMap.fromPairs(mapA1.pairs().toList()), mapA1);
     expectCollection(
-      ImmortalMap.fromPairsIterable(mapA1.pairs().toMutableList()),
-      mapA1,
-    );
-    expectCollection(
-      ImmortalMap.fromPairsIterable(mapA1B2C3.pairs().toMutableList()),
+      ImmortalMap.fromPairs(mapA1B2C3.pairs().toList()),
       mapA1B2C3,
     );
   });
 
-  test('should create map from lists of keys and values', () {
-    expectCollection(ImmortalMap.fromLists(listABC, list123), mapA1B2C3);
-    expectCollection(ImmortalMap.fromLists(listABC.take(1), list123), mapA1);
-    expectCollection(ImmortalMap.fromLists(listABC, list1), mapA1);
-  });
-
   test('should create map from iterables of keys and values', () {
+    expectCollection(ImmortalMap.fromIterables(listABC, list123), mapA1B2C3);
+    expectCollection(
+      ImmortalMap.fromIterables(listABC.take(1), list123),
+      mapA1,
+    );
+    expectCollection(ImmortalMap.fromIterables(listABC, list1), mapA1);
     expectCollection(
       ImmortalMap.fromIterables(['a', 'b', 'c'], [1, 2, 3]),
       mapA1B2C3,
@@ -136,19 +124,16 @@ void main() {
     expectCollection(ImmortalMap.fromIterables(['a', 'b', 'c'], [1]), mapA1);
   });
 
-  test('should create map from list', () {
+  test('should create map from iterable', () {
     expectCollection(
-      ImmortalMap.fromList(
+      ImmortalMap.fromIterable(
         list123,
         keyGenerator: (key) => 'b',
         valueGenerator: (value) => 2,
       ),
       mapB2,
     );
-    expectCollection(ImmortalMap.fromList(list123), map123);
-  });
-
-  test('should create map from iterable', () {
+    expectCollection(ImmortalMap.fromIterable(list123), map123);
     expectCollection(
       ImmortalMap.fromIterable(
         [1, 2, 3],
@@ -209,18 +194,12 @@ void main() {
     expectCollection(emptyMap.addEntries(mapA1B2C3.entries), mapA1B2C3);
     expectCollection(mapA1.addEntries(mapA1B2C3.entries), mapA1B2C3);
     expect(mapA1B2C3.addEntries(ImmortalList()), mapA1B2C3);
-  });
-
-  test('should add iterable of entries', () {
     expectCollection(
-      emptyMap.addEntriesIterable(mapA1B2C3.entries.toMutableList()),
+      emptyMap.addEntries(mapA1B2C3.entries.toList()),
       mapA1B2C3,
     );
-    expectCollection(
-      mapA1.addEntriesIterable(mapA1B2C3.entries.toMutableList()),
-      mapA1B2C3,
-    );
-    expect(mapA1B2C3.addEntriesIterable([]), mapA1B2C3);
+    expectCollection(mapA1.addEntries(mapA1B2C3.entries.toList()), mapA1B2C3);
+    expect(mapA1B2C3.addEntries([]), mapA1B2C3);
   });
 
   test('should add entry if absent', () {
@@ -240,8 +219,8 @@ void main() {
   });
 
   test('should combine with the given mortal map', () {
-    expectCollection(emptyMap.addMap(mapA1B2C3.toMutableMap()), mapA1B2C3);
-    expectCollection(mapA1.addMap(mapA1B2C3.toMutableMap()), mapA1B2C3);
+    expectCollection(emptyMap.addMap(mapA1B2C3.toMap()), mapA1B2C3);
+    expectCollection(mapA1.addMap(mapA1B2C3.toMap()), mapA1B2C3);
     expect(mapA1B2C3.addMap({}), mapA1B2C3);
   });
 
@@ -249,18 +228,9 @@ void main() {
     expectCollection(emptyMap.addPairs(mapA1B2C3.pairs()), mapA1B2C3);
     expectCollection(mapA1.addPairs(mapA1B2C3.pairs()), mapA1B2C3);
     expect(mapA1B2C3.addPairs(ImmortalList()), mapA1B2C3);
-  });
-
-  test('should add iterable of pairs', () {
-    expectCollection(
-      emptyMap.addPairsIterable(mapA1B2C3.pairs().toMutableList()),
-      mapA1B2C3,
-    );
-    expectCollection(
-      mapA1.addPairsIterable(mapA1B2C3.pairs().toMutableList()),
-      mapA1B2C3,
-    );
-    expect(mapA1B2C3.addPairsIterable([]), mapA1B2C3);
+    expectCollection(emptyMap.addPairs(mapA1B2C3.pairs().toList()), mapA1B2C3);
+    expectCollection(mapA1.addPairs(mapA1B2C3.pairs().toList()), mapA1B2C3);
+    expect(mapA1B2C3.addPairs([]), mapA1B2C3);
   });
 
   test('should check if any entry satisfies a test', () {
@@ -297,9 +267,9 @@ void main() {
     );
   });
 
-  test('should create map by casting mutable', () {
+  test('should create map by casting mutable map', () {
     expectCollection(
-      ImmortalMap.castFromMutable(<Object, Object>{'a': 1, 'b': 2, 'c': 3}),
+      ImmortalMap.castFromMap(<Object, Object>{'a': 1, 'b': 2, 'c': 3}),
       mapA1B2C3,
     );
   });
@@ -399,7 +369,7 @@ void main() {
       2: {'a': 1, 'c': 4},
       3: {'b': 2, 'c': 3},
     });
-    expectCollection(initialMap.flattenMutables(), mapA1B2C3);
+    expectCollection(initialMap.flattenMaps(), mapA1B2C3);
   });
 
   test('should execute function for each entry', () {
@@ -550,11 +520,8 @@ void main() {
   test('should remove entries by value', () {
     expectCollection(mapA1.removeValues(list1), emptyMap);
     expectCollection(mapA1B2C3.removeValues(ImmortalList([1, 3])), mapB2);
-  });
-
-  test('should remove entries by value iterable', () {
-    expectCollection(mapA1.removeValuesIterable([1]), emptyMap);
-    expectCollection(mapA1B2C3.removeValuesIterable([1, 3]), mapB2);
+    expectCollection(mapA1.removeValues([1]), emptyMap);
+    expectCollection(mapA1B2C3.removeValues([1, 3]), mapB2);
   });
 
   test('should remove entries fulfilling a test', () {
@@ -646,9 +613,9 @@ void main() {
   });
 
   test('should return map', () {
-    expect(emptyMap.toMutableMap(), <String, int>{});
-    expect(mapA1.toMutableMap(), {'a': 1});
-    expect(mapA1B2C3.toMutableMap(), {'a': 1, 'b': 2, 'c': 3});
+    expect(emptyMap.toMap(), <String, int>{});
+    expect(mapA1.toMap(), {'a': 1});
+    expect(mapA1B2C3.toMap(), {'a': 1, 'b': 2, 'c': 3});
   });
 
   test('should transform map to string', () {

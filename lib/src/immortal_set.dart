@@ -11,12 +11,16 @@ import 'utils.dart';
 /// new instances created from mutable sets where the operations are applied to.
 ///
 /// Internally a [LinkedHashSet] is used, regardless of what type of set is
-/// passed to the constructor.
+/// passed to the constructor. Even though this implementation might implement
+/// [Iterable] and provide a certain guarantee for the order of the elements
+/// contained, it is discouraged to rely on any order of elements in
+/// [ImmortalSet].
 class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// Creates an [ImmortalSet] that contains all elements of [iterable].
   ///
   /// All the elements of [iterable] should be instances of [T].
   /// The [iterable] itself can have any type.
+  ///
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
   ///
@@ -50,6 +54,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   ///
   /// All the elements of [iterable] should be instances of [T].
   /// The [iterable] itself can have any type.
+  ///
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
   ///
@@ -77,7 +82,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   final Set<T> _set;
 
   ImmortalSet<T> _mutateAsSet(Set<T> Function(Set<T>) f) =>
-      ImmortalSet._internal(f(toMutableSet()));
+      ImmortalSet._internal(f(toSet()));
 
   ImmortalSet<T> _mutateAsSetIf(bool condition, Set<T> Function(Set<T>) f) =>
       condition ? _mutateAsSet(f) : this;
@@ -108,22 +113,23 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// returned unchanged.
   ///
   /// Example:
-  ///
-  ///     var set = ImmortalSet();
-  ///     final time1 = DateTime.fromMillisecondsSinceEpoch(0);
-  ///     final time2 = DateTime.fromMillisecondsSinceEpoch(0);
-  ///     // time1 and time2 are equal, but not identical.
-  ///     expect(time1, time2);
-  ///     expect(identical(time1, time2), false);
-  ///     set = set.add(time1);
-  ///     // A value equal to time2 exists already in the set, and the call to
-  ///     // add does not expand the copy even further.
-  ///     set = set.add(time2);
-  ///     expect(set.length, 1);
-  ///     expect(set.contains(time1), true);
-  ///     expect(set.contains(time2), true);
+  /// ```dart
+  /// var set = ImmortalSet();
+  /// final time1 = DateTime.fromMillisecondsSinceEpoch(0);
+  /// final time2 = DateTime.fromMillisecondsSinceEpoch(0);
+  /// // time1 and time2 are equal, but not identical.
+  /// expect(time1, time2);
+  /// expect(identical(time1, time2), false);
+  /// set = set.add(time1);
+  /// // A value equal to time2 exists already in the set, and the call to
+  /// // add does not expand the copy even further.
+  /// set = set.add(time2);
+  /// expect(set.length, 1);
+  /// expect(set.contains(time1), true);
+  /// expect(set.contains(time2), true);
+  /// ```
   ImmortalSet<T> add(T value) {
-    final newSet = toMutableSet();
+    final newSet = toSet();
     if (newSet.add(value)) {
       return ImmortalSet._internal(newSet);
     }
@@ -133,8 +139,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// Returns a copy of this set where all elements of [other] are added.
   ///
   /// If [other] is empty, the set is returned unchanged.
-  ImmortalSet<T> addAll(ImmortalSet<T> other) =>
-      addIterable(other.toMutableSet());
+  ImmortalSet<T> addAll(ImmortalSet<T> other) => addIterable(other.toSet());
 
   /// Returns a copy of this set where all elements of [iterable] are added.
   ///
@@ -143,12 +148,6 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// iteration.
   ImmortalSet<T> addIterable(Iterable<T> iterable) =>
       _mutateAsSetIf(iterable.isNotEmpty, (set) => set..addAll(iterable));
-
-  /// Returns a copy of this set where all elements of [list] are added.
-  ///
-  /// See [addAll].
-  ImmortalSet<T> addList(ImmortalList<T> list) =>
-      addIterable(list.toMutableList());
 
   /// Returns a copy of this set replacing each element that fulfills the given
   /// [predicate] by [value], or adds [value] to the set if no element
@@ -186,7 +185,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// If a key is already present in the map, the corresponding value is
   /// overwritten.
   ImmortalMap<K, T> asMapWithKeys<K>(K Function(T value) keyGenerator) =>
-      ImmortalMap.fromEntries(toList().map(
+      ImmortalMap.fromEntries(toImmortalList().map(
         (value) => MapEntry(keyGenerator(value), value),
       ));
 
@@ -201,7 +200,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
 
   /// Returns whether this set contains all the elements of [other].
   bool containsAll(ImmortalSet<Object?> other) =>
-      containsIterable(other.toMutableSet());
+      containsIterable(other.toSet());
 
   /// Returns whether this set contains all the elements of [iterable].
   ///
@@ -221,7 +220,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   ///
   /// If [other] is empty, the set is returned unchanged.
   ImmortalSet<T> difference(ImmortalSet<Object?> other) =>
-      differenceWithSet(other.toMutableSet());
+      differenceWithSet(other.toSet());
 
   /// Returns a new set with the elements of this set that are not in the set
   /// [other].
@@ -234,10 +233,9 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
 
   /// Checks whether this set is equal to [other].
   ///
-  /// First an identity check is performed, using [ImmortalSet.==]. If this
-  /// fails, it is checked if [other] is an [ImmortalSet] and all contained
-  /// values of the two sets are compared using their respective `==`
-  /// operators.
+  /// First an identity check is performed, using [operator ==]. If this fails,
+  /// it is checked if [other] is an [ImmortalSet] and all contained values of
+  /// the two sets are compared using their respective `==` operators.
   ///
   /// To solely test if two sets are identical, the operator `==` can be used.
   @override
@@ -257,19 +255,20 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// more elements.
   ///
   /// Example:
+  /// ```dart
+  /// final pairs = ImmortalSet({
+  ///   ImmortalSet({1, 2}),
+  ///   ImmortalSet({3, 4}),
+  /// });
+  /// final flattened = pairs.flatMap((pair) => pair);
+  /// print(flattened); // => Immortal{1, 2, 3, 4};
   ///
-  ///     final pairs = ImmortalSet({
-  ///       ImmortalSet({1, 2}),
-  ///       ImmortalSet({3, 4}),
-  ///     });
-  ///     final flattened = pairs.flatMap((pair) => pair);
-  ///     print(flattened); // => Immortal{1, 2, 3, 4};
-  ///
-  ///     final input = ImmortalSet({1, 2, 3});
-  ///     final timesTwo = input.flatMap((i) => ImmortalSet({i, i * 2}));
-  ///     print(timesTwo); // => Immortal{1, 2, 4, 3, 6};
+  /// final input = ImmortalSet({1, 2, 3});
+  /// final timesTwo = input.flatMap((i) => ImmortalSet({i, i * 2}));
+  /// print(timesTwo); // => Immortal{1, 2, 4, 3, 6};
+  /// ```
   ImmortalSet<R> expand<R>(ImmortalSet<R> Function(T value) f) =>
-      expandIterable((value) => f(value).toMutableSet());
+      expandIterable((value) => f(value).toSet());
 
   /// Returns a new set expanding each element of this set into an iterable of
   /// zero or more elements.
@@ -322,30 +321,23 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   ImmortalSet<R> flattenIterables<R>() =>
       cast<Iterable<R>>().expandIterable<R>(identity);
 
-  /// Flattens a set of [ImmortalList]s by combining their values to a single
-  /// set.
-  ///
-  /// If this set contains only instances of [ImmortalList<R>] the new set will
-  /// be created correctly, otherwise an exception is thrown.
-  ImmortalSet<R> flattenLists<R>() =>
-      cast<ImmortalList<R>>().expand<R>((value) => value.toSet());
-
   /// Reduces the set to a single value by iteratively combining each element of
   /// this set with an existing value.
   ///
   /// Uses [initialValue] as the initial value, then iterates through the
   /// elements and updates the value with each element using the [combine]
   /// function, as if by:
-  ///
-  ///     var value = initialValue;
-  ///     for (E element in this) {
-  ///       value = combine(value, element);
-  ///     }
-  ///     return value;
-  ///
+  /// ```dart
+  /// var value = initialValue;
+  /// for (E element in this) {
+  ///   value = combine(value, element);
+  /// }
+  /// return value;
+  /// ```
   /// Example of calculating the sum of a set:
-  ///
-  ///     set.fold(0, (prev, element) => prev + element);
+  /// ```dart
+  /// set.fold(0, (prev, element) => prev + element);
+  /// ```
   R fold<R>(R initialValue, R Function(R previousResult, T value) combine) =>
       _set.fold(initialValue, combine);
 
@@ -357,7 +349,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// That is, the returned set contains all the elements of this set that are
   /// also elements of [other] according to `other.contains`.
   ImmortalSet<T> intersection(ImmortalSet<Object?> other) =>
-      intersectionWithSet(other.toMutableSet());
+      intersectionWithSet(other.toSet());
 
   /// Returns a new set which is the intersection between this set and the set
   /// [other].
@@ -423,7 +415,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// Returns a copy of this set where [element] is removed from if present,
   /// otherwise the set is returned unchanged.
   ImmortalSet<T> remove(Object? element) {
-    final newSet = toMutableSet();
+    final newSet = toSet();
     if (newSet.remove(element)) {
       return ImmortalSet._internal(newSet);
     }
@@ -434,7 +426,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   ///
   /// If [other] is empty, the set is returned unchanged.
   ImmortalSet<T> removeAll(ImmortalSet<Object?> other) =>
-      removeIterable(other.toMutableSet());
+      removeIterable(other.toSet());
 
   /// Returns a copy of this set where each element in the [iterable] is
   /// removed from.
@@ -470,7 +462,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// element in this set is retained in the copy, and elements that are not
   /// equal to any element in [other] are removed from the copy.
   ImmortalSet<T> retainAll(ImmortalSet<Object?> other) =>
-      retainIterable(other.toMutableSet());
+      retainIterable(other.toSet());
 
   /// Returns a copy of this set where are all elements that are not in
   /// [iterable] are removed from.
@@ -524,17 +516,16 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
       contains(value) ? remove(value) : add(value);
 
   /// Returns an [ImmortalList] containing the elements of this set.
-  ImmortalList<T> toList() => ImmortalList(_set.toList());
+  ImmortalList<T> toImmortalList() => ImmortalList(_set.toList());
 
   /// Returns a mutable [List] containing the elements of this set.
   ///
   /// The list is fixed-length if [growable] is `false`.
-  List<T> toMutableList({bool growable = true}) =>
-      _set.toList(growable: growable);
+  List<T> toList({bool growable = true}) => _set.toList(growable: growable);
 
   /// Returns a mutable [LinkedHashSet] containing the same elements as this
   /// set.
-  Set<T> toMutableSet() => _set.toSet();
+  Set<T> toSet() => _set.toSet();
 
   @override
   String toString() => 'Immortal${_set.toString()}';
@@ -545,8 +536,7 @@ class ImmortalSet<T> implements DeeplyComparable, Mergeable<ImmortalSet<T>> {
   /// the elements of [other].
   ///
   /// If [other] is empty, the set is returned unchanged.
-  ImmortalSet<T> union(ImmortalSet<T> other) =>
-      unionWithSet(other.toMutableSet());
+  ImmortalSet<T> union(ImmortalSet<T> other) => unionWithSet(other.toSet());
 
   /// Returns a new set which contains all the elements of this set and the set
   /// [other].

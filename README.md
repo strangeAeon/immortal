@@ -81,10 +81,10 @@ The key objectives for this library are the following:
 
 - Mutation methods return new instances instead of throwing exceptions
 - No builder pattern to create new instances
-- Optionals for nullable returns values
-- High fault tolerance in general, e.g. list indices passed as parameters are adjusted to fit inside the list's boundaries
+- Optionals for nullable return values or at least providing alternatives using optionals (e.g. for list methods required to implement the `Iterable` interface like `first` there is an alternative `firstAsOptional`)
+- High fault tolerance in general, e.g. list indices passed as parameters are adjusted to fit inside the list's boundaries (except for list methods required to implement the `Iterable` interface, but alternatives using optionals are provided as stated above)
 - Return the same instance if no changes were made in mutation methods (there is still some potential to improve and extend this in future updates of this library)
-- No assumptions about the order of elements in a set: `ImmortalSet` does not provide methods like `elementAt`, `first`, `skip` etc. even though the underlying implementation of Dart's `Set` might do so.
+- No assumptions about the order of elements in a set: `ImmortalSet` does not implement the `Iterable` interface and provides methods like `elementAt`, `first`, `skip` etc. even though the underlying implementation of Dart's `Set` might do so.
 - Provide more common names in addition to the Dart method names, like `flatMap` for `expand` (this is something that might be extended in future updates as well)
 - Addition of useful methods missing in `dart:core`, e.g. `mapKeys` and `mapValues` on `ImmortalMap` (this is again something that might be extended in future library updates).
 - Encourage further usage of immutable collections by prefering `Immortal` parameters.

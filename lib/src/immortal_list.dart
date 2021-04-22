@@ -25,15 +25,19 @@ class _Range {
 /// return new instances created from mutable lists where the operations are
 /// applied to.
 ///
+/// ImmortalLists are [Iterable]. Iteration occurs over values in index order.
+///
 /// Internally a fixed-length [List] is used, regardless of what type of list is
 /// passed to the constructor.
-class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
+class ImmortalList<T>
+    implements Iterable<T>, DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// Creates an [ImmortalList] that contains all elements of [iterable].
   ///
   /// The [Iterator] of [iterable] provides the order of the elements.
   ///
   /// All the elements in [iterable] should be instances of [T].
   /// The [iterable] itself may have any type.
+  ///
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
   ImmortalList([Iterable<T> iterable = const []])
@@ -50,7 +54,7 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// Creates an [ImmortalList] of the given [length] with [fillValue] at each
   /// position.
   ///
-  /// Will return an empty list, if [length] is negative.
+  /// Will return an empty list if [length] is negative.
   ///
   /// You can use [ImmortalList.generate] to create a list with a new object at
   /// each position.
@@ -61,16 +65,10 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
         growable: false,
       ));
 
-  /// Creates an [ImmortalList] as copy of [other].
-  ///
-  /// See [ImmortalList.of].
-  factory ImmortalList.from(ImmortalList<T> other) => ImmortalList.of(other);
-
   /// Creates an [ImmortalList] that contains all elements of [iterable].
   ///
-  /// See [ImmortalList.ofIterable].
-  factory ImmortalList.fromIterable(Iterable<T> iterable) =>
-      ImmortalList(iterable);
+  /// See [new ImmortalList].
+  factory ImmortalList.from(Iterable<T> iterable) => ImmortalList(iterable);
 
   /// Generates an [ImmortalList] of values.
   ///
@@ -78,7 +76,7 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// calling [valueGenerator] for each index in the range `0` .. `length - 1`
   /// in increasing order.
   ///
-  /// Will return an empty list, if [length] is negative.
+  /// Will return an empty list if [length] is negative.
   factory ImmortalList.generate(
     int length,
     T Function(int index) valueGenerator,
@@ -89,37 +87,18 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
         growable: false,
       ));
 
-  /// Creates an [ImmortalList] as copy of [other].
-  ///
-  /// See [copy].
-  factory ImmortalList.of(ImmortalList<T> other) => other.copy();
-
   /// Creates an [ImmortalList] that contains all elements of [iterable].
   ///
-  /// The [Iterator] of [iterable] provides the order of the elements.
-  ///
-  /// All the elements in [iterable] should be instances of [T].
-  /// The [iterable] itself may have any type.
-  /// It iterates over [iterable], which must therefore not change during the
-  /// iteration.
-  factory ImmortalList.ofIterable(Iterable<T> iterable) =>
-      ImmortalList(iterable);
-
-  /// Returns a copy of [other] casting all elements to instances of [R].
-  ///
-  /// See [cast].
-  static ImmortalList<R> castFrom<T, R>(ImmortalList<T> other) =>
-      other.cast<R>();
+  /// See [new ImmortalList].
+  factory ImmortalList.of(Iterable<T> iterable) => ImmortalList(iterable);
 
   /// Creates an [ImmortalList] by casting all elements of [iterable] to
   /// instances of [R].
   ///
-  /// If [iterable] contains only instances of [R], the list will be created
-  /// correctly, otherwise an exception will be thrown.
-  ///
+  /// See [cast].
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  static ImmortalList<R> castFromIterable<T, R>(Iterable<T> iterable) =>
+  static ImmortalList<R> castFrom<T, R>(Iterable<T> iterable) =>
       ImmortalList(iterable.cast<R>());
 
   final List<T> _list;
@@ -127,7 +106,7 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   bool _isValidIndex(int index) => index >= 0 && index < length;
 
   ImmortalList<T> _mutateAsList(Iterable<T> Function(List<T>) f) =>
-      ImmortalList._internal(f(toMutableList()));
+      ImmortalList._internal(f(toList()));
 
   ImmortalList<T> _mutateAsListIf(
     bool condition,
@@ -160,47 +139,41 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   R _withRange<R>(int start, int end, R Function(_Range) f) =>
       f(_validRange(start, end));
 
-  /// Returns a copy of this list concatenating [other].
+  /// Returns a copy of this list concatenating [iterable].
   ///
-  /// See [followedBy].
-  ImmortalList<T> operator +(ImmortalList<T> other) => followedBy(other);
+  /// See [addAll].
+  ImmortalList<T> operator +(Iterable<T> iterable) => addAll(iterable);
 
-  /// Returns a copy of this list where all values in [other] are removed from
-  /// if present.
+  /// Returns a copy of this list where all values in [iterable] are removed
+  /// from if present.
   ///
   /// See [removeAll].
-  ImmortalList<T> operator -(ImmortalList<Object?> other) => removeAll(other);
+  ImmortalList<T> operator -(Iterable<Object?> iterable) => removeAll(iterable);
 
   /// Returns the [index]th element wrapped by an [Optional] if this element
   /// exists, otherwise returns [Optional.empty].
   ///
-  /// See [elementAt].
-  Optional<T> operator [](int index) => elementAt(index);
+  /// See [elementAtAsOptional].
+  Optional<T> operator [](int index) => elementAtAsOptional(index);
 
   /// Returns a copy of this list where [value] is added to the end.
   ImmortalList<T> add(T value) => _mutateAsList((list) => list..add(value));
 
-  /// Returns a copy of this list where all elements of [other] are added to the
-  /// end.
+  /// Returns a copy of this list where all elements of [iterable] are added to
+  /// the end.
   ///
-  /// If [other] is empty, the list is returned unchanged.
-  ImmortalList<T> addAll(ImmortalList<T> other) =>
-      addIterable(other.toMutableList());
+  /// If [iterable] is empty, the list is returned unchanged.
+  ///
+  /// It iterates over [iterable], which must therefore not change during the
+  /// iteration.
+  ImmortalList<T> addAll(Iterable<T> iterable) =>
+      _mutateAsListIf(iterable.isNotEmpty, (list) => list..addAll(iterable));
 
   /// Returns a copy of this list where [value] is added to the end if it is
   /// not present yet.
   ///
   /// Otherwise the list is returned unchanged.
   ImmortalList<T> addIfAbsent(T value) => contains(value) ? this : add(value);
-
-  /// Returns a copy of this list where all elements of [iterable] are added to
-  /// the end.
-  ///
-  /// See [addAll].
-  /// It iterates over [iterable], which must therefore not change during the
-  /// iteration.
-  ImmortalList<T> addIterable(Iterable<T> iterable) =>
-      _mutateAsListIf(iterable.isNotEmpty, (list) => list..addAll(iterable));
 
   /// Returns a copy of this list replacing each element that fulfills the given
   /// [predicate] by [value], or adds [value] to the end of the list if no
@@ -247,6 +220,7 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   ///
   /// Checks every element in iteration order, and returns `true` if any of them
   /// make [predicate] return `true`, otherwise returns `false`.
+  @override
   bool any(bool Function(T value) predicate) => _list.any(predicate);
 
   /// Checks whether any element and its respective index satisfies the given
@@ -260,11 +234,12 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// corresponding objects as values.
   ///
   /// Example:
-  ///
-  ///     final words = ImmortalList(['fee', 'fi', 'fo', 'fum']);
-  ///     final map = words.asMap();
-  ///     map[0].value + map[1].value; // 'feefi'
-  ///     map.keys.toList();           // [0, 1, 2, 3]
+  /// ```dart
+  /// final words = ImmortalList(['fee', 'fi', 'fo', 'fum']);
+  /// final map = words.asMap();
+  /// map[0].value + map[1].value; // 'feefi'
+  /// map.keys.toList();           // [0, 1, 2, 3]
+  /// ```
   ImmortalMap<int, T> asMap() => ImmortalMap(_list.asMap());
 
   /// Returns an [ImmortalMap] using the given [keyGenerator] and concatenating
@@ -310,26 +285,30 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   ///
   /// If this list contains only instances of [R] the new list will be created
   /// correctly, otherwise an exception is thrown.
+  @override
   ImmortalList<R> cast<R>() => ImmortalList(_list.cast<R>());
-
-  /// Returns a copy of this list concatenating [other].
-  ///
-  /// See [followedBy].
-  ImmortalList<T> concatenate(ImmortalList<T> other) => followedBy(other);
 
   /// Returns a copy of this list concatenating [iterable].
   ///
-  /// See [followedByIterable].
-  ImmortalList<T> concatenateIterable(Iterable<T> iterable) =>
-      followedByIterable(iterable);
+  /// See [addAll].
+  ImmortalList<T> concatenate(Iterable<T> iterable) => addAll(iterable);
 
   /// Returns `true` if the list contains an element equal to [element].
   ///
   /// Equality is determined using the `==` operator.
+  @override
   bool contains(Object? element) => _list.contains(element);
 
   /// Returns a copy of this list.
   ImmortalList<T> copy() => ImmortalList(_list);
+
+  /// Returns the [index]th element.
+  ///
+  /// The [index] must be non-negative and less than [length].
+  /// Index zero represents the first element (so `elementAt(0)` is equivalent
+  /// to `first`).
+  @override
+  T elementAt(int index) => _list.elementAt(index);
 
   /// Returns the [index]th element wrapped by an [Optional] if this element
   /// exists, otherwise returns [Optional.empty].
@@ -343,15 +322,15 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// containing the value `null` at the requested index.
   /// Methods like [contains] or [length] can be used if the distinction is
   /// important.
-  Optional<T> elementAt(int index) =>
+  Optional<T> elementAtAsOptional(int index) =>
       getValueIf(_isValidIndex(index), () => _list.elementAt(index));
 
   /// Checks whether this list is equal to [other].
   ///
-  /// First an identity check is performed, using [ImmortalList.==]. If this
-  /// fails, it is checked if [other] is an [ImmortalList] and all contained
-  /// values of the two lists are compared in iteration order using their
-  /// respective `==` operators.
+  /// First an identity check is performed, using [operator ==]. If this fails,
+  /// it is checked if [other] is an [ImmortalList] and all contained values of
+  /// the two lists are compared in iteration order using their respective `==`
+  /// operators.
   ///
   /// To solely test if two lists are identical, the operator `==` can be used.
   @override
@@ -366,6 +345,7 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   ///
   /// Returns `false` if any element makes [predicate] return `false`, otherwise
   /// returns `true`.
+  @override
   bool every(bool Function(T value) predicate) => _list.every(predicate);
 
   /// Checks whether all elements and their respective indices satisfy the given
@@ -376,51 +356,36 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
       mapIndexed(predicate).every(isTrue);
 
   /// Returns a new list expanding each element of this list into a list of zero
-  /// or more elements.
-  ///
-  /// Example:
-  ///
-  ///     final pairs = ImmortalList([
-  ///       ImmortalList([1, 2]),
-  ///       ImmortalList([3, 4]),
-  ///     ]);
-  ///     final flattened = pairs.flatMap((pair) => pair);
-  ///     print(flattened); // => Immortal[1, 2, 3, 4];
-  ///
-  ///     final input = ImmortalList([1, 2, 3]);
-  ///     final duplicated = input.flatMap((i) => ImmortalList([i, i]));
-  ///     print(duplicated); // => Immortal[1, 1, 2, 2, 3, 3]
-  ImmortalList<R> expand<R>(ImmortalList<R> Function(T value) f) =>
-      expandIterable((value) => f(value).toMutableList());
-
-  /// Returns a new list expanding each element of this list into a list of zero
   /// or more elements by applying [f] to each element and its respective index
   /// and concatenating the resulting lists.
   ///
   /// See [expand].
   ImmortalList<R> expandIndexed<R>(
-    ImmortalList<R> Function(int index, T value) f,
+    Iterable<R> Function(int index, T value) f,
   ) =>
       mapIndexed(f).expand(identity);
 
   /// Returns a new list expanding each element of this list into an iterable of
   /// zero or more elements.
   ///
-  /// See [expand].
+  /// Example:
+  /// ```dart
+  /// final pairs = ImmortalList([
+  ///   ImmortalList([1, 2]),
+  ///   ImmortalList([3, 4]),
+  /// ]);
+  /// final flattened = pairs.flatMap((pair) => pair);
+  /// print(flattened); // => Immortal[1, 2, 3, 4];
+  ///
+  /// final input = ImmortalList([1, 2, 3]);
+  /// final duplicated = input.flatMap((i) => ImmortalList([i, i]));
+  /// print(duplicated); // => Immortal[1, 1, 2, 2, 3, 3]
+  /// ```
   /// The iterables returnd by [f] are iterated over and must therefore not
   /// change during the iteration.
-  ImmortalList<R> expandIterable<R>(Iterable<R> Function(T value) f) =>
+  @override
+  ImmortalList<R> expand<R>(Iterable<R> Function(T value) f) =>
       ImmortalList(_list.expand(f));
-
-  /// Returns a new list expanding each element of this list into an interable
-  /// of zero or more elements by applying [f] to each element and its
-  /// respective index and concatenating the resulting lists.
-  ///
-  /// See [expandIterable].
-  ImmortalList<R> expandIterableIndexed<R>(
-    Iterable<R> Function(int index, T value) f,
-  ) =>
-      mapIndexed(f).expandIterable(identity);
 
   /// Returns a copy of this list setting the objects in the range [start]
   /// inclusive to [end] exclusive to the given [fillValue].
@@ -434,10 +399,11 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// The resulting list will have the same length as the original list.
   ///
   /// Example:
-  ///
-  ///     final list = ImmortalList([1, 2, 3]);
-  ///     final filledList = list.fillRange(0, 2, 4);
-  ///     print(filledList); //  Immortal[4, 4, 3]
+  /// ```dart
+  /// final list = ImmortalList([1, 2, 3]);
+  /// final filledList = list.fillRange(0, 2, 4);
+  /// print(filledList); //  Immortal[4, 4, 3]
+  /// ```
   ImmortalList<T> fillRange(int start, int end, [T? fillValue]) => _withRange(
       start,
       end,
@@ -468,6 +434,14 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// See [whereType].
   ImmortalList<R> filterType<R>() => whereType<R>();
 
+  /// Returns the first element.
+  ///
+  /// Throws a [StateError] if this list is empty.
+  /// Otherwise returns the first element in the iteration order,
+  /// equivalent to `elementAt(0)`.
+  @override
+  T get first => _list.first;
+
   /// Returns an [Optional] containing the first element of the list if the list
   /// is not empty, otherwise returns [Optional.empty].
   ///
@@ -478,7 +452,18 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// containing the `null` value as first element.
   /// Methods like [contains] or [length] can be used if the distinction is
   /// important.
-  Optional<T> get first => getValueIf(isNotEmpty, () => _list.first);
+  Optional<T> get firstAsOptional => getValueIf(isNotEmpty, () => _list.first);
+
+  /// Returns the first element that satisfies the given predicate [predicate].
+  ///
+  /// Iterates through elements and returns the first to satisfy [predicate].
+  ///
+  /// If no element satisfies [predicate], the result of invoking the [orElse]
+  /// function is returned.
+  /// If [orElse] is omitted, it defaults to throwing a [StateError].
+  @override
+  T firstWhere(bool Function(T value) predicate, {T Function()? orElse}) =>
+      _list.firstWhere(predicate, orElse: orElse);
 
   /// Returns an [Optional] containing the first element that satisfies the
   /// given [predicate], or [Optional.empty] if none was found.
@@ -493,7 +478,7 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// containing the `null` value satisfying the predicate.
   /// Methods like [contains] or [indexWhere] can be used if the distinction is
   /// important.
-  Optional<T> firstWhere(bool Function(T value) predicate) {
+  Optional<T> firstWhereAsOptional(bool Function(T value) predicate) {
     try {
       return Optional.ofNullable(_list.firstWhere(predicate));
       // ignore: avoid_catching_errors
@@ -502,45 +487,21 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
     }
   }
 
-  /// Returns a new list expanding each element of this list into a list of zero
-  /// or more elements.
-  ///
-  /// See [expand].
-  ImmortalList<R> flatMap<R>(ImmortalList<R> Function(T value) f) => expand(f);
-
-  /// Returns a new list expanding each element of this list into a list of zero
-  /// or more elements by applying [f] to each element and its respective index
-  /// and concatenating the resulting lists.
-  ///
-  /// See [expand].
-  ImmortalList<R> flatMapIndexed<R>(
-    ImmortalList<R> Function(int index, T value) f,
-  ) =>
-      expandIndexed(f);
-
   /// Returns a new list expanding each element of this list into an iterable of
   /// zero or more elements.
   ///
-  /// See [expandIterable].
-  ImmortalList<R> flatMapIterable<R>(Iterable<R> Function(T value) f) =>
-      expandIterable(f);
+  /// See [expand].
+  ImmortalList<R> flatMap<R>(Iterable<R> Function(T value) f) => expand(f);
 
   /// Returns a new list expanding each element of this list into an interable
   /// of zero or more elements by applying [f] to each element and its
   /// respective index and concatenating the resulting lists.
   ///
-  /// See [expandIterable].
-  ImmortalList<R> flatMapIterableIndexed<R>(
+  /// See [expand].
+  ImmortalList<R> flatMapIndexed<R>(
     Iterable<R> Function(int index, T value) f,
   ) =>
-      expandIterableIndexed(f);
-
-  /// Flattens a list of [ImmortalList]s by concatenating the values in
-  /// iteration order.
-  ///
-  /// If this list contains only instances of [ImmortalList<R>] the new list
-  /// will be created correctly, otherwise an exception is thrown.
-  ImmortalList<R> flatten<R>() => cast<ImmortalList<R>>().expand<R>(identity);
+      expandIndexed(f);
 
   /// Flattens a list of iterables by concatenating the values in iteration
   /// order.
@@ -548,11 +509,9 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// If this list contains only instances of [Iterable<R>] the new list will be
   /// created correctly, otherwise an exception is thrown.
   ///
-  /// See [flatten].
   /// The iterables are iterated over and must therefore not change during the
   /// iteration.
-  ImmortalList<R> flattenIterables<R>() =>
-      cast<Iterable<R>>().expandIterable<R>(identity);
+  ImmortalList<R> flatten<R>() => cast<Iterable<R>>().expand<R>(identity);
 
   /// Reduces the list to a single value by iteratively combining each element
   /// of this list with an existing value.
@@ -560,41 +519,32 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// Uses [initialValue] as the initial value, then iterates through the
   /// elements and updates the value with each element using the [combine]
   /// function, as if by:
-  ///
-  ///     var value = initialValue;
-  ///     for (E element in this) {
-  ///       value = combine(value, element);
-  ///     }
-  ///     return value;
-  ///
+  /// ```dart
+  /// var value = initialValue;
+  /// for (E element in this) {
+  ///   value = combine(value, element);
+  /// }
+  /// return value;
+  /// ```
   /// Example of calculating the sum of a list:
-  ///
-  ///     list.fold(0, (prev, element) => prev + element);
+  /// ```dart
+  /// list.fold(0, (prev, element) => prev + element);
+  /// ```
+  @override
   R fold<R>(R initialValue, R Function(R previousResult, T value) combine) =>
       _list.fold(initialValue, combine);
 
-  /// Returns a copy of this list concatenating [other].
-  ///
-  /// The returned list will contain the elements of this list followed by the
-  /// elements of [other].
-  ///
-  /// If [other] is empty, the list is returned unchanged.
-  ImmortalList<T> followedBy(ImmortalList<T> other) =>
-      followedByIterable(other.toMutableList());
-
   /// Returns a copy of this list concatenating [iterable].
   ///
-  /// See [followedBy].
-  /// It iterates over [iterable], which must therefore not change during the
-  /// iteration.
-  ImmortalList<T> followedByIterable(Iterable<T> iterable) => iterable.isEmpty
-      ? this
-      : ImmortalList.fromIterable(_list.followedBy(iterable));
+  /// See [addAll].
+  ImmortalList<T> followedBy(Iterable<T> iterable) => addAll(iterable);
 
-  /// Applies the function [f] to each element of this list.
+  /// Applies the function [f] to each element of this list in iteration order.
+  @override
   void forEach(void Function(T value) f) => _list.forEach(f);
 
-  /// Applies the function [f] to each element and its index of this list.
+  /// Applies the function [f] to each element and its index of this list in
+  /// iteration order.
   ///
   /// See [forEach].
   void forEachIndexed(void Function(int index, T value) f) => mapIndexed(f);
@@ -609,10 +559,11 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// If the resulting range covers the whole list, it is returned unchanged.
   ///
   /// Example:
-  ///
-  ///     final colors = ImmortalList(['red', 'green', 'blue', 'cyan', 'pink']);
-  ///     final range = colors.getRange(1, 4);
-  ///     range.join(', ');  // 'green, blue, cyan'
+  /// ```dart
+  /// final colors = ImmortalList(['red', 'green', 'blue', 'cyan', 'pink']);
+  /// final range = colors.getRange(1, 4);
+  /// range.join(', ');  // 'green, blue, cyan'
+  /// ```
   ImmortalList<T> getRange(int start, int end) => _withRange(
       start,
       end,
@@ -625,14 +576,15 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// Searches the list from index [start] to the end of the list.
   /// The first time an object [:o:] is encountered so that [:o == value:], the
   /// index of [:o:] is returned.
-  ///
-  ///     final notes = ImmortalList(['do', 're', 'mi', 're']);
-  ///     notes.indexOf('re');    // 1
-  ///     notes.indexOf('re', 2); // 3
-  ///
+  /// ```dart
+  /// final notes = ImmortalList(['do', 're', 'mi', 're']);
+  /// notes.indexOf('re');    // 1
+  /// notes.indexOf('re', 2); // 3
+  /// ```
   /// Returns -1 if [value] is not found.
-  ///
-  ///     notes.indexOf('fa');    // -1
+  /// ```dart
+  /// notes.indexOf('fa');    // -1
+  /// ```
   int indexOf(T value, [int start = 0]) => _list.indexOf(value, start);
 
   /// Returns the first index in the list that satisfies the given [predicate].
@@ -641,14 +593,15 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   ///
   /// The first time an object `o` is encountered so that `predicate(o)` is
   /// `true`, the index of `o` is returned.
-  ///
-  ///     final notes = ImmortalList(['do', 're', 'mi', 're']);
-  ///     notes.indexWhere((note) => note.startsWith('r'));    // 1
-  ///     notes.indexWhere((note) => note.startsWith('r'), 2); // 3
-  ///
+  /// ```dart
+  /// final notes = ImmortalList(['do', 're', 'mi', 're']);
+  /// notes.indexWhere((note) => note.startsWith('r'));    // 1
+  /// notes.indexWhere((note) => note.startsWith('r'), 2); // 3
+  /// ```
   /// Returns -1 if no element fulfilling [predicate] was found.
-  ///
-  ///     notes.indexWhere((note) => note.startsWith('k'));    // -1
+  /// ```dart
+  /// notes.indexWhere((note) => note.startsWith('k'));    // -1
+  /// ```
   int indexWhere(bool Function(T value) predicate, [int start = 0]) =>
       _list.indexWhere(predicate, start);
 
@@ -671,8 +624,8 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
         (list) => list..insert(_validIndexOrEnd(index), value),
       );
 
-  /// Returns a copy of this list where all objects of [other] are inserted at
-  /// position [index].
+  /// Returns a copy of this list where all objects of [iterable] are inserted
+  /// at position [index].
   ///
   /// All later objects are shifted towards the end of the list.
   ///
@@ -680,29 +633,31 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// i.e. to fulfill `0 <= index <= length`.
   ///
   /// This returned list might be longer than the original list.
-  /// The list is returned unchanged, if [other] is empty.
-  ImmortalList<T> insertAll(int index, ImmortalList<T> other) =>
-      insertIterable(index, other.toMutableList());
-
-  /// Returns a copy of this list where all objects of [iterable] are inserted
-  /// at position [index].
+  /// The list is returned unchanged if [iterable] is empty.
   ///
-  /// See [insertAll].
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> insertIterable(int index, Iterable<T> iterable) =>
-      _mutateAsListIf(
+  ImmortalList<T> insertAll(int index, Iterable<T> iterable) => _mutateAsListIf(
         iterable.isNotEmpty,
         (list) => list..insertAll(_validIndexOrEnd(index), iterable),
       );
 
   /// Returns `true` if there are no elements in this list.
+  @override
   bool get isEmpty => _list.isEmpty;
 
   /// Returns `true` if there is at least one element in this list.
+  @override
   bool get isNotEmpty => _list.isNotEmpty;
 
-  /// Returns a new `Iterator` that allows iterating the elements of this list.
+  /// Returns a new `Iterator` that allows iterating the elements of this list
+  /// in index order.
+  ///
+  /// Each time `iterator` is read, it returns a new iterator,
+  /// which can be used to iterate through all the elements again.
+  /// The iterators of the same list can be stepped through independently and
+  /// return the same elements in the same order.
+  @override
   Iterator<T> get iterator => _list.iterator;
 
   /// Converts each element to a [String] and concatenates the strings.
@@ -710,7 +665,16 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// Iterates through elements of this list, converts each one to a [String] by
   /// calling [Object.toString], and then concatenates the strings, with the
   /// [separator] string interleaved between the elements.
+  @override
   String join([String separator = '']) => _list.join(separator);
+
+  /// Returns the last element.
+  ///
+  /// Throws a [StateError] if this list is empty.
+  /// Otherwise returns the last element in the iteration order,
+  /// equivalent to `elementAt(length - 1)`.
+  @override
+  T get last => _list.last;
 
   /// Returns an [Optional] containing the last element of the list if the list
   /// is not empty, otherwise returns [Optional.empty].
@@ -721,7 +685,7 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// containing the `null` value as last element.
   /// Methods like [contains] or [length] can be used if the distinction is
   /// important.
-  Optional<T> get last => getValueIf(isNotEmpty, () => _list.last);
+  Optional<T> get lastAsOptional => getValueIf(isNotEmpty, () => _list.last);
 
   /// Returns the last index of [value] in this list.
   ///
@@ -730,14 +694,15 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   ///
   /// The first time an object [:o:] is encountered so that [:o == value:], the
   /// index of [:o:] is returned.
-  ///
-  ///     final notes = ImmortalList(['do', 're', 'mi', 're']);
-  ///     notes.lastIndexOf('re');    // 3
-  ///     notes.lastIndexOf('re', 2); // 1
-  ///
+  /// ```dart
+  /// final notes = ImmortalList(['do', 're', 'mi', 're']);
+  /// notes.lastIndexOf('re');    // 3
+  /// notes.lastIndexOf('re', 2); // 1
+  /// ```
   /// Returns -1 if [value] is not found.
-  ///
-  ///     notes.lastIndexOf('fa');    // -1
+  /// ```dart
+  /// notes.lastIndexOf('fa');    // -1
+  /// ```
   int lastIndexOf(T value, [int? start]) => _list.lastIndexOf(value, start);
 
   /// Returns the last index in the list that satisfies the given [predicate].
@@ -747,16 +712,28 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   ///
   /// The first time an object `o` is encountered so that `predicate(o)` is
   /// `true`, the index of `o` is returned.
-  ///
-  ///     final notes = ImmortalList(['do', 're', 'mi', 're']);
-  ///     notes.lastIndexWhere((note) => note.startsWith('r'));    // 3
-  ///     notes.lastIndexWhere((note) => note.startsWith('r'), 2); // 1
-  ///
+  /// ```dart
+  /// final notes = ImmortalList(['do', 're', 'mi', 're']);
+  /// notes.lastIndexWhere((note) => note.startsWith('r'));    // 3
+  /// notes.lastIndexWhere((note) => note.startsWith('r'), 2); // 1
+  /// ```
   /// Returns -1 if no element fulfilling [predicate] was found.
-  ///
-  ///     notes.lastIndexWhere((note) => note.startsWith('k'));    // -1
+  /// ```dart
+  /// notes.lastIndexWhere((note) => note.startsWith('k'));    // -1
+  /// ```
   int lastIndexWhere(bool Function(T value) predicate, [int? start]) =>
       _list.lastIndexWhere(predicate, start);
+
+  /// Returns the last element that satisfies the given predicate [predicate].
+  ///
+  /// Iterates through elements and returns the last one to satisfy [predicate].
+  ///
+  /// If no element satisfies [predicate], the result of invoking the [orElse]
+  /// function is returned.
+  /// If [orElse] is omitted, it defaults to throwing a [StateError].
+  @override
+  T lastWhere(bool Function(T value) predicate, {T Function()? orElse}) =>
+      _list.lastWhere(predicate, orElse: orElse);
 
   /// Returns an [Optional] containing the last element that satisfies the given
   /// [predicate], or [Optional.empty] if none was found.
@@ -770,7 +747,7 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// containing the `null` value satisfying the predicate.
   /// Methods like [contains] or [lastIndexWhere] can be used if the distinction
   /// is important.
-  Optional<T> lastWhere(bool Function(T value) predicate) {
+  Optional<T> lastWhereAsOptional(bool Function(T value) predicate) {
     try {
       return Optional.ofNullable(_list.lastWhere(predicate));
       // ignore: avoid_catching_errors
@@ -780,10 +757,12 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   }
 
   /// Returns the number of objects in this list.
+  @override
   int get length => _list.length;
 
   /// Returns a new list with elements that are created by calling [f] on each
   /// element of this list in iteration order.
+  @override
   ImmortalList<R> map<R>(R Function(T value) f) => ImmortalList(_list.map(f));
 
   /// Returns a new list with elements that are created by calling [f] on each
@@ -798,9 +777,9 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
 
   /// Returns a copy of this list concatenating [other].
   ///
-  /// See [followedBy].
+  /// See [addAll].
   @override
-  ImmortalList<T> merge(ImmortalList<T> other) => followedBy(other);
+  ImmortalList<T> merge(Iterable<T> other) => addAll(other);
 
   /// Returns a tuple of two new lists by splitting the list into two depending
   /// on the result of the given [predicate].
@@ -836,9 +815,32 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   ) =>
       setWhereIndexed(predicate, value);
 
+  /// Reduces the list to a single value by iteratively combining each element
+  /// of this list using the provided function [combine].
+  ///
+  /// The list must have at least one element.
+  /// If it has only one element, that element is returned.
+  ///
+  /// Otherwise this method starts with the first element from the iterator,
+  /// and then combines it with the remaining elements in iteration order,
+  /// as if by:
+  /// ```dart
+  /// E value = list.first;
+  /// list.skip(1).forEach((element) {
+  ///   value = combine(value, element);
+  /// });
+  /// return value;
+  /// ```
+  /// Example of calculating the sum of a list:
+  /// ```dart
+  /// list.reduce((value, element) => value + element);
+  /// ```
+  @override
+  T reduce(T Function(T value, T element) combine) => _list.reduce(combine);
+
   /// Returns a copy of this list where all occurrences of [element] are
   /// removed.
-  ImmortalList<T> remove(Object? element) => removeIterable([element]);
+  ImmortalList<T> remove(Object? element) => removeAll([element]);
 
   /// Returns a copy of this list where the first element is removed if the
   /// list is not empty.
@@ -855,12 +857,15 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   ImmortalList<T> removeFirstOccurrence(Object? element) =>
       _mutateAsListIf(contains(element), (list) => list..remove(element));
 
-  /// Returns a copy of this list where all values in [other] are removed from
-  /// if present.
+  /// Returns a copy of this list where all values in [iterable] are removed
+  /// from if present.
   ///
-  /// All occurrences of the values in [other] are removed.
-  ImmortalList<T> removeAll(ImmortalList<Object?> other) =>
-      removeIterable(other.toMutableList());
+  /// All occurrences of the values in [iterable] are removed.
+  ///
+  /// It iterates over [iterable], which must therefore not change during the
+  /// iteration.
+  ImmortalList<T> removeAll(Iterable<Object?> iterable) => _mutateAsListIf(
+      iterable.isNotEmpty, (list) => list..removeWhere(iterable.contains));
 
   /// Returns a copy of this list removing the object at position [index] if
   /// present.
@@ -873,15 +878,6 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// Empty lists are returned unchanged.
   ImmortalList<T> removeAt(int index) =>
       _mutateAsListIf(isNotEmpty, (list) => list..removeAt(_validIndex(index)));
-
-  /// Returns a copy of this list where all values in [iterable] are removed
-  /// from if present.
-  ///
-  /// See [removeAll].
-  /// It iterates over [iterable], which must therefore not change during the
-  /// iteration.
-  ImmortalList<T> removeIterable(Iterable<Object?> iterable) => _mutateAsListIf(
-      iterable.isNotEmpty, (list) => list..removeWhere(iterable.contains));
 
   /// Returns a copy of this list removing the last object if there is one,
   /// otherwise the list is returned unchanged.
@@ -924,10 +920,11 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// An object [:o:] satisfies [predicate] if [:predicate(o):] is `true`.
   ///
   /// Example:
-  ///
-  ///     final numbers = ImmortalList(['one', 'two', 'three', 'four']);
-  ///     final removed = numbers.removeWhere((item) => item.length == 3);
-  ///     removed.join(', '); // 'three, four'
+  /// ```dart
+  /// final numbers = ImmortalList(['one', 'two', 'three', 'four']);
+  /// final removed = numbers.removeWhere((item) => item.length == 3);
+  /// removed.join(', '); // 'three, four'
+  /// ```
   ImmortalList<T> removeWhere(bool Function(T value) predicate) =>
       _mutateAsList((list) => list..removeWhere(predicate));
 
@@ -939,38 +936,23 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
 
   /// Returns a copy of this list where all objects in the range [start]
   /// inclusive to [end] exclusive are removed from and replaced by the contents
-  /// of [other].
+  /// of [iterable].
   ///
   /// Example:
-  ///
-  ///     final list = ImmortalList([1, 2, 3, 4, 5]);
-  ///     final replaced = list.replaceRange(1, 4, ImmortalList([6, 7]));
-  ///     list.join(', '); // '1, 6, 7, 5'
-  ///
+  /// ```dart
+  /// final list = ImmortalList([1, 2, 3, 4, 5]);
+  /// final replaced = list.replaceRange(1, 4, ImmortalList([6, 7]));
+  /// list.join(', '); // '1, 6, 7, 5'
+  /// ```
   /// The provided range, given by [start] and [end], will be adjusted to fit
   /// inside the boundaries of the list if necessary, i.e. to fulfill
   /// `0 <= start <= end <= len`, where `len` is this list's [length].
   ///
   /// The resulting list might be longer than the original list.
-  ImmortalList<T> replaceRange(int start, int end, ImmortalList<T> other) =>
-      replaceRangeIterable(
-        start,
-        end,
-        other.toMutableList(),
-      );
-
-  /// Returns a copy of this list where all objects in the range [start]
-  /// inclusive to [end] exclusive are removed from and replaced by the contents
-  /// of [iterable].
   ///
-  /// See [replaceRange].
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> replaceRangeIterable(
-    int start,
-    int end,
-    Iterable<T> iterable,
-  ) =>
+  ImmortalList<T> replaceRange(int start, int end, Iterable<T> iterable) =>
       _withRange(
           start,
           end,
@@ -1004,10 +986,11 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// An object [:o:] satisfies [predicate] if [:predicate(o):] is `true`.
   ///
   /// Example:
-  ///
-  ///     final numbers = ImmortalList(['one', 'two', 'three', 'four']);
-  ///     final retained = numbers.retainWhere((item) => item.length == 3);
-  ///     retained.join(', '); // 'one, two'
+  /// ```dart
+  /// final numbers = ImmortalList(['one', 'two', 'three', 'four']);
+  /// final retained = numbers.retainWhere((item) => item.length == 3);
+  /// retained.join(', '); // 'one, two'
+  /// ```
   ImmortalList<T> retainWhere(bool Function(T value) predicate) =>
       _mutateAsList((list) => list..retainWhere(predicate));
 
@@ -1026,31 +1009,25 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
       _mutateAsListIf(isNotEmpty, (list) => list..[_validIndex(index)] = value);
 
   /// Returns a copy of this list replacing the objects starting at position
-  /// [index] with the objects of [other].
-  ///
-  /// Example:
-  ///
-  ///     final list = ImmortalList(['a', 'b', 'c']);
-  ///     final newList = list.setAll(1, ImmortalList(['bee', 'sea']));
-  ///     newList.join(', '); // 'a, bee, sea'
-  ///
-  /// The provided [index] is adjusted to fit inside the boundaries of the list,
-  /// i.e. to fulfill `0 <= index <= length`.
-  /// As the list [other] has to fit inside these boundaries as well, it will be
-  /// shortened as necessary, so that the resulting list will have the same
-  /// length as the original one.
-  ///
-  /// If [other] is empty, the list is returned unchanged.
-  ImmortalList<T> setAll(int index, ImmortalList<T> other) =>
-      setIterable(index, other.toMutableList());
-
-  /// Returns a copy of this list replacing the objects starting at position
   /// [index] with the objects of [iterable].
   ///
-  /// See [setAll].
+  /// Example:
+  /// ```dart
+  /// final list = ImmortalList(['a', 'b', 'c']);
+  /// final newList = list.setAll(1, ImmortalList(['bee', 'sea']));
+  /// newList.join(', '); // 'a, bee, sea'
+  /// ```
+  /// The provided [index] is adjusted to fit inside the boundaries of the list,
+  /// i.e. to fulfill `0 <= index <= length`.
+  /// As the list [iterable] has to fit inside these boundaries as well, it will
+  /// be shortened as necessary, so that the resulting list will have the same
+  /// length as the original one.
+  ///
+  /// If [iterable] is empty, the list is returned unchanged.
+  ///
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> setIterable(int index, Iterable<T> iterable) =>
+  ImmortalList<T> setAll(int index, Iterable<T> iterable) =>
       _mutateAsListIf(iterable.isNotEmpty, (list) {
         final validIndex = _validIndexOrEnd(index);
         return list
@@ -1061,49 +1038,32 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
       });
 
   /// Returns a copy of this list where the objects in the range [start]
-  /// inclusive to [end] exclusive are replaced by the objects of [other] while
-  /// skipping [skipCount] objects first.
-  ///
-  /// Example:
-  ///
-  ///     final list1 = ImmortalList([1, 2, 3, 4]);
-  ///     final list2 = ImmortalList([5, 6, 7, 8, 9]);
-  ///     // Copies the 4th and 5th items in list2 as the 2nd and 3rd items
-  ///     // of list1.
-  ///     final newList = list1.setRange(1, 3, list2, 3);
-  ///     newList.join(', '); // '1, 8, 9, 4'
-  ///
-  /// The provided range, given by [start] and [end], will be adjusted to fit
-  /// inside the boundaries of the list if necessary, i.e. to fulfill
-  /// `0 <= start <= end <= len`, where `len` is this list's [length].
-  /// If the list [other] is not long enough to fill the range, the range will
-  /// be shortened accordingly.
-  ///
-  /// If the resulting range or [other] is empty, the list is returned
-  /// unchanged.
-  ///
-  /// The resulting list will have the same length as the original list.
-  ImmortalList<T> setRange(
-    int start,
-    int end,
-    ImmortalList<T> other, [
-    int skipCount = 0,
-  ]) =>
-      setRangeIterable(
-        start,
-        end,
-        other.toMutableList(),
-        skipCount,
-      );
-
-  /// Returns a copy of this list where the objects in the range [start]
   /// inclusive to [end] exclusive are replaced by the objects of [iterable]
   /// while skipping [skipCount] objects first.
   ///
-  /// See [setRange].
+  /// Example:
+  /// ```dart
+  /// final list1 = ImmortalList([1, 2, 3, 4]);
+  /// final list2 = ImmortalList([5, 6, 7, 8, 9]);
+  /// // Copies the 4th and 5th items in list2 as the 2nd and 3rd
+  /// // items of list1.
+  /// final newList = list1.setRange(1, 3, list2, 3);
+  /// newList.join(', '); // '1, 8, 9, 4'
+  /// ```
+  /// The provided range, given by [start] and [end], will be adjusted to fit
+  /// inside the boundaries of the list if necessary, i.e. to fulfill
+  /// `0 <= start <= end <= len`, where `len` is this list's [length].
+  /// If the list [iterable] is not long enough to fill the range, the range
+  /// will be shortened accordingly.
+  ///
+  /// If the resulting range or [iterable] is empty, the list is returned
+  /// unchanged.
+  ///
+  /// The resulting list will have the same length as the original list.
+  ///
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<T> setRangeIterable(
+  ImmortalList<T> setRange(
     int start,
     int end,
     Iterable<T> iterable, [
@@ -1142,6 +1102,12 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   ImmortalList<T> shuffle([Random? random]) =>
       _mutateAsList((list) => list..shuffle(random));
 
+  /// Checks that this list has only one element, and returns that element.
+  ///
+  /// Throws a [StateError] if this list is empty or has more than one element.
+  @override
+  T get single => _list.single;
+
   /// Returns an [Optional] containing the only element of this list if it has
   /// exactly one element, otherwise returns [Optional.empty].
   ///
@@ -1149,7 +1115,19 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// containing the `null` value as only element.
   /// Methods like [contains] or [length] can be used if the distinction is
   /// important.
-  Optional<T> get single => getValueIf(length == 1, () => _list.single);
+  Optional<T> get singleAsOptional =>
+      getValueIf(length == 1, () => _list.single);
+
+  /// Returns the single element of this list that satisfies [predicate].
+  ///
+  /// Checks elements to see if `predicate(element)` returns true.
+  /// If exactly one element satisfies [predicate], that element is returned.
+  /// If more than one matching element is found, throws [StateError].
+  /// If no matching element is found, returns the result of [orElse].
+  /// If [orElse] is omitted, it defaults to throwing a [StateError].
+  @override
+  T singleWhere(bool Function(T value) predicate, {T Function()? orElse}) =>
+      _list.singleWhere(predicate, orElse: orElse);
 
   /// Returns an [Optional] containing the only element satisfying the given
   /// [predicate] if there is exactly one, otherwise returns [Optional.empty].
@@ -1164,7 +1142,7 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// distinguish between not having exactly one element satisfying the
   /// predicate and containing only the `null` value satisfying the predicate.
   /// Methods like [contains] can be used if the distinction is important.
-  Optional<T> singleWhere(bool Function(T value) predicate) {
+  Optional<T> singleWhereAsOptional(bool Function(T value) predicate) {
     try {
       return Optional.ofNullable(_list.singleWhere(predicate));
       // ignore: avoid_catching_errors
@@ -1182,6 +1160,7 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// empty.
   ///
   /// If the passed [count] is zero or negative, the list is returned unchanged.
+  @override
   ImmortalList<T> skip(int count) =>
       count <= 0 ? this : ImmortalList(_list.skip(count));
 
@@ -1194,6 +1173,7 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// otherwise it iterates the remaining elements in their original order,
   /// starting with the first element for which `predicate(element)` returns
   /// `false`.
+  @override
   ImmortalList<T> skipWhile(bool Function(T value) predicate) =>
       ImmortalList(_list.skipWhile(predicate));
 
@@ -1201,38 +1181,39 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// specified by the [compare] function.
   ///
   /// The [compare] function must act as a [Comparator].
-  ///
-  ///     final numbers = ImmortalList(['two', 'three', 'four']);
-  ///     // Sort from shortest to longest.
-  ///     final sorted = numbers.sort((a, b) => a.length.compareTo(b.length));
-  ///     print(sorted);  // Immortal[two, four, three]
-  ///
+  /// ```dart
+  /// final numbers = ImmortalList(['two', 'three', 'four']);
+  /// // Sort from shortest to longest.
+  /// final sorted = numbers.sort((a, b) => a.length.compareTo(b.length));
+  /// print(sorted);  // Immortal[two, four, three]
+  /// ```
   /// If [compare] is omitted, [Comparable.compare] is used.
-  ///
-  ///     final nums = ImmortalList([13, 2, -11]);
-  ///     final sorted = nums.sort();
-  ///     print(sorted);  // [-11, 2, 13]
-  ///
+  /// ```dart
+  /// final nums = ImmortalList([13, 2, -11]);
+  /// final sorted = nums.sort();
+  /// print(sorted);  // [-11, 2, 13]
+  /// ```
   /// A [Comparator] may compare objects as equal (return zero), even if they
   /// are distinct objects.
   /// The sort function is not guaranteed to be stable, so distinct objects that
   /// compare as equal may occur in any order in the result:
-  ///
-  ///     final numbers = ImmortalList(['one', 'two', 'three', 'four']);
-  ///     final sorted = numbers.sort((a, b) => a.length.compareTo(b.length));
-  ///     print(sorted);  // [one, two, four, three] OR [two, one, four, three]
+  /// ```dart
+  /// final numbers = ImmortalList(['one', 'two', 'three', 'four']);
+  /// final sorted = numbers.sort((a, b) => a.length.compareTo(b.length));
+  /// print(sorted);  // [one, two, four, three] OR [two, one, four, three]
+  /// ```
   ImmortalList<T> sort([int Function(T value, T otherValue)? compare]) =>
       _mutateAsList((list) => list..sort(compare));
 
   /// Returns a copy of this containing all elements between [start] and [end].
-  ///
-  ///     final colors = ImmortalList(['red', 'green', 'blue', 'orange']);
-  ///     print(colors.sublist(1, 3)); // Immortal[green, blue]
-  ///
+  /// ```dart
+  /// final colors = ImmortalList(['red', 'green', 'blue', 'orange']);
+  /// print(colors.sublist(1, 3)); // Immortal[green, blue]
+  /// ```
   /// If [end] is omitted, it defaults to the [length] of this list.
-  ///
-  ///      print(colors.sublist(1)); // Immortal[green, blue, orange]
-  ///
+  /// ```dart
+  /// print(colors.sublist(1)); // Immortal[green, blue, orange]
+  /// ```
   /// The provided range, given by [start] and [end], will be adjusted to fit
   /// inside the boundaries of the list if necessary, i.e. to fulfill
   /// `0 <= start <= end <= len`, where `len` is this list's [length].
@@ -1248,19 +1229,21 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
 
   /// Returns a copy of this list containing the [count] first elements.
   ///
-  /// The returned list may contain fewer than [count] elements, if this list
+  /// The returned list may contain fewer than [count] elements if this list
   /// contains fewer than [count] elements.
   ///
-  /// Returns an empty list, if [count] is zero or negative.
+  /// Returns an empty list if [count] is zero or negative.
   ///
   /// If [count] is equal to or grater than the list's length, the list is
   /// returned unchanged.
+  @override
   ImmortalList<T> take(int count) => count >= length
       ? this
       : ImmortalList(count <= 0 ? <T>[] : _list.take(count));
 
   /// Returns a copy of this list containing the leading elements satisfying the
   /// given [predicate].
+  @override
   ImmortalList<T> takeWhile(bool Function(T value) predicate) =>
       ImmortalList(_list.takeWhile(predicate));
 
@@ -1268,16 +1251,29 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   ///
   /// The elements are in iteration order.
   /// The list is fixed-length if [growable] is `false`.
-  List<T> toMutableList({bool growable = true}) =>
-      _list.toList(growable: growable);
+  @override
+  List<T> toList({bool growable = true}) => _list.toList(growable: growable);
 
   /// Creates an [ImmortalSet] containing the same elements as this list.
   ///
   /// The set may contain fewer elements than this list if the list contains an
-  /// element more than once, or it contains on ore more elements that are equal
-  /// in respect to the `==` opeator.
-  ImmortalSet<T> toSet() => ImmortalSet(_list.toSet());
+  /// element more than once, or it contains one or more elements that are equal
+  /// in respect to the `==` operator.
+  ImmortalSet<T> toImmortalSet() => ImmortalSet(_list.toSet());
 
+  /// Creates a mutable [Set] containing the same elements as this list.
+  ///
+  /// The set may contain fewer elements than this list if the list contains an
+  /// element more than once, or it contains one or more elements that are equal
+  /// in respect to the `==` operator.
+  /// The order of the elements in the set is not guaranteed to be the same
+  /// as for the iterable.
+  @override
+  Set<T> toSet() => _list.toSet();
+
+  /// A string representation of this object.
+  ///
+  /// See [Object.toString].
   @override
   String toString() => 'Immortal${_list.toString()}';
 
@@ -1288,7 +1284,7 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   /// unchanged.
   /// The resulting list will have the same length as the original list.
   ImmortalList<T> updateAt(int index, T Function(T value) update) =>
-      elementAt(index)
+      elementAtAsOptional(index)
           .map(
             (value) => set(index, update(value)),
           )
@@ -1318,6 +1314,7 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   ///
   /// The matching elements have the same order in the returned list as they
   /// have in [iterator].
+  @override
   ImmortalList<T> where(bool Function(T value) predicate) =>
       ImmortalList(_list.where(predicate));
 
@@ -1332,28 +1329,23 @@ class ImmortalList<T> implements DeeplyComparable, Mergeable<ImmortalList<T>> {
   ///
   /// The matching elements have the same order in the returned list as they
   /// have in [iterator].
+  @override
   ImmortalList<R> whereType<R>() => ImmortalList(_list.whereType<R>());
-
-  /// Returns a new list consisting of tuples with elements from this list and
-  /// [other].
-  ///
-  /// The element at index `i` of the resulting list will consist of the
-  /// elements at index `i` from this list and [other].
-  /// If this list and [other] have different lengths, the iteration will stop
-  /// at the length of the shorter one, so that there are always two values for
-  /// building the tuples.
-  ImmortalList<Tuple2<T, R>> zip<R>(ImmortalList<R> other) =>
-      take(other.length).mapIndexed((index, value) => Tuple2<T, R>(
-            elementAt(index).value,
-            other.elementAt(index).value,
-          ));
 
   /// Returns a new list consisting of tuples with elements from this list and
   /// the [iterable].
   ///
-  /// See [zip].
+  /// The element at index `i` of the resulting list will consist of the
+  /// elements at index `i` from this list and [iterable].
+  /// If this list and [iterable] have different lengths, the iteration will
+  /// stop at the length of the shorter one, so that there are always two
+  /// values for building the tuples.
+  ///
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
-  ImmortalList<Tuple2<T, R>> zipIterable<R>(Iterable<R> iterable) =>
-      zip(ImmortalList._internal(iterable));
+  ImmortalList<Tuple2<T, R>> zip<R>(Iterable<R> iterable) =>
+      take(iterable.length).mapIndexed((index, value) => Tuple2<T, R>(
+            elementAt(index),
+            iterable.elementAt(index),
+          ));
 }

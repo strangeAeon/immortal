@@ -46,15 +46,10 @@ class ImmortalMap<K, V>
   ///
   /// If multiple [entries] have the same key, later occurrences overwrite the
   /// earlier ones.
-  factory ImmortalMap.fromEntries(ImmortalList<MapEntry<K, V>> entries) =>
-      ImmortalMap.fromEntriesIterable(entries.toMutableList());
-
-  /// Creates an [ImmortalMap] instance that contains all [entries].
   ///
-  /// See [ImmortalMap.fromEntries].
   /// It iterates over [entries], which must therefore not change during the
   /// iteration.
-  factory ImmortalMap.fromEntriesIterable(Iterable<MapEntry<K, V>> entries) =>
+  factory ImmortalMap.fromEntries(Iterable<MapEntry<K, V>> entries) =>
       ImmortalMap._internal(Map.fromEntries(entries));
 
   /// Creates an [ImmortalMap] by associating the given [keys] to [values].
@@ -62,8 +57,8 @@ class ImmortalMap<K, V>
   /// This constructor iterates over [keys] and [values] and maps each element
   /// of [keys] to the corresponding element of [values].
   ///
-  /// If the two lists have different lengths, the iteration will stop at the
-  /// length of the shorter one, so that there are always complete key/value
+  /// If the two iterables have different lengths, the iteration will stop at
+  /// the length of the shorter one, so that there are always complete key/value
   /// pairs.
   ///
   /// If [keys] contains the same object multiple times, later occurrences
@@ -71,15 +66,7 @@ class ImmortalMap<K, V>
   ///
   /// All [keys] are required to implement compatible `operator==` and
   /// `hashCode`.
-  factory ImmortalMap.fromLists(ImmortalList<K> keys, ImmortalList<V> values) =>
-      ImmortalMap.fromIterables(
-        keys.toMutableList(),
-        values.toMutableList(),
-      );
-
-  /// Creates an [ImmortalMap] by associating the given [keys] to [values].
   ///
-  /// See [ImmortalMap.fromLists].
   /// It iterates over [keys] and [values], which must therefore not change
   /// during the iteration.
   factory ImmortalMap.fromIterables(Iterable<K> keys, Iterable<V> values) =>
@@ -87,6 +74,11 @@ class ImmortalMap<K, V>
         keys.take(values.length),
         values.take(keys.length),
       ));
+
+  /// Creates an [ImmortalMap] containing all entries of [other].
+  ///
+  /// See [ImmortalMap.ofMap].
+  factory ImmortalMap.fromMap(Map<K, V> other) => ImmortalMap(other);
 
   /// Creates an [ImmortalMap] instance that contains all [pairs] as entries.
   ///
@@ -96,21 +88,11 @@ class ImmortalMap<K, V>
   ///
   /// If multiple [pairs] have the same key, later occurrences overwrite the
   /// earlier ones.
-  factory ImmortalMap.fromPairs(ImmortalList<Tuple2<K, V>> pairs) =>
-      ImmortalMap.fromPairsIterable(pairs.toMutableList());
-
-  /// Creates an [ImmortalMap] instance that contains all [pairs] as entries.
   ///
-  /// See [ImmortalMap.fromPairs].
   /// It iterates over [pairs], which must therefore not change during the
   /// iteration.
-  factory ImmortalMap.fromPairsIterable(Iterable<Tuple2<K, V>> pairs) =>
-      ImmortalMap<K, V>().addPairsIterable(pairs);
-
-  /// Creates an [ImmortalMap] containing all entries of [other].
-  ///
-  /// See [ImmortalMap.ofMutable].
-  factory ImmortalMap.fromMutable(Map<K, V> other) => ImmortalMap(other);
+  factory ImmortalMap.fromPairs(Iterable<Tuple2<K, V>> pairs) =>
+      ImmortalMap<K, V>().addPairs(pairs);
 
   /// Creates an [ImmortalMap] as copy of [other].
   ///
@@ -127,7 +109,7 @@ class ImmortalMap<K, V>
   /// during the iteration.
   ///
   /// All keys are required to implement compatible `operator==` and `hashCode`.
-  factory ImmortalMap.ofMutable(Map<K, V> other) => ImmortalMap(other);
+  factory ImmortalMap.ofMap(Map<K, V> other) => ImmortalMap(other);
 
   /// Returns a copy of [other] casting all keys to instances of [K2] and all
   /// values to instances of [V2].
@@ -144,34 +126,21 @@ class ImmortalMap<K, V>
   ///
   /// It iterates over the entries of [other], which must therefore not change
   /// during the iteration.
-  static ImmortalMap<K2, V2> castFromMutable<K, V, K2, V2>(Map<K, V> other) =>
+  static ImmortalMap<K2, V2> castFromMap<K, V, K2, V2>(Map<K, V> other) =>
       ImmortalMap(other.cast<K2, V2>());
-
-  /// Creates an [ImmortalMap] by computing the keys and values from [list].
-  ///
-  /// For each element of [list] this constructor computes a key/value pair by
-  /// applying [keyGenerator] and [valueGenerator] respectively.
-  /// If no values are specified for [keyGenerator] and [valueGenerator] the
-  /// default is the identity function.
-  ///
-  /// The keys computed by the source [list] do not need to be unique. The last
-  /// occurrence of a key will simply overwrite any previous value.
-  ///
-  /// All keys are required to implement compatible `operator==` and `hashCode`.
-  static ImmortalMap<K, V> fromList<K, V>(
-    ImmortalList<dynamic> list, {
-    K Function(dynamic value)? keyGenerator,
-    V Function(dynamic value)? valueGenerator,
-  }) =>
-      ImmortalMap.fromIterable(
-        list.toMutableList(),
-        keyGenerator: keyGenerator,
-        valueGenerator: valueGenerator,
-      );
 
   /// Creates an [ImmortalMap] by computing the keys and values from [iterable].
   ///
-  /// See [ImmortalMap.fromList].
+  /// For each element of [iterable] this constructor computes a key/value pair
+  /// by applying [keyGenerator] and [valueGenerator] respectively.
+  /// If no values are specified for [keyGenerator] and [valueGenerator] the
+  /// default is the identity function.
+  ///
+  /// The keys computed by the source [iterable] do not need to be unique. The
+  /// last occurrence of a key will simply overwrite any previous value.
+  ///
+  /// All keys are required to implement compatible `operator==` and `hashCode`.
+  ///
   /// It iterates over [iterable], which must therefore not change during the
   /// iteration.
   static ImmortalMap<K, V> fromIterable<K, V>(
@@ -188,7 +157,7 @@ class ImmortalMap<K, V>
   final Map<K, V> _map;
 
   ImmortalMap<K, V> _mutateAsMap(Map<K, V> Function(Map<K, V>) f) =>
-      ImmortalMap._internal(f(toMutableMap()));
+      ImmortalMap._internal(f(toMap()));
 
   ImmortalMap<K, V> _mutateAsMapIf(
     bool condition,
@@ -219,8 +188,7 @@ class ImmortalMap<K, V>
   /// the copy.
   ///
   /// If [other] is empty, the map is returned unchanged.
-  ImmortalMap<K, V> addAll(ImmortalMap<K, V> other) =>
-      addMap(other.toMutableMap());
+  ImmortalMap<K, V> addAll(ImmortalMap<K, V> other) => addMap(other.toMap());
 
   /// Returns a copy of this map where all key/value pairs of [entries] are
   /// added.
@@ -229,24 +197,17 @@ class ImmortalMap<K, V>
   /// value is overwritten.
   ///
   /// If [entries] is empty, the map is returned unchanged.
-  ImmortalMap<K, V> addEntries(ImmortalList<MapEntry<K, V>> entries) =>
-      addEntriesIterable(entries.toMutableList());
-
-  /// Returns a copy of this map where all key/value pairs of the iterable
-  /// [entries] are added.
   ///
-  /// See [addEntries].
   /// It iterates over [entries], which must therefore not change during the
   /// iteration.
-  ImmortalMap<K, V> addEntriesIterable(Iterable<MapEntry<K, V>> entries) =>
+  ImmortalMap<K, V> addEntries(Iterable<MapEntry<K, V>> entries) =>
       _mutateAsMapIf(entries.isNotEmpty, (map) => map..addEntries(entries));
 
   /// Returns a copy of this map where the key/value pair [entry] is added.
   ///
   /// If the key of [entry] is already present in the copy, the corresponding
   /// value is overwritten.
-  ImmortalMap<K, V> addEntry(MapEntry<K, V> entry) =>
-      addEntriesIterable([entry]);
+  ImmortalMap<K, V> addEntry(MapEntry<K, V> entry) => addEntries([entry]);
 
   /// Returns a copy of this map where the key/value pair [entry] is added if no
   /// entry for [entry.key] is already present.
@@ -286,17 +247,11 @@ class ImmortalMap<K, V>
   /// overwritten.
   ///
   /// If [pairs] is empty, the map is returned unchanged.
-  ImmortalMap<K, V> addPairs(ImmortalList<Tuple2<K, V>> pairs) =>
-      addPairsIterable(pairs.toMutableList());
-
-  /// Returns a copy of this map where all elements of [pairs] are added as new
-  /// map entries.
   ///
-  /// See [addPairs].
   /// It iterates over [pairs], which must therefore not change during the
   /// iteration.
-  ImmortalMap<K, V> addPairsIterable(Iterable<Tuple2<K, V>> pairs) =>
-      addEntriesIterable(pairs.map(
+  ImmortalMap<K, V> addPairs(Iterable<Tuple2<K, V>> pairs) =>
+      addEntries(pairs.map(
         (pair) => MapEntry(pair.item1, pair.item2),
       ));
 
@@ -346,10 +301,9 @@ class ImmortalMap<K, V>
 
   /// Checks whether this map is equal to [other].
   ///
-  /// First an identity check is performed, using [ImmortalMap.==]. If this
-  /// fails, it is checked if [other] is an [ImmortalMap] and all contained
-  /// entries of the two maps are compared using the `==` operators for keys
-  /// and values.
+  /// First an identity check is performed, using [operator ==]. If this fails,
+  /// it is checked if [other] is an [ImmortalMap] and all contained entries of
+  /// the two maps are compared using the `==` operators for keys and values.
   ///
   /// To solely test if two maps are identical, the operator `==` can be used.
   @override
@@ -422,10 +376,8 @@ class ImmortalMap<K, V>
   /// created correctly, otherwise an exception is thrown.
   ///
   /// See [flatten].
-  ImmortalMap<K2, V2> flattenMutables<K2, V2>() =>
-      ImmortalMap.fromEntries(cast<K, Map<K2, V2>>()
-          .mapEntries((_, map) => map.entries)
-          .flattenIterables());
+  ImmortalMap<K2, V2> flattenMaps<K2, V2>() => ImmortalMap.fromEntries(
+      cast<K, Map<K2, V2>>().mapEntries((_, map) => map.entries).flatten());
 
   /// Applies [f] to each key/value pair of the map.
   void forEach(void Function(K key, V value) f) => _map.forEach(f);
@@ -557,14 +509,15 @@ class ImmortalMap<K, V>
   /// new value and [key] is associated to that value in the copied map.
   ///
   /// Example:
-  ///
-  ///     var scores = ImmortalMap({'Bob': 36});
-  ///     for (var key in ['Bob', 'Rohan', 'Sophena']) {
-  ///       scores = scores.addIfAbsent(key, () => key.length);
-  ///     }
-  ///     scores['Bob'];      // 36
-  ///     scores['Rohan'];    //  5
-  ///     scores['Sophena'];  //  7
+  /// ```dart
+  /// var scores = ImmortalMap({'Bob': 36});
+  /// for (var key in ['Bob', 'Rohan', 'Sophena']) {
+  ///   scores = scores.addIfAbsent(key, () => key.length);
+  /// }
+  /// scores['Bob'];      // 36
+  /// scores['Rohan'];    //  5
+  /// scores['Sophena'];  //  7
+  /// ```
   ImmortalMap<K, V> putIfAbsent(K key, V Function() ifAbsent) =>
       _mutateAsMap((map) => map..putIfAbsent(key, ifAbsent));
 
@@ -602,16 +555,10 @@ class ImmortalMap<K, V>
 
   /// Returns a copy of this map where all entries with a value contained in
   /// [valuesToRemove] are removed from.
-  ImmortalMap<K, V> removeValues(ImmortalList<Object?> valuesToRemove) =>
-      removeWhereValue(valuesToRemove.contains);
-
-  /// Returns a copy of this map where all entries with a value contained in the
-  /// iterable [valuesToRemove] are removed from.
   ///
-  /// See [removeValues].
   /// It iterates over [valuesToRemove], which must therefore not change during
   /// the iteration.
-  ImmortalMap<K, V> removeValuesIterable(Iterable<Object?> valuesToRemove) =>
+  ImmortalMap<K, V> removeValues(Iterable<Object?> valuesToRemove) =>
       removeWhereValue(valuesToRemove.contains);
 
   /// Returns a copy of this map where all entries that satisfy the given
@@ -701,7 +648,7 @@ class ImmortalMap<K, V>
 
   /// Returns an [Optional] containing the only entry of this map if it has
   /// exactly one key/value pair, otherwise returns [Optional.empty].
-  Optional<MapEntry<K, V>> get single => entries.single;
+  Optional<MapEntry<K, V>> get single => entries.singleAsOptional;
 
   /// Returns an [Optional] containing the only key in this map if it has
   /// exactly one key/value pair, otherwise returns [Optional.empty].
@@ -742,7 +689,7 @@ class ImmortalMap<K, V>
 
   /// Returns a mutable [LinkedHashMap] containing all key/value pairs of this
   /// map.
-  Map<K, V> toMutableMap() => Map.from(_map);
+  Map<K, V> toMap() => Map.from(_map);
 
   @override
   String toString() => 'Immortal${_map.toString()}';
