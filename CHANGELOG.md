@@ -1,3 +1,12 @@
+## 2.1.2-nullsafety
+
+* Update dependencies:
+  * optional: ^6.0.0-nullsafety.0
+  * tuple: ^2.0.0
+* Update dev dependencies:
+  * effective_dart: ^1.3.1
+  * test: ^1.16.8
+
 ## 2.1.1
 
 * Update dependencies:
