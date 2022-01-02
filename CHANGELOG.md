@@ -1,3 +1,11 @@
+## 3.0.0
+
+* Update dependencies:
+  * optional: ^6.1.0
+* Update dev dependencies:
+  * effective_dart: ^1.3.2
+  * test: ^1.20.1
+
 ## 3.0.0-nullsafety
 
 * Extend `ImmortalList` to implement `Iterable`

@@ -15,7 +15,7 @@ Add `immortal` as dependency in your `pubspec.yaml`:
 ```yaml
 dependencies:
   ...
-  immortal: ^2.1.1
+  immortal: ^3.0.0
 ```
 
 Import `immortal`:
