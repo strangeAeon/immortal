@@ -1,7 +1,6 @@
+import 'package:immortal/src/utils.dart' as utils;
 import 'package:optional/optional.dart';
 import 'package:test/test.dart';
-
-import 'package:immortal/src/utils.dart' as utils;
 
 import 'test_data.dart';
 

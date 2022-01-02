@@ -1,8 +1,8 @@
+import 'package:immortal/immortal.dart';
 import 'package:immortal/src/utils.dart';
 import 'package:optional/optional_internal.dart';
 import 'package:test/test.dart';
 
-import 'package:immortal/immortal.dart';
 import 'package:tuple/tuple.dart';
 
 import 'test_data.dart';
