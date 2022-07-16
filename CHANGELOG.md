@@ -1,3 +1,12 @@
+# CHANGELOG
+
+## 3.1.0
+
+* Extend list functionality:
+  * methods: `filterMap`, `filterMapOptional`, `whereMap`, `whereMapOptional`
+* Update dev dependencies:
+  * test: ^1.21.4
+
 ## 3.0.0
 
 * Update dependencies:
