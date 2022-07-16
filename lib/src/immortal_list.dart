@@ -429,6 +429,19 @@ class ImmortalList<T>
   ImmortalList<T> filterIndexed(bool Function(int index, T value) predicate) =>
       whereIndexed(predicate);
 
+  /// Returns a new list with elements that are created by calling [f] on each
+  /// element of this list in iteration order and filters out `null` values.
+  ///
+  /// See [whereMap].
+  ImmortalList<R> filterMap<R>(R? Function(T value) f) => whereMap(f);
+
+  /// Returns a new list with elements that are created by calling [f] on each
+  /// element of this list in iteration order and filters out empty optionals.
+  ///
+  /// See [whereMapOptional].
+  ImmortalList<R> filterMapOptional<R>(Optional<R> Function(T value) f) =>
+      whereMapOptional(f);
+
   /// Returns a new list with all elements of this list that have type [R].
   ///
   /// See [whereType].
@@ -1324,6 +1337,16 @@ class ImmortalList<T>
   /// See [where].
   ImmortalList<T> whereIndexed(bool Function(int index, T value) predicate) =>
       asMap().where(predicate).values;
+
+  /// Returns a new list with elements that are created by calling [f] on each
+  /// element of this list in iteration order and filters out `null` values.
+  ImmortalList<R> whereMap<R>(R? Function(T value) f) =>
+      ImmortalList(_list.map(f).where(nonNull).cast<R>());
+
+  /// Returns a new list with elements that are created by calling [f] on each
+  /// element of this list in iteration order and filters out empty optionals.
+  ImmortalList<R> whereMapOptional<R>(Optional<R> Function(T value) f) =>
+      whereMap((value) => f(value).orElseNull);
 
   /// Returns a new list with all elements of this list that have type [R].
   ///

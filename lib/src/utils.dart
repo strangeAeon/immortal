@@ -35,3 +35,9 @@ Optional<T> getValueIf<T>(
   T Function() getValue,
 ) =>
     condition ? Optional.ofNullable(getValue()) : const Optional.empty();
+
+/// Helper function that checks if a nullable value is null.
+bool nonNull<T>(T? value) => value != null;
+
+/// Helper function that checks if an optional is not an [Optional.empty].
+bool nonEmptyOptional<T>(Optional<T> optional) => optional.isPresent;

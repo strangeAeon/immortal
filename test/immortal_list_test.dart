@@ -310,6 +310,46 @@ void main() {
     expectCollection(list123.whereIndexed(matchingAll), list123);
   });
 
+  test('should apply function to each element return non null results', () {
+    expectCollection(list123.filterMap(identity), list123);
+    expectCollection(
+      list123.filterMap((value) => value.isOdd ? value : null),
+      list13,
+    );
+    expectCollection(list123.filterMap<int?>(yields1(null)), emptyList);
+    expectCollection(list123.whereMap(identity), list123);
+    expectCollection(
+      list123.whereMap((value) => value.isOdd ? value : null),
+      list13,
+    );
+    expectCollection(list123.whereMap<int?>(yields1(null)), emptyList);
+  });
+
+  test('should apply function to each element return non empty values', () {
+    Optional<int> optionalIdentity(value) => Optional.of(value);
+
+    expectCollection(list123.filterMapOptional(optionalIdentity), list123);
+    expectCollection(
+      list123.filterMapOptional(
+          (value) => Optional.ofNullable(value.isOdd ? value : null)),
+      list13,
+    );
+    expectCollection(
+      list123.filterMapOptional(yields1(Optional.empty())),
+      emptyList,
+    );
+    expectCollection(list123.whereMapOptional(optionalIdentity), list123);
+    expectCollection(
+      list123.whereMapOptional(
+          (value) => Optional.ofNullable(value.isOdd ? value : null)),
+      list13,
+    );
+    expectCollection(
+      list123.whereMapOptional(yields1(Optional.empty())),
+      emptyList,
+    );
+  });
+
   test('should return elements of a type', () {
     final emptyStringList = ImmortalList<String>();
     expectCollection(ImmortalList([1, '1', '2']).filterType<int>(), list1);
